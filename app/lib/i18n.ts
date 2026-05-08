@@ -216,6 +216,7 @@ raw.fontCustom = T("Custom", { "zh-CN": "自定义", "zh-TW": "自訂", ja: "カ
 
 // Placeholders
 raw.stCustomFontPlaceholder = T("Enter font name...", { "zh-CN": "输入字体名称...", "zh-TW": "輸入字體名稱...", ja: "フォント名を入力...", ko: "폰트 이름 입력...", fr: "Entrez le nom de la police...", de: "Schriftartname eingeben...", es: "Introduzca el nombre de la fuente...", ru: "Введите название шрифта...", pt: "Digite o nome da fonte..." });
+raw.stApiPlaceholder = T("https://api.example.com", { "zh-CN": "https://api.example.com", "zh-TW": "https://api.example.com", ja: "https://api.example.com", ko: "https://api.example.com", fr: "https://api.example.com", de: "https://api.example.com", es: "https://api.example.com", ru: "https://api.example.com", pt: "https://api.example.com" });
 
 // Accessibility labels
 raw.ariaSettings = T("Settings", { "zh-CN": "设置", "zh-TW": "設定", ja: "設定", ko: "설정", fr: "Paramètres", de: "Einstellungen", es: "Configuración", ru: "Настройки", pt: "Configurações" });

@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "1.4.0",
+    date: "2026-05-08",
+    title: "Games Hub Visuals + i18n Polish",
+    items: [
+      "Added game preview images to all three game cards on the Games Hub page.",
+      "Fixed remaining untranslated placeholder in API settings tab.",
+      "Verified complete i18n coverage across homepage, games page, settings modal, and all 10 settings tabs.",
+      "All 20 interface languages, aria-labels, and dynamic html lang attribute confirmed working.",
+    ],
+  },
+  {
     version: "1.2.3",
     date: "2026-05-08",
     title: "Full i18n Translation System",

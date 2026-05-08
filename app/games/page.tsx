@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useEffect } from "react";
 import { useTranslation } from "../hooks/useTranslation";
@@ -10,19 +11,22 @@ const games = [
     title: "gameTicTacToeTitle",
     description: "gameTicTacToeDesc",
     href: "https://hzagaming.github.io/Tic-Tac-Toe/",
-    tag: "gameTagStrategy"
+    tag: "gameTagStrategy",
+    image: "/games/tic-tac-toe.jpg"
   },
   {
     title: "gameMinesweeperTitle",
     description: "gameMinesweeperDesc",
     href: "https://hanazar-games.github.io/Minesweeper/",
-    tag: "gameTagPuzzle"
+    tag: "gameTagPuzzle",
+    image: "/games/minesweeper.jpg"
   },
   {
     title: "game2048Title",
     description: "game2048Desc",
     href: "https://hanazar-games.github.io/3D-2048-webgame/",
-    tag: "gameTagArcade"
+    tag: "gameTagArcade",
+    image: "/games/3d-2048.jpg"
   }
 ];
 
@@ -68,18 +72,30 @@ export default function GamesPage() {
             data-reveal
             style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
           >
-            <span className="gameCardTag">{tr(game.tag)}</span>
-            <h2>{tr(game.title)}</h2>
-            <p>{tr(game.description)}</p>
-            <a
-              className="gameCardButton"
-              href={game.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {tr("gamePlayButton")}
-              <span className="gameCardArrow">↗</span>
-            </a>
+            <div className="gameCardImageWrap">
+              <Image
+                src={game.image}
+                alt={tr(game.title)}
+                className="gameCardImage"
+                width={640}
+                height={360}
+                sizes="(max-width: 800px) 100vw, 33vw"
+              />
+            </div>
+            <div className="gameCardBody">
+              <span className="gameCardTag">{tr(game.tag)}</span>
+              <h2>{tr(game.title)}</h2>
+              <p>{tr(game.description)}</p>
+              <a
+                className="gameCardButton"
+                href={game.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {tr("gamePlayButton")}
+                <span className="gameCardArrow">↗</span>
+              </a>
+            </div>
           </article>
         ))}
       </div>

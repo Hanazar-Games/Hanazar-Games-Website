@@ -15,7 +15,7 @@ export default function ApiTab() {
           id="api-url"
           type="text"
           className="settingsInput"
-          placeholder="https://api.example.com"
+          placeholder={tr("stApiPlaceholder")}
           value={settings.apiBaseUrl}
           onChange={(e) => update("apiBaseUrl", e.target.value)}
         />
