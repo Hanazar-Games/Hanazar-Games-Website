@@ -1,26 +1,30 @@
 "use client";
 
+import { useTranslation } from "../../hooks/useTranslation";
+
 const shortcuts = [
-  { action: "Open Settings", key: "Ctrl + ," },
-  { action: "Close Modal", key: "Escape" },
-  { action: "Navigate Tabs", key: "Tab / Shift + Tab" },
-  { action: "Toggle Theme", key: "Ctrl + Shift + L" },
-  { action: "Mute / Unmute", key: "Ctrl + M" },
-  { action: "Reset Settings", key: "Ctrl + Shift + R" },
-  { action: "Export Config", key: "Ctrl + Shift + E" },
-  { action: "Import Config", key: "Ctrl + Shift + I" },
+  { actionKey: "scOpenSettings", key: "Ctrl + ," },
+  { actionKey: "scCloseModal", key: "Escape" },
+  { actionKey: "scNavigateTabs", key: "Tab / Shift + Tab" },
+  { actionKey: "scToggleTheme", key: "Ctrl + Shift + L" },
+  { actionKey: "scMute", key: "Ctrl + M" },
+  { actionKey: "scReset", key: "Ctrl + Shift + R" },
+  { actionKey: "scExport", key: "Ctrl + Shift + E" },
+  { actionKey: "scImport", key: "Ctrl + Shift + I" },
 ];
 
 export default function ShortcutsTab() {
+  const { tr } = useTranslation();
+
   return (
     <div className="settingsTabContent">
       <div className="settingGroup">
-        <span className="settingLabel">Keyboard Shortcuts</span>
-        <p className="settingDesc">These shortcuts are available across the site.</p>
+        <span className="settingLabel">{tr("stShortcuts")}</span>
+        <p className="settingDesc">{tr("stShortcutsDesc")}</p>
         <div className="shortcutsTable">
           {shortcuts.map((s) => (
-            <div className="shortcutRow" key={s.action}>
-              <span className="shortcutAction">{s.action}</span>
+            <div className="shortcutRow" key={s.actionKey}>
+              <span className="shortcutAction">{tr(s.actionKey)}</span>
               <kbd className="shortcutKey">{s.key}</kbd>
             </div>
           ))}

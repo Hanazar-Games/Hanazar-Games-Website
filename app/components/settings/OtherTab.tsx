@@ -2,9 +2,11 @@
 
 import { useSettingsContext } from "../SettingsContext";
 import { useState } from "react";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function OtherTab() {
   const { reset, exportJson, importJson } = useSettingsContext();
+  const { tr } = useTranslation();
   const [importArea, setImportArea] = useState("");
   const [showImport, setShowImport] = useState(false);
 
@@ -27,57 +29,57 @@ export default function OtherTab() {
     if (ok) {
       setImportArea("");
       setShowImport(false);
-      alert("Settings imported successfully.");
+      alert(tr("stImported"));
     } else {
-      alert("Invalid JSON. Please check your config.");
+      alert(tr("stImportFail"));
     }
   };
 
   const handleClearCache = () => {
     localStorage.removeItem("hanazar-settings-v1");
-    alert("Local cache cleared.");
+    alert(tr("stCacheCleared"));
   };
 
   return (
     <div className="settingsTabContent">
       <div className="settingGroup">
-        <span className="settingLabel">Reset</span>
-        <p className="settingDesc">Restore all settings to their default values. This cannot be undone.</p>
+        <span className="settingLabel">{tr("stReset")}</span>
+        <p className="settingDesc">{tr("stResetDesc")}</p>
         <button className="settingsBtn danger" onClick={reset}>
-          Reset All Settings
+          {tr("stResetBtn")}
         </button>
       </div>
 
       <div className="settingGroup">
-        <span className="settingLabel">Export / Import</span>
+        <span className="settingLabel">{tr("stExportImport")}</span>
         <div className="dataActions">
-          <button className="settingsBtn" onClick={handleCopy}>Copy JSON</button>
-          <button className="settingsBtn" onClick={handleExport}>Download JSON</button>
+          <button className="settingsBtn" onClick={handleCopy}>{tr("stCopyJson")}</button>
+          <button className="settingsBtn" onClick={handleExport}>{tr("stDownloadJson")}</button>
           <button className="settingsBtn" onClick={() => setShowImport((v) => !v)}>
-            {showImport ? "Cancel" : "Import JSON"}
+            {showImport ? tr("stCancel") : tr("stImportJson")}
           </button>
         </div>
         {showImport && (
           <div className="importArea">
             <textarea
               className="settingsTextarea"
-              placeholder="Paste your settings JSON here..."
+              placeholder={tr("stImportPlaceholder")}
               value={importArea}
               onChange={(e) => setImportArea(e.target.value)}
               rows={6}
             />
             <button className="settingsBtn primary" onClick={handleImport}>
-              Confirm Import
+              {tr("stConfirmImport")}
             </button>
           </div>
         )}
       </div>
 
       <div className="settingGroup">
-        <span className="settingLabel">Cache</span>
-        <p className="settingDesc">Clear all locally stored data including settings.</p>
+        <span className="settingLabel">{tr("stCache")}</span>
+        <p className="settingDesc">{tr("stCacheDesc")}</p>
         <button className="settingsBtn danger" onClick={handleClearCache}>
-          Clear Local Cache
+          {tr("stClearCache")}
         </button>
       </div>
     </div>

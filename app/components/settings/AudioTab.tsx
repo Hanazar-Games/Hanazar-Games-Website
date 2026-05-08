@@ -1,6 +1,7 @@
 "use client";
 
 import { useSettingsContext } from "../SettingsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 const sfxStyles = [
   "Classic", "Electronic", "Retro", "Wood", "Bell", "Space",
@@ -19,12 +20,13 @@ const bgmStyles = [
 
 export default function AudioTab() {
   const { settings, update } = useSettingsContext();
+  const { tr } = useTranslation();
 
   return (
     <div className="settingsTabContent">
       <div className="settingGroup">
         <div className="sliderHeader">
-          <label className="settingLabel" htmlFor="master-vol">Master Volume</label>
+          <label className="settingLabel" htmlFor="master-vol">{tr("stMasterVolume")}</label>
           <span className="sliderValue">{settings.masterVolume}%</span>
         </div>
         <input
@@ -40,7 +42,7 @@ export default function AudioTab() {
 
       <div className="settingGroup">
         <div className="settingRow">
-          <span className="settingLabel" id="label-sfx">Sound Effects</span>
+          <span className="settingLabel" id="label-sfx">{tr("stSfx")}</span>
           <label className="switch">
             <input
               type="checkbox"
@@ -52,7 +54,7 @@ export default function AudioTab() {
           </label>
         </div>
         <div className="sliderHeader">
-          <label className="settingLabel sub" htmlFor="sfx-vol">SFX Volume</label>
+          <label className="settingLabel sub" htmlFor="sfx-vol">{tr("stSfxVolume")}</label>
           <span className="sliderValue">{settings.sfxVolume}%</span>
         </div>
         <input
@@ -64,7 +66,7 @@ export default function AudioTab() {
           value={settings.sfxVolume}
           onChange={(e) => update("sfxVolume", Number(e.target.value))}
         />
-        <span className="settingLabel sub">SFX Style</span>
+        <span className="settingLabel sub">{tr("stSfxStyle")}</span>
         <div className="segmented">
           {sfxStyles.map((s) => (
             <button
@@ -80,7 +82,7 @@ export default function AudioTab() {
 
       <div className="settingGroup">
         <div className="settingRow">
-          <span className="settingLabel" id="label-bgm">Background Music</span>
+          <span className="settingLabel" id="label-bgm">{tr("stBgm")}</span>
           <label className="switch">
             <input
               type="checkbox"
@@ -92,7 +94,7 @@ export default function AudioTab() {
           </label>
         </div>
         <div className="sliderHeader">
-          <label className="settingLabel sub" htmlFor="bgm-vol">BGM Volume</label>
+          <label className="settingLabel sub" htmlFor="bgm-vol">{tr("stBgmVolume")}</label>
           <span className="sliderValue">{settings.bgmVolume}%</span>
         </div>
         <input
@@ -104,7 +106,7 @@ export default function AudioTab() {
           value={settings.bgmVolume}
           onChange={(e) => update("bgmVolume", Number(e.target.value))}
         />
-        <span className="settingLabel sub">Music Style</span>
+        <span className="settingLabel sub">{tr("stBgmStyle")}</span>
         <div className="segmented musicStyleGrid">
           {bgmStyles.slice(0, 12).map((s) => (
             <button
@@ -116,7 +118,7 @@ export default function AudioTab() {
             </button>
           ))}
         </div>
-        <p className="settingDesc">Top 12 curated styles. Full list available via import.</p>
+        <p className="settingDesc">{tr("stBgmNote")}</p>
       </div>
     </div>
   );

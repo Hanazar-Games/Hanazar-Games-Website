@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "../hooks/useTranslation";
 import StyleTab from "./settings/StyleTab";
 import LanguageTab from "./settings/LanguageTab";
 import AudioTab from "./settings/AudioTab";
@@ -13,16 +14,16 @@ import AnnouncementTab from "./settings/AnnouncementTab";
 import AboutTab from "./settings/AboutTab";
 
 const tabs = [
-  { key: "style", label: "Style", icon: "S" },
-  { key: "language", label: "Language", icon: "L" },
-  { key: "audio", label: "Audio", icon: "A" },
-  { key: "animation", label: "Animation", icon: "N" },
-  { key: "performance", label: "Performance", icon: "P" },
-  { key: "api", label: "API", icon: "I" },
-  { key: "shortcuts", label: "Shortcuts", icon: "K" },
-  { key: "other", label: "Other", icon: "O" },
-  { key: "announcement", label: "Announce", icon: "B" },
-  { key: "about", label: "About", icon: "?" },
+  { key: "style", label: "tabStyle", icon: "S" },
+  { key: "language", label: "tabLanguage", icon: "L" },
+  { key: "audio", label: "tabAudio", icon: "A" },
+  { key: "animation", label: "tabAnimation", icon: "N" },
+  { key: "performance", label: "tabPerformance", icon: "P" },
+  { key: "api", label: "tabApi", icon: "I" },
+  { key: "shortcuts", label: "tabShortcuts", icon: "K" },
+  { key: "other", label: "tabOther", icon: "O" },
+  { key: "announcement", label: "tabAnnouncement", icon: "B" },
+  { key: "about", label: "tabAbout", icon: "?" },
 ];
 
 interface SettingsPanelProps {
@@ -35,6 +36,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const { tr } = useTranslation();
 
   useEffect(() => {
     if (open) {
@@ -96,11 +98,11 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label="Settings"
+        aria-label={tr("ariaSettings")}
       >
         <div className="settingsModalHeader">
-          <h2>Project Settings</h2>
-          <button className="settingsCloseBtn" onClick={onClose} aria-label="Close settings">
+          <h2>{tr("settingsTitle")}</h2>
+          <button className="settingsCloseBtn" onClick={onClose} aria-label={tr("ariaCloseSettings")}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
@@ -109,7 +111,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         </div>
 
         <div className="settingsModalBody">
-          <nav className="settingsTabNav" aria-label="Settings categories">
+          <nav className="settingsTabNav" aria-label={tr("ariaSettingsCategories")}>
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -118,7 +120,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 aria-pressed={activeTab === tab.key}
               >
                 <span className="settingsTabIcon">{tab.icon}</span>
-                <span className="settingsTabLabel">{tab.label}</span>
+                <span className="settingsTabLabel">{tr(tab.label)}</span>
               </button>
             ))}
           </nav>

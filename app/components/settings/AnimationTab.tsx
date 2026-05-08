@@ -1,14 +1,16 @@
 "use client";
 
 import { useSettingsContext } from "../SettingsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function AnimationTab() {
   const { settings, update } = useSettingsContext();
+  const { tr } = useTranslation();
 
   return (
     <div className="settingsTabContent">
       <div className="settingRow">
-        <span className="settingLabel" id="label-anim">Enable Animations</span>
+        <span className="settingLabel" id="label-anim">{tr("stEnableAnim")}</span>
         <label className="switch">
           <input
             type="checkbox"
@@ -22,7 +24,7 @@ export default function AnimationTab() {
 
       <div className="settingGroup">
         <div className="sliderHeader">
-          <label className="settingLabel" htmlFor="anim-speed">Animation Speed</label>
+          <label className="settingLabel" htmlFor="anim-speed">{tr("stAnimSpeed")}</label>
           <span className="sliderValue">{settings.animSpeed}%</span>
         </div>
         <input
@@ -34,15 +36,15 @@ export default function AnimationTab() {
           value={settings.animSpeed}
           onChange={(e) => update("animSpeed", Number(e.target.value))}
         />
-        <p className="settingDesc">Lower value means slower animations.</p>
+        <p className="settingDesc">{tr("stAnimSpeedDesc")}</p>
       </div>
 
       <div className="settingGroup">
-        <span className="settingLabel">Individual Effects</span>
+        <span className="settingLabel">{tr("stIndivEffects")}</span>
         {[
-          { key: "animUiFade" as const, label: "UI Fade In" },
-          { key: "animButtonHover" as const, label: "Button Hover" },
-          { key: "animModal" as const, label: "Modal Transition" },
+          { key: "animUiFade" as const, label: tr("stUiFade") },
+          { key: "animButtonHover" as const, label: tr("stBtnHover") },
+          { key: "animModal" as const, label: tr("stModalTrans") },
         ].map((item) => (
           <div className="settingRow" key={item.key}>
             <span className="settingLabel sub" id={`label-${item.key}`}>{item.label}</span>

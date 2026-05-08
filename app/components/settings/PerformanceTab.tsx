@@ -1,20 +1,22 @@
 "use client";
 
 import { useSettingsContext } from "../SettingsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function PerformanceTab() {
   const { settings, update } = useSettingsContext();
+  const { tr } = useTranslation();
 
   return (
     <div className="settingsTabContent">
       {[
-        { key: "reduceAnimations" as const, label: "Reduce Animations" },
-        { key: "disableBlur" as const, label: "Disable Glassmorphism Blur" },
-        { key: "lowResPreview" as const, label: "Low Resolution Preview" },
-        { key: "lazyLoad" as const, label: "Lazy Load Modules" },
-        { key: "disableParticles" as const, label: "Disable Particle Effects" },
-        { key: "aggressiveCache" as const, label: "Aggressive Cache Strategy" },
-        { key: "devMode" as const, label: "Developer Debug Mode" },
+        { key: "reduceAnimations" as const, label: tr("stReduceAnim") },
+        { key: "disableBlur" as const, label: tr("stDisableBlur") },
+        { key: "lowResPreview" as const, label: tr("stLowRes") },
+        { key: "lazyLoad" as const, label: tr("stLazyLoad") },
+        { key: "disableParticles" as const, label: tr("stDisableParticles") },
+        { key: "aggressiveCache" as const, label: tr("stAggressiveCache") },
+        { key: "devMode" as const, label: tr("stDevMode") },
       ].map((item) => (
         <div className="settingRow" key={item.key}>
           <span className="settingLabel" id={`label-${item.key}`}>{item.label}</span>
@@ -32,7 +34,7 @@ export default function PerformanceTab() {
 
       <div className="settingGroup">
         <div className="sliderHeader">
-          <label className="settingLabel" htmlFor="max-concurrent">Max Concurrent Requests</label>
+          <label className="settingLabel" htmlFor="max-concurrent">{tr("stMaxConcurrent")}</label>
           <span className="sliderValue">{settings.maxConcurrent}</span>
         </div>
         <input
@@ -46,7 +48,7 @@ export default function PerformanceTab() {
         />
       </div>
 
-      <p className="settingDesc">Disabling visual effects improves performance on low-end devices.</p>
+      <p className="settingDesc">{tr("stPerfDesc")}</p>
     </div>
   );
 }

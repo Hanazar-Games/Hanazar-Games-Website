@@ -1,14 +1,16 @@
 "use client";
 
 import { useSettingsContext } from "../SettingsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function ApiTab() {
   const { settings, update } = useSettingsContext();
+  const { tr } = useTranslation();
 
   return (
     <div className="settingsTabContent">
       <div className="settingGroup">
-        <label className="settingLabel" htmlFor="api-url">API Base URL</label>
+        <label className="settingLabel" htmlFor="api-url">{tr("stApiUrl")}</label>
         <input
           id="api-url"
           type="text"
@@ -21,7 +23,7 @@ export default function ApiTab() {
 
       <div className="settingGroup">
         <div className="sliderHeader">
-          <label className="settingLabel" htmlFor="api-timeout">Timeout (ms)</label>
+          <label className="settingLabel" htmlFor="api-timeout">{tr("stApiTimeout")}</label>
           <span className="sliderValue">{settings.apiTimeout}ms</span>
         </div>
         <input
@@ -38,7 +40,7 @@ export default function ApiTab() {
 
       <div className="settingGroup">
         <div className="sliderHeader">
-          <label className="settingLabel" htmlFor="api-retries">Retry Count</label>
+          <label className="settingLabel" htmlFor="api-retries">{tr("stApiRetries")}</label>
           <span className="sliderValue">{settings.apiRetries}</span>
         </div>
         <input

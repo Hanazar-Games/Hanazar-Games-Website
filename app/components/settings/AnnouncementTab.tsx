@@ -1,6 +1,20 @@
 "use client";
 
+import { useTranslation } from "../../hooks/useTranslation";
+
 const changelog = [
+  {
+    version: "1.2.3",
+    date: "2026-05-08",
+    title: "Full i18n Translation System",
+    items: [
+      "Wired up complete i18n translation across homepage, games page, settings modal, and all 10 settings tabs.",
+      "20 interface languages supported with per-key fallback to English.",
+      "Dynamic html lang attribute updates for screen-reader accessibility when switching languages.",
+      "All aria-labels translated (Settings, Close settings, Settings categories, Homepage sections, Open settings).",
+      "Fixed previously untranslated footer link placeholders, theme buttons, font labels, and input placeholders.",
+    ],
+  },
   {
     version: "1.2.2",
     date: "2026-05-08",
@@ -61,6 +75,8 @@ const changelog = [
 ];
 
 export default function AnnouncementTab() {
+  const { tr } = useTranslation();
+
   return (
     <div className="settingsTabContent">
       <div className="changelogList">

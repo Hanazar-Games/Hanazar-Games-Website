@@ -1,24 +1,25 @@
 "use client";
 
+import { useTranslation } from "../../hooks/useTranslation";
+
 export default function AboutTab() {
+  const { tr } = useTranslation();
+
   return (
     <div className="settingsTabContent">
       <div className="aboutContent">
-        <h3 className="aboutTitle">Hanazar Games</h3>
+        <h3 className="aboutTitle">{tr("aboutProjectTitle")}</h3>
         <p className="aboutDesc">
-          An independent game studio built around atmosphere, strong visual identity,
-          and worlds that feel deliberate from the first screen to the final detail.
-          This site serves as a central archive for projects, development notes, and
-          public-facing material around each release.
+          {tr("aboutProjectDesc")}
         </p>
 
         <div className="aboutSection">
-          <span className="settingLabel">Author</span>
-          <p className="aboutDesc">Hanazar Ochikawa</p>
+          <span className="settingLabel">{tr("aboutAuthor")}</span>
+          <p className="aboutDesc">{tr("aboutAuthorName")}</p>
         </div>
 
         <div className="aboutSection">
-          <span className="settingLabel">Links</span>
+          <span className="settingLabel">{tr("aboutLinks")}</span>
           <div className="aboutLinks">
             <a href="https://github.com/hzagaming" target="_blank" rel="noreferrer">
               GitHub
@@ -33,16 +34,15 @@ export default function AboutTab() {
         </div>
 
         <div className="aboutSection">
-          <span className="settingLabel">Version</span>
-          <p className="aboutDesc">1.2.2</p>
+          <span className="settingLabel">{tr("aboutVersion")}</span>
+          <p className="aboutDesc">1.2.3</p>
         </div>
 
         <div className="aboutFooter">
-          <p>Contact: hanazar@mirako.co</p>
-          <p>Copyright &copy; 2026 Mirako Company. Developed by Hanazar Ochikawa.</p>
+          <p>{tr("aboutContact")}</p>
+          <p>{tr("aboutCopyright")}</p>
           <p className="aboutPrivacy">
-            All information on this site is stored locally.
-            No personal data or API keys are uploaded.
+            {tr("aboutPrivacy")}
           </p>
         </div>
       </div>

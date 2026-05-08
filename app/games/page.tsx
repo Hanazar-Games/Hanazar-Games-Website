@@ -3,32 +3,32 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { useEffect } from "react";
+import { useTranslation } from "../hooks/useTranslation";
 
 const games = [
   {
-    title: "Tic-Tac-Toe",
-    description:
-      "Classic tic-tac-toe with a modern twist — includes Connect Four, Gomoku, custom boards, AI opponents, puzzle rush, tactics trainer, and full replay analysis.",
+    title: "gameTicTacToeTitle",
+    description: "gameTicTacToeDesc",
     href: "https://hzagaming.github.io/Tic-Tac-Toe/",
-    tag: "Strategy"
+    tag: "gameTagStrategy"
   },
   {
-    title: "Minesweeper",
-    description:
-      "The timeless mine-clearing puzzle. Use logic and intuition to flag every mine without setting one off.",
+    title: "gameMinesweeperTitle",
+    description: "gameMinesweeperDesc",
     href: "https://hanazar-games.github.io/Minesweeper/",
-    tag: "Puzzle"
+    tag: "gameTagPuzzle"
   },
   {
-    title: "3D 2048",
-    description:
-      "The classic number-merging game reimagined in three dimensions. Slide blocks in 3D space and reach 2048.",
+    title: "game2048Title",
+    description: "game2048Desc",
     href: "https://hanazar-games.github.io/3D-2048-webgame/",
-    tag: "Arcade"
+    tag: "gameTagArcade"
   }
 ];
 
 export default function GamesPage() {
+  const { tr } = useTranslation();
+
   useEffect(() => {
     const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
     const observer = new IntersectionObserver(
@@ -50,11 +50,10 @@ export default function GamesPage() {
     <main className="pageShell gamesShell">
       <section className="gamesHero">
         <div className="gamesHeroInner">
-          <span className="gamesHeroEyebrow">Hanazar Games</span>
-          <h1 className="gamesHeroTitle">Games Hub</h1>
+          <span className="gamesHeroEyebrow">{tr("gamesHeroEyebrow")}</span>
+          <h1 className="gamesHeroTitle">{tr("gamesHeroTitle")}</h1>
           <p className="gamesHeroSubtitle">
-            A growing collection of browser-based games built by Hanazar Games.
-            No install needed — click and play.
+            {tr("gamesHeroSubtitle")}
           </p>
         </div>
       </section>
@@ -69,16 +68,16 @@ export default function GamesPage() {
             data-reveal
             style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
           >
-            <span className="gameCardTag">{game.tag}</span>
-            <h2>{game.title}</h2>
-            <p>{game.description}</p>
+            <span className="gameCardTag">{tr(game.tag)}</span>
+            <h2>{tr(game.title)}</h2>
+            <p>{tr(game.description)}</p>
             <a
               className="gameCardButton"
               href={game.href}
               target="_blank"
               rel="noreferrer"
             >
-              Play Game
+              {tr("gamePlayButton")}
               <span className="gameCardArrow">↗</span>
             </a>
           </article>
@@ -86,9 +85,9 @@ export default function GamesPage() {
       </div>
 
       <div className="gamesCta reveal revealFade" data-reveal>
-        <p>More games coming soon.</p>
+        <p>{tr("gamesMoreSoon")}</p>
         <Link href="/" className="gamesHomeButton">
-          ← Back to Home
+          {tr("gamesBackHome")}
         </Link>
       </div>
     </main>

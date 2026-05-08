@@ -5,37 +5,38 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import SettingsPanel from "./components/SettingsPanel";
+import { useTranslation } from "./hooks/useTranslation";
 
 const githubUrl = "https://github.com/hzagaming";
 const heroBackdropImage = "/IntroPic.jpg";
 
 const heroLinks = [
-  { label: "Products", href: "#products" },
-  { label: "About", href: "#about" },
-  { label: "Documents", href: "#documents" },
-  { label: "Updates", href: "#updates" },
-  { label: "Contact", href: "#contact" }
+  { label: "navProducts", href: "#products" },
+  { label: "navAbout", href: "#about" },
+  { label: "navDocuments", href: "#documents" },
+  { label: "navUpdates", href: "#updates" },
+  { label: "navContact", href: "#contact" }
 ];
 
 const productModules = [
   {
-    title: "Featured Title",
-    body: "Use this card for your main project showcase, store link, or the game you want visitors to see first.",
-    cta: "View GitHub",
+    title: "productFeaturedTitle",
+    body: "productFeaturedBody",
+    cta: "ctaViewGithub",
     href: githubUrl,
     icon: true
   },
   {
-    title: "Games Hub",
-    body: "A collection of browser-based mini-games — Tic-Tac-Toe, Minesweeper, and 3D 2048. Click to play directly in your browser.",
-    cta: "Play Now",
+    title: "productWorldsTitle",
+    body: "productWorldsBody",
+    cta: "ctaPlayNow",
     href: "/games",
     icon: true
   },
   {
-    title: "Playable Concepts",
-    body: "Use this module for prototypes, upcoming releases, or experimental ideas that you want to surface early.",
-    cta: "View GitHub",
+    title: "productConceptsTitle",
+    body: "productConceptsBody",
+    cta: "ctaViewGithub",
     href: githubUrl,
     icon: true
   }
@@ -43,80 +44,81 @@ const productModules = [
 
 const documentModules = [
   {
-    title: "Design Docs",
-    body: "Gameplay structure, mechanics breakdowns, loop design, and system planning."
+    title: "docDesignTitle",
+    body: "docDesignBody"
   },
   {
-    title: "Lore Notes",
-    body: "Setting history, worldbuilding fragments, naming systems, and narrative references."
+    title: "docLoreTitle",
+    body: "docLoreBody"
   },
   {
-    title: "Visual Direction",
-    body: "Moodboards, UI direction, color studies, layout standards, and brand language."
+    title: "docVisualTitle",
+    body: "docVisualBody"
   }
 ];
 
 const updateModules = [
   {
-    title: "Devlog",
-    body: "A living stream of progress, experiments, milestones, and production snapshots."
+    title: "updateDevlogTitle",
+    body: "updateDevlogBody"
   },
   {
-    title: "Release Notes",
-    body: "Patch notes, version summaries, feature additions, and change history."
+    title: "updateReleaseTitle",
+    body: "updateReleaseBody"
   },
   {
-    title: "Studio News",
-    body: "Announcements, roadmap moments, festival news, and public updates from the team."
+    title: "updateNewsTitle",
+    body: "updateNewsBody"
   }
 ];
 
 const contactModules = [
   {
-    title: "Steam",
-    body: "Direct players to your store page, game hub, or current featured release."
+    title: "contactSteamTitle",
+    body: "contactSteamBody"
   },
   {
-    title: "Business",
-    body: "Reserve this area for partnerships, press, publishing inquiries, or contact mail."
+    title: "contactBusinessTitle",
+    body: "contactBusinessBody"
   },
   {
-    title: "Community",
-    body: "Link out to Discord, social channels, or a future community portal when ready."
+    title: "contactCommunityTitle",
+    body: "contactCommunityBody"
   }
 ];
 
 const footerCtas = [
-  { title: "Play on Steam", href: githubUrl },
-  { title: "View Projects", href: githubUrl },
-  { title: "Contact Studio", href: githubUrl }
+  { title: "footerPlaySteam", href: githubUrl },
+  { title: "footerViewProjects", href: githubUrl },
+  { title: "footerContactStudio", href: githubUrl }
 ];
 
 const footerColumns = [
   {
-    title: "Games",
-    links: ["Featured Title", "Worlds & Characters", "Playable Concepts", "Upcoming Releases"]
+    title: "footerColumnGames",
+    links: ["productFeaturedTitle", "footerWorldsChars", "productConceptsTitle", "footerUpcoming"]
   },
   {
-    title: "Documents",
-    links: ["Design Docs", "Lore Notes", "Visual Direction", "Internal Archive"]
+    title: "footerColumnDocs",
+    links: ["docDesignTitle", "docLoreTitle", "docVisualTitle", "footerInternalArchive"]
   },
   {
-    title: "Updates",
-    links: ["Devlog", "Release Notes", "Announcements", "Roadmap"]
+    title: "footerColumnUpdates",
+    links: ["updateDevlogTitle", "updateReleaseTitle", "footerAnnouncements", "footerRoadmap"]
   },
   {
-    title: "Studio",
-    links: ["About HanazarGames", "Contact", "Press Kit", "Partnerships"]
+    title: "footerColumnStudio",
+    links: ["sectionAbout", "navContact", "footerPressKit", "footerPartnerships"]
   },
   {
-    title: "Support",
-    links: ["GitHub", "Steam", "Community", "Privacy"]
+    title: "footerColumnSupport",
+    links: ["footerSocialGithub", "footerSocialSteam", "contactCommunityTitle", "footerPrivacy"]
   }
 ];
 
 export default function HomePage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { tr } = useTranslation();
 
   useEffect(() => {
     const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
@@ -164,14 +166,13 @@ export default function HomePage() {
         </div>
 
         <div className="heroInner">
-          <span className="heroEyebrow">Hanazar Games</span>
-          <h1 className="heroTitle">Welcome to Hanazar Games</h1>
+          <span className="heroEyebrow">{tr("heroEyebrow")}</span>
+          <h1 className="heroTitle">{tr("heroTitle")}</h1>
           <p className="heroSubtitle">
-            A focused home for projects, documents, development notes, and the
-            growing archive behind every world we build.
+            {tr("heroSubtitle")}
           </p>
 
-          <nav className="heroNav" aria-label="Homepage sections">
+          <nav className="heroNav" aria-label={tr("ariaHomepageSections")}>
             {heroLinks.map((link, index) => (
               <a
                 key={link.href}
@@ -179,16 +180,16 @@ export default function HomePage() {
                 href={link.href}
                 style={{ "--button-index": index } as CSSProperties}
               >
-                {link.label}
+                {tr(link.label)}
               </a>
             ))}
             <button
               className="heroNavButton"
               onClick={() => setSettingsOpen(true)}
               style={{ "--button-index": heroLinks.length } as CSSProperties}
-              aria-label="Open settings"
+              aria-label={tr("ariaOpenSettings")}
             >
-              Settings
+              {tr("navSettings")}
             </button>
           </nav>
 
@@ -199,7 +200,7 @@ export default function HomePage() {
       <section className="contentSection productsSection" id="products">
         <div className="sectionHeading reveal revealFade" data-reveal>
           <span className="sectionIndex">01</span>
-          <h2>Products</h2>
+          <h2>{tr("sectionProducts")}</h2>
         </div>
 
         <div className="productsFrame reveal revealFade" data-reveal>
@@ -226,12 +227,12 @@ export default function HomePage() {
                   />
                 </div>
               ) : null}
-              <h3>{module.title}</h3>
-              <p>{module.body}</p>
+              <h3>{tr(module.title)}</h3>
+              <p>{tr(module.body)}</p>
               {module.href ? (
                 module.href.startsWith("/") ? (
                   <Link className="moduleButton" href={module.href}>
-                    {module.cta}
+                    {tr(module.cta)}
                   </Link>
                 ) : (
                   <a
@@ -240,7 +241,7 @@ export default function HomePage() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {module.cta}
+                    {tr(module.cta)}
                   </a>
                 )
               ) : null}
@@ -252,31 +253,20 @@ export default function HomePage() {
       <section className="contentSection aboutSection" id="about">
         <div className="sectionHeading reveal revealLeft" data-reveal>
           <span className="sectionIndex">02</span>
-          <h2>About HanazarGames</h2>
+          <h2>{tr("sectionAbout")}</h2>
         </div>
 
         <div className="aboutPanel reveal revealRight" data-reveal>
-          <p>
-            Hanazar Games is an independent game studio built around atmosphere,
-            strong visual identity, and worlds that feel deliberate from the first
-            screen to the final detail.
-          </p>
-          <p>
-            This site is designed to grow into a central archive for our projects,
-            development notes, internal thinking, and the public-facing material
-            around each release.
-          </p>
-          <p>
-            The visual language stays restrained and monochrome so the work itself
-            stays in focus while the structure remains scalable for future content.
-          </p>
+          <p>{tr("aboutBody1")}</p>
+          <p>{tr("aboutBody2")}</p>
+          <p>{tr("aboutBody3")}</p>
         </div>
       </section>
 
       <section className="contentSection documentsSection" id="documents">
         <div className="sectionHeading reveal revealRight" data-reveal>
           <span className="sectionIndex">03</span>
-          <h2>Documents</h2>
+          <h2>{tr("sectionDocuments")}</h2>
         </div>
 
         <div className="infoGrid documentsGrid">
@@ -289,8 +279,8 @@ export default function HomePage() {
               data-reveal
               style={{ "--reveal-delay": `${index * 0.1}s` } as CSSProperties}
             >
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
+              <h3>{tr(item.title)}</h3>
+              <p>{tr(item.body)}</p>
             </article>
           ))}
         </div>
@@ -299,7 +289,7 @@ export default function HomePage() {
       <section className="contentSection updatesSection" id="updates">
         <div className="sectionHeading reveal revealLeft" data-reveal>
           <span className="sectionIndex">04</span>
-          <h2>Updates</h2>
+          <h2>{tr("sectionUpdates")}</h2>
         </div>
 
         <div className="infoGrid updatesGrid">
@@ -312,8 +302,8 @@ export default function HomePage() {
               data-reveal
               style={{ "--reveal-delay": `${index * 0.1}s` } as CSSProperties}
             >
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
+              <h3>{tr(item.title)}</h3>
+              <p>{tr(item.body)}</p>
             </article>
           ))}
         </div>
@@ -322,7 +312,7 @@ export default function HomePage() {
       <section className="contentSection contactSection" id="contact">
         <div className="sectionHeading reveal revealRight" data-reveal>
           <span className="sectionIndex">05</span>
-          <h2>Contact</h2>
+          <h2>{tr("sectionContact")}</h2>
         </div>
 
         <div className="contactPanel reveal revealFade" data-reveal>
@@ -335,8 +325,8 @@ export default function HomePage() {
               data-reveal
               style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
             >
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
+              <h3>{tr(item.title)}</h3>
+              <p>{tr(item.body)}</p>
             </article>
           ))}
         </div>
@@ -356,7 +346,7 @@ export default function HomePage() {
               data-reveal
               style={{ "--reveal-delay": `${index * 0.08}s` } as CSSProperties}
             >
-              <span>{item.title}</span>
+              <span>{tr(item.title)}</span>
               <span className="footerArrow">↗</span>
             </a>
           ))}
@@ -372,12 +362,12 @@ export default function HomePage() {
               data-reveal
               style={{ "--reveal-delay": `${index * 0.06}s` } as CSSProperties}
             >
-              <h3>{column.title}</h3>
+              <h3>{tr(column.title)}</h3>
               <ul>
                 {column.links.map((link) => (
                   <li key={link}>
                     <a href={githubUrl} target="_blank" rel="noreferrer">
-                      {link}
+                      {tr(link)}
                     </a>
                   </li>
                 ))}
@@ -389,27 +379,27 @@ export default function HomePage() {
         <div className="footerBottom reveal revealFade" data-reveal>
           <div className="footerSocials">
             <a href={githubUrl} target="_blank" rel="noreferrer">
-              GitHub
+              {tr("footerSocialGithub")}
             </a>
             <a href={githubUrl} target="_blank" rel="noreferrer">
-              Steam
+              {tr("footerSocialSteam")}
             </a>
             <a href={githubUrl} target="_blank" rel="noreferrer">
-              Contact
+              {tr("footerSocialContact")}
             </a>
           </div>
 
           <div className="footerMeta">
-            <p>© 2026 Hanazar Games. All rights reserved.</p>
+            <p>{tr("footerCopyright")}</p>
             <div className="footerMetaLinks">
               <a href={githubUrl} target="_blank" rel="noreferrer">
-                Privacy Policy
+                {tr("footerPrivacy")}
               </a>
               <a href={githubUrl} target="_blank" rel="noreferrer">
-                Terms
+                {tr("footerTerms")}
               </a>
               <a href={githubUrl} target="_blank" rel="noreferrer">
-                Links
+                {tr("footerLinks")}
               </a>
             </div>
           </div>

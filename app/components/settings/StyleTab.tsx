@@ -1,14 +1,16 @@
 "use client";
 
 import { useSettingsContext } from "../SettingsContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
-const fonts = [
-  { key: "sans", label: "Default Sans" },
-  { key: "serif", label: "Serif" },
-  { key: "mono", label: "Monospace" },
-  { key: "rounded", label: "Rounded" },
-  { key: "custom", label: "Custom" },
-];
+const fontKeys = ["sans", "serif", "mono", "rounded", "custom"] as const;
+const fontKeyMap: Record<string, string> = {
+  sans: "fontDefaultSans",
+  serif: "fontSerif",
+  mono: "fontMono",
+  rounded: "fontRounded",
+  custom: "fontCustom",
+};
 
 const presets = [
   { key: "graphite", label: "Graphite", color: "#888888" },
@@ -21,11 +23,12 @@ const presets = [
 
 export default function StyleTab() {
   const { settings, update } = useSettingsContext();
+  const { tr } = useTranslation();
 
   return (
     <div className="settingsTabContent">
       <div className="settingGroup">
-        <span className="settingLabel">Theme</span>
+        <span className="settingLabel">{tr("stTheme")}</span>
         <div className="segmented">
           {(["dark", "light", "auto"] as const).map((t) => (
             <button
@@ -33,22 +36,22 @@ export default function StyleTab() {
               className={`seg-btn${settings.theme === t ? " active" : ""}`}
               onClick={() => update("theme", t)}
             >
-              {t.charAt(0).toUpperCase() + t.slice(1)}
+              {tr(`theme${t.charAt(0).toUpperCase() + t.slice(1)}` as string)}
             </button>
           ))}
         </div>
       </div>
 
       <div className="settingGroup">
-        <span className="settingLabel">Font</span>
+        <span className="settingLabel">{tr("stFont")}</span>
         <div className="segmented">
-          {fonts.map((f) => (
+          {fontKeys.map((f) => (
             <button
-              key={f.key}
-              className={`seg-btn${settings.font === f.key ? " active" : ""}`}
-              onClick={() => update("font", f.key as typeof settings.font)}
+              key={f}
+              className={`seg-btn${settings.font === f ? " active" : ""}`}
+              onClick={() => update("font", f as typeof settings.font)}
             >
-              {f.label}
+              {tr(fontKeyMap[f])}
             </button>
           ))}
         </div>
@@ -56,7 +59,7 @@ export default function StyleTab() {
           <input
             type="text"
             className="settingsInput"
-            placeholder="Enter font name..."
+            placeholder={tr("stCustomFontPlaceholder")}
             value={settings.customFont}
             onChange={(e) => update("customFont", e.target.value)}
           />
@@ -64,7 +67,7 @@ export default function StyleTab() {
       </div>
 
       <div className="settingGroup">
-        <span className="settingLabel">Color Preset</span>
+        <span className="settingLabel">{tr("stColorPreset")}</span>
         <div className="colorPresetGrid">
           {presets.map((p) => (
             <button
@@ -82,7 +85,7 @@ export default function StyleTab() {
 
       <div className="settingGroup">
         <div className="sliderHeader">
-          <label className="settingLabel" htmlFor="contrast-slider">Contrast</label>
+          <label className="settingLabel" htmlFor="contrast-slider">{tr("stContrast")}</label>
           <span className="sliderValue">{settings.contrast}%</span>
         </div>
         <input
