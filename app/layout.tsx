@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { SettingsProvider } from "./components/SettingsContext";
 import HtmlLang from "./components/HtmlLang";
+import StyleApplier from "./components/StyleApplier";
 
 export const metadata: Metadata = {
   title: "Hanazar Games",
@@ -18,6 +19,7 @@ export default function RootLayout({
       <body>
         <SettingsProvider>
           <HtmlLang />
+          <StyleApplier />
           {children}
         </SettingsProvider>
       </body>
