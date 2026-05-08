@@ -50,9 +50,6 @@ export default function GamesPage() {
     <main className="pageShell gamesShell">
       <section className="gamesHero">
         <div className="gamesHeroInner">
-          <Link href="/" className="gamesBackLink">
-            ← Back to Home
-          </Link>
           <span className="gamesHeroEyebrow">Hanazar Games</span>
           <h1 className="gamesHeroTitle">Games Hub</h1>
           <p className="gamesHeroSubtitle">
@@ -91,7 +88,7 @@ export default function GamesPage() {
       <div className="gamesCta reveal revealFade" data-reveal>
         <p>More games coming soon.</p>
         <Link href="/" className="gamesHomeButton">
-          Return to Homepage
+          ← Back to Home
         </Link>
       </div>
     </main>
