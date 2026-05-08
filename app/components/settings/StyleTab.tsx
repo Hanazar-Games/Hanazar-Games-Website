@@ -1,0 +1,100 @@
+"use client";
+
+import { useSettingsContext } from "../SettingsContext";
+
+const fonts = [
+  { key: "sans", label: "Default Sans" },
+  { key: "serif", label: "Serif" },
+  { key: "mono", label: "Monospace" },
+  { key: "rounded", label: "Rounded" },
+  { key: "custom", label: "Custom" },
+];
+
+const presets = [
+  { key: "graphite", label: "Graphite", color: "#888888" },
+  { key: "ocean", label: "Ocean", color: "#4a90d9" },
+  { key: "emerald", label: "Emerald", color: "#50c878" },
+  { key: "amber", label: "Amber", color: "#ffbf00" },
+  { key: "rose", label: "Rose", color: "#e06c75" },
+  { key: "lavender", label: "Lavender", color: "#b4a7d6" },
+];
+
+export default function StyleTab() {
+  const { settings, update } = useSettingsContext();
+
+  return (
+    <div className="settingsTabContent">
+      <div className="settingGroup">
+        <span className="settingLabel">Theme</span>
+        <div className="segmented">
+          {(["dark", "light", "auto"] as const).map((t) => (
+            <button
+              key={t}
+              className={`seg-btn${settings.theme === t ? " active" : ""}`}
+              onClick={() => update("theme", t)}
+            >
+              {t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settingGroup">
+        <span className="settingLabel">Font</span>
+        <div className="segmented">
+          {fonts.map((f) => (
+            <button
+              key={f.key}
+              className={`seg-btn${settings.font === f.key ? " active" : ""}`}
+              onClick={() => update("font", f.key as typeof settings.font)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        {settings.font === "custom" && (
+          <input
+            type="text"
+            className="settingsInput"
+            placeholder="Enter font name..."
+            value={settings.customFont}
+            onChange={(e) => update("customFont", e.target.value)}
+          />
+        )}
+      </div>
+
+      <div className="settingGroup">
+        <span className="settingLabel">Color Preset</span>
+        <div className="colorPresetGrid">
+          {presets.map((p) => (
+            <button
+              key={p.key}
+              className={`colorPreset${settings.colorPreset === p.key ? " active" : ""}`}
+              onClick={() => update("colorPreset", p.key)}
+              title={p.label}
+            >
+              <span className="colorDot" style={{ background: p.color }} />
+              <span className="colorLabel">{p.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settingGroup">
+        <div className="sliderHeader">
+          <label className="settingLabel" htmlFor="contrast-slider">Contrast</label>
+          <span className="sliderValue">{settings.contrast}%</span>
+        </div>
+        <input
+          id="contrast-slider"
+          type="range"
+          className="rangeSlider"
+          min={80}
+          max={130}
+          value={settings.contrast}
+          onChange={(e) => update("contrast", Number(e.target.value))}
+        />
+      </div>
+    </div>
+  );
+}

@@ -1,9 +1,10 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import SettingsPanel from "./components/SettingsPanel";
 
 const githubUrl = "https://github.com/hzagaming";
 const heroBackdropImage = "/IntroPic.jpg";
@@ -115,6 +116,8 @@ const footerColumns = [
 ];
 
 export default function HomePage() {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
   useEffect(() => {
     const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
 
@@ -179,7 +182,17 @@ export default function HomePage() {
                 {link.label}
               </a>
             ))}
+            <button
+              className="heroNavButton"
+              onClick={() => setSettingsOpen(true)}
+              style={{ "--button-index": heroLinks.length } as CSSProperties}
+              aria-label="Open settings"
+            >
+              Settings
+            </button>
           </nav>
+
+          <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         </div>
       </section>
 
