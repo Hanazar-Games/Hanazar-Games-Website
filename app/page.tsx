@@ -3,6 +3,7 @@
 import type { CSSProperties } from "react";
 import { useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const githubUrl = "https://github.com/hzagaming";
 const heroBackdropImage = "/IntroPic.jpg";
@@ -79,8 +80,9 @@ const contactModules = [
     body: "Reserve this area for partnerships, press, publishing inquiries, or contact mail."
   },
   {
-    title: "Community",
-    body: "Link out to Discord, social channels, or a future community portal when ready."
+    title: "Games Hub",
+    body: "A collection of browser-based mini-games including Tic-Tac-Toe, Minesweeper, and 3D 2048. Click to explore.",
+    href: "/games"
   }
 ];
 
@@ -306,19 +308,35 @@ export default function HomePage() {
         </div>
 
         <div className="contactPanel reveal revealFade" data-reveal>
-          {contactModules.map((item, index) => (
-            <article
-              key={item.title}
-              className={`contactModule ${
-                index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
-              }`}
-              data-reveal
-              style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
-            >
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
+          {contactModules.map((item, index) =>
+            item.href ? (
+              <Link
+                key={item.title}
+                href={item.href}
+                className={`contactModule contactModuleLink ${
+                  index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
+                }`}
+                data-reveal
+                style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
+              >
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+                <span className="contactModuleCta">Explore →</span>
+              </Link>
+            ) : (
+              <article
+                key={item.title}
+                className={`contactModule ${
+                  index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
+                }`}
+                data-reveal
+                style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
+              >
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            )
+          )}
         </div>
       </section>
 
