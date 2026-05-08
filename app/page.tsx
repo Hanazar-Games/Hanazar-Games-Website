@@ -25,10 +25,10 @@ const productModules = [
     icon: true
   },
   {
-    title: "Worlds & Characters",
-    body: "Use this module for worldbuilding, factions, visual language, or other supporting project material.",
-    cta: "View GitHub",
-    href: githubUrl,
+    title: "Games Hub",
+    body: "A collection of browser-based mini-games — Tic-Tac-Toe, Minesweeper, and 3D 2048. Click to play directly in your browser.",
+    cta: "Play Now",
+    href: "/games",
     icon: true
   },
   {
@@ -80,9 +80,8 @@ const contactModules = [
     body: "Reserve this area for partnerships, press, publishing inquiries, or contact mail."
   },
   {
-    title: "Games Hub",
-    body: "A collection of browser-based mini-games including Tic-Tac-Toe, Minesweeper, and 3D 2048. Click to explore.",
-    href: "/games"
+    title: "Community",
+    body: "Link out to Discord, social channels, or a future community portal when ready."
   }
 ];
 
@@ -204,7 +203,7 @@ export default function HomePage() {
               data-reveal
               style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
             >
-              {module.icon && module.href ? (
+              {module.icon ? (
                 <div className="moduleIconWrap">
                   <Image
                     src="/hanazar-emblem.svg"
@@ -217,14 +216,20 @@ export default function HomePage() {
               <h3>{module.title}</h3>
               <p>{module.body}</p>
               {module.href ? (
-                <a
-                  className="moduleButton"
-                  href={module.href}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {module.cta}
-                </a>
+                module.href.startsWith("/") ? (
+                  <Link className="moduleButton" href={module.href}>
+                    {module.cta}
+                  </Link>
+                ) : (
+                  <a
+                    className="moduleButton"
+                    href={module.href}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {module.cta}
+                  </a>
+                )
               ) : null}
             </article>
           ))}
@@ -308,35 +313,19 @@ export default function HomePage() {
         </div>
 
         <div className="contactPanel reveal revealFade" data-reveal>
-          {contactModules.map((item, index) =>
-            item.href ? (
-              <Link
-                key={item.title}
-                href={item.href}
-                className={`contactModule contactModuleLink ${
-                  index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
-                }`}
-                data-reveal
-                style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
-              >
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-                <span className="contactModuleCta">Explore →</span>
-              </Link>
-            ) : (
-              <article
-                key={item.title}
-                className={`contactModule ${
-                  index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
-                }`}
-                data-reveal
-                style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
-              >
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-              </article>
-            )
-          )}
+          {contactModules.map((item, index) => (
+            <article
+              key={item.title}
+              className={`contactModule ${
+                index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
+              }`}
+              data-reveal
+              style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
+            >
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
         </div>
       </section>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { useEffect } from "react";
 
 const games = [
   {
@@ -28,18 +29,38 @@ const games = [
 ];
 
 export default function GamesPage() {
+  useEffect(() => {
+    const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealVisible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.16, rootMargin: "0px 0px -10% 0px" }
+    );
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <main className="pageShell gamesShell">
-      <div className="gamesHeader reveal revealFade" data-reveal>
-        <Link href="/" className="gamesBackLink">
-          ← Back to Home
-        </Link>
-        <h1 className="gamesTitle">Games Hub</h1>
-        <p className="gamesSubtitle">
-          A growing collection of browser-based games built by Hanazar Games.
-          Click any card to play — no install needed.
-        </p>
-      </div>
+      <section className="gamesHero">
+        <div className="gamesHeroInner">
+          <Link href="/" className="gamesBackLink">
+            ← Back to Home
+          </Link>
+          <span className="gamesHeroEyebrow">Hanazar Games</span>
+          <h1 className="gamesHeroTitle">Games Hub</h1>
+          <p className="gamesHeroSubtitle">
+            A growing collection of browser-based games built by Hanazar Games.
+            No install needed — click and play.
+          </p>
+        </div>
+      </section>
 
       <div className="gamesGrid">
         {games.map((game, index) => (
