@@ -106,7 +106,7 @@ export default function AudioTab() {
         />
         <span className="settingLabel sub">Music Style</span>
         <div className="segmented musicStyleGrid">
-          {bgmStyles.map((s) => (
+          {bgmStyles.slice(0, 12).map((s) => (
             <button
               key={s}
               className={`seg-btn${settings.bgmStyle === s ? " active" : ""}`}
@@ -116,6 +116,7 @@ export default function AudioTab() {
             </button>
           ))}
         </div>
+        <p className="settingDesc">Top 12 curated styles. Full list available via import.</p>
       </div>
     </div>
   );

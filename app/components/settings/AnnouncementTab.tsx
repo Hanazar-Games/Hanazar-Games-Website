@@ -2,6 +2,17 @@
 
 const changelog = [
   {
+    version: "1.2.2",
+    date: "2026-05-08",
+    title: "Bug Fix Release",
+    items: [
+      "Fixed: Clear Cache now only removes hanazar-settings-v1 instead of wiping all localStorage.",
+      "Fixed: Tab switching no longer re-mounts content panel — scroll position resets smoothly via ref.",
+      "Fixed: BGM style list trimmed from 40 to 12 curated options for better mobile UX.",
+      "Added: Custom dark scrollbar styling for settings panel, language list, and style grid.",
+    ],
+  },
+  {
     version: "1.2.1",
     date: "2026-05-08",
     title: "Settings Panel Complete",

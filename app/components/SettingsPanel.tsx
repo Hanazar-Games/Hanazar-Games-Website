@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import StyleTab from "./settings/StyleTab";
 import LanguageTab from "./settings/LanguageTab";
 import AudioTab from "./settings/AudioTab";
@@ -34,6 +34,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState("style");
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -45,6 +46,12 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       return () => clearTimeout(timer);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (panelRef.current) {
+      panelRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -116,7 +123,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             ))}
           </nav>
 
-          <div className="settingsTabPanel" key={activeTab}>
+          <div className="settingsTabPanel" ref={panelRef}>
             {renderTab()}
           </div>
         </div>

@@ -1647,3 +1647,37 @@ a {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* Custom Scrollbar - Dark Theme */
+.settingsTabPanel::-webkit-scrollbar,
+.languageList::-webkit-scrollbar,
+.musicStyleGrid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.settingsTabPanel::-webkit-scrollbar-track,
+.languageList::-webkit-scrollbar-track,
+.musicStyleGrid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settingsTabPanel::-webkit-scrollbar-thumb,
+.languageList::-webkit-scrollbar-thumb,
+.musicStyleGrid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.settingsTabPanel::-webkit-scrollbar-thumb:hover,
+.languageList::-webkit-scrollbar-thumb:hover,
+.musicStyleGrid::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Firefox */
+.settingsTabPanel,
+.languageList,
+.musicStyleGrid {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}

@@ -34,7 +34,7 @@ export default function OtherTab() {
   };
 
   const handleClearCache = () => {
-    localStorage.clear();
+    localStorage.removeItem("hanazar-settings-v1");
     alert("Local cache cleared.");
   };
 
