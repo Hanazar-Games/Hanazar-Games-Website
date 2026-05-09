@@ -185,6 +185,7 @@ body[data-reduce-motion="true"] *::after {
 body[data-reduce-motion="true"] .reveal {
   opacity: 1 !important;
   transform: none !important;
+  filter: none !important;
 }
 
 /* ── Disable Blur ── */
@@ -198,6 +199,7 @@ body[data-disable-blur="true"] .settingsOverlay {
 body[data-disable-ui-fade="true"] .reveal {
   opacity: 1 !important;
   transform: none !important;
+  filter: none !important;
   transition: none !important;
 }
 
@@ -435,13 +437,29 @@ a {
   transition:
     border-color 0.25s ease,
     background 0.25s ease,
+    box-shadow 0.25s ease,
     transform 0.25s ease;
 }
 
 .heroNavButton:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 14px 42px rgba(255, 255, 255, 0.08);
   transform: translateY(-2px);
+}
+
+.heroNavButton:focus-visible,
+.moduleButton:focus-visible,
+.gameCardButton:focus-visible,
+.settingsBtn:focus-visible,
+.settingsCloseBtn:focus-visible,
+.settingsTabBtn:focus-visible,
+.seg-btn:focus-visible,
+.colorPreset:focus-visible,
+.languageItem:focus-visible,
+.gamesHomeButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .contentSection {
@@ -774,11 +792,13 @@ a {
 
 .reveal {
   opacity: 0;
+  filter: blur(8px);
   transition:
     opacity calc(1s * var(--anim-speed, 1)) ease,
-    transform calc(1s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1);
+    transform calc(1s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1),
+    filter calc(0.9s * var(--anim-speed, 1)) ease;
   transition-delay: var(--reveal-delay, 0s);
-  will-change: opacity, transform;
+  will-change: opacity, transform, filter;
 }
 
 .revealFade {
@@ -796,6 +816,7 @@ a {
 .revealVisible {
   opacity: 1;
   transform: translate(0, 0);
+  filter: blur(0);
 }
 
 @keyframes fadeInTitle {
@@ -1344,12 +1365,17 @@ a {
   font-size: 0.9rem;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .settingsTabBtn:hover {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
+  transform: translateX(2px);
 }
 
 .settingsTabBtn.active {
@@ -1524,12 +1550,17 @@ a {
   color: var(--muted);
   font-size: 0.84rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .seg-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text);
+  transform: translateY(-1px);
 }
 
 .seg-btn.active {
@@ -1671,6 +1702,20 @@ a {
 .settingsBtn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.audioPreviewRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.audioStatus {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .settingsBtn.primary {

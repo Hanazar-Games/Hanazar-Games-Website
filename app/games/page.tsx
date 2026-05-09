@@ -10,7 +10,7 @@ const games = [
   {
     title: "gameTicTacToeTitle",
     description: "gameTicTacToeDesc",
-    href: "https://hzagaming.github.io/Tic-Tac-Toe/",
+    href: "https://hanazar-games.github.io/Tic-Tac-Toe/",
     tag: "gameTagStrategy",
     image: "/games/tic-tac-toe.jpg"
   },

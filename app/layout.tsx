@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { SettingsProvider } from "./components/SettingsContext";
 import HtmlLang from "./components/HtmlLang";
 import StyleApplier from "./components/StyleApplier";
+import AudioEngine from "./components/AudioEngine";
 
 export const metadata: Metadata = {
   title: "Hanazar Games",
@@ -20,6 +21,7 @@ export default function RootLayout({
         <SettingsProvider>
           <HtmlLang />
           <StyleApplier />
+          <AudioEngine />
           {children}
         </SettingsProvider>
       </body>

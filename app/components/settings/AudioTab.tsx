@@ -21,6 +21,9 @@ const bgmStyles = [
 export default function AudioTab() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
+  const previewSfx = () => {
+    window.dispatchEvent(new CustomEvent("hanazar:sfx-preview"));
+  };
 
   return (
     <div className="settingsTabContent">
@@ -38,6 +41,14 @@ export default function AudioTab() {
           value={settings.masterVolume}
           onChange={(e) => update("masterVolume", Number(e.target.value))}
         />
+        <div className="audioPreviewRow">
+          <button className="settingsBtn" type="button" data-sfx-preview onClick={previewSfx}>
+            {tr("stPreviewSfx")}
+          </button>
+          <span className="audioStatus">
+            {settings.bgmEnabled ? tr("stBgmReady") : tr("stBgmIdle")}
+          </span>
+        </div>
       </div>
 
       <div className="settingGroup">
@@ -108,7 +119,7 @@ export default function AudioTab() {
         />
         <span className="settingLabel sub">{tr("stBgmStyle")}</span>
         <div className="segmented musicStyleGrid">
-          {bgmStyles.slice(0, 12).map((s) => (
+          {bgmStyles.map((s) => (
             <button
               key={s}
               className={`seg-btn${settings.bgmStyle === s ? " active" : ""}`}

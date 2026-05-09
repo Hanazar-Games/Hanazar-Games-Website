@@ -225,6 +225,10 @@ raw.ariaSettingsCategories = T("Settings categories", { "zh-CN": "设置分类",
 raw.ariaHomepageSections = T("Homepage sections", { "zh-CN": "首页栏目", "zh-TW": "首頁欄目", ja: "ホームページセクション", ko: "홈페이지 섹션", fr: "Sections de la page d'accueil", de: "Startseitenabschnitte", es: "Secciones de la página de inicio", ru: "Разделы главной страницы", pt: "Seções da página inicial" });
 raw.ariaOpenSettings = T("Open settings", { "zh-CN": "打开设置", "zh-TW": "開啟設定", ja: "設定を開く", ko: "설정 열기", fr: "Ouvrir les paramètres", de: "Einstellungen öffnen", es: "Abrir configuración", ru: "Открыть настройки", pt: "Abrir configurações" });
 
+raw.stPreviewSfx = T("Preview SFX", {});
+raw.stBgmReady = T("BGM will start after your next interaction.", {});
+raw.stBgmIdle = T("BGM is off.", {});
+
 // Build final translations object
 export const t = (() => {
   const result: Record<LangCode, Record<string, string>> = {} as any;

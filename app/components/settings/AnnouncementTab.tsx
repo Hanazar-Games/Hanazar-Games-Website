@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "1.5.0",
+    date: "2026-05-09",
+    title: "Audio Engine + Interaction Polish",
+    items: [
+      "Updated Tic-Tac-Toe to the hanazar-games GitHub Pages deployment.",
+      "Added Web Audio powered SFX feedback and ambient BGM behavior tied to Audio settings.",
+      "Added SFX preview control and restored access to the full BGM style list.",
+      "Improved reveal, hover, and keyboard focus states across homepage, games, and settings UI.",
+    ],
+  },
+  {
     version: "1.4.0",
     date: "2026-05-08",
     title: "Games Hub Visuals + i18n Polish",
