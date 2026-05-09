@@ -206,7 +206,11 @@ body[data-disable-ui-fade="true"] .reveal {
 body[data-disable-btn-hover="true"] .heroNavButton:hover,
 body[data-disable-btn-hover="true"] .moduleButton:hover,
 body[data-disable-btn-hover="true"] .gameCardButton:hover,
-body[data-disable-btn-hover="true"] .settingsBtn:hover {
+body[data-disable-btn-hover="true"] .settingsBtn:hover,
+body[data-disable-btn-hover="true"] .settingsTabBtn:hover,
+body[data-disable-btn-hover="true"] .seg-btn:hover,
+body[data-disable-btn-hover="true"] .colorPreset:hover,
+body[data-disable-btn-hover="true"] .languageItem:hover {
   transform: none !important;
 }
 
@@ -1252,6 +1256,7 @@ a {
   .gamesHeroInner {
     padding: 72px 24px 48px;
   }
+}
 
 /* Settings Panel */
 .settingsOverlay {

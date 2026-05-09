@@ -37,13 +37,23 @@ const bgmProfiles: Record<string, { wave: OscillatorType; root: number; fifth: n
   Blues: { wave: "triangle", root: 98, fifth: 146.83, drift: 0.035 },
 };
 
+function resolveStyleName(style: string, options: string[]) {
+  return options.find((option) => option.toLowerCase() === style.toLowerCase()) ?? style;
+}
+
+function getSfxProfile(style: string) {
+  const resolved = resolveStyleName(style, Object.keys(sfxProfiles));
+  return sfxProfiles[resolved] ?? sfxProfiles.Classic;
+}
+
 function getBgmProfile(style: string) {
-  const known = bgmProfiles[style];
+  const resolved = resolveStyleName(style, Object.keys(bgmProfiles));
+  const known = bgmProfiles[resolved];
   if (known) return known;
 
   const roots = [73.42, 82.41, 87.31, 92.5, 98, 103.83, 110, 123.47];
   const waves: OscillatorType[] = ["sine", "triangle", "sawtooth"];
-  const seed = Array.from(style).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const seed = Array.from(resolved).reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const root = roots[seed % roots.length];
 
   return {
@@ -89,7 +99,7 @@ export default function AudioEngine() {
     const ctx = getContext();
     if (!ctx || ctx.state !== "running") return;
 
-    const profile = sfxProfiles[current.sfxStyle] ?? sfxProfiles.Classic;
+    const profile = getSfxProfile(current.sfxStyle);
     const now = ctx.currentTime;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -165,13 +175,30 @@ export default function AudioEngine() {
   }, [getContext]);
 
   useEffect(() => {
+    const interactiveSelector =
+      "button, a, input[type='checkbox'], input[type='range'], .colorPreset, .languageItem";
+
     const handlePointerDown = async (event: PointerEvent) => {
       await unlock();
       const target = event.target;
       if (
         target instanceof HTMLElement &&
         !target.closest("[data-sfx-preview]") &&
-        target.closest("button, a, input[type='checkbox'], input[type='range'], .colorPreset, .languageItem")
+        target.closest(interactiveSelector)
+      ) {
+        playSfx();
+      }
+      startBgm();
+    };
+
+    const handleKeyDown = async (event: KeyboardEvent) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      await unlock();
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        !target.closest("[data-sfx-preview]") &&
+        target.closest(interactiveSelector)
       ) {
         playSfx();
       }
@@ -185,9 +212,11 @@ export default function AudioEngine() {
     };
 
     window.addEventListener("pointerdown", handlePointerDown, { capture: true });
+    window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("hanazar:sfx-preview", handlePreview);
     return () => {
       window.removeEventListener("pointerdown", handlePointerDown, { capture: true });
+      window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("hanazar:sfx-preview", handlePreview);
     };
   }, [playSfx, startBgm, unlock]);

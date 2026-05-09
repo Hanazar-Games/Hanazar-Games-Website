@@ -21,6 +21,12 @@ const bgmStyles = [
 export default function AudioTab() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
+  const selectedSfxStyle = sfxStyles.find(
+    (style) => style.toLowerCase() === settings.sfxStyle.toLowerCase()
+  ) ?? settings.sfxStyle;
+  const selectedBgmStyle = bgmStyles.find(
+    (style) => style.toLowerCase() === settings.bgmStyle.toLowerCase()
+  ) ?? settings.bgmStyle;
   const previewSfx = () => {
     window.dispatchEvent(new CustomEvent("hanazar:sfx-preview"));
   };
@@ -82,7 +88,7 @@ export default function AudioTab() {
           {sfxStyles.map((s) => (
             <button
               key={s}
-              className={`seg-btn${settings.sfxStyle === s ? " active" : ""}`}
+              className={`seg-btn${selectedSfxStyle === s ? " active" : ""}`}
               onClick={() => update("sfxStyle", s)}
             >
               {s}
@@ -122,7 +128,7 @@ export default function AudioTab() {
           {bgmStyles.map((s) => (
             <button
               key={s}
-              className={`seg-btn${settings.bgmStyle === s ? " active" : ""}`}
+              className={`seg-btn${selectedBgmStyle === s ? " active" : ""}`}
               onClick={() => update("bgmStyle", s)}
             >
               {s}
