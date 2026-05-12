@@ -4,6 +4,16 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "1.6.0",
+    date: "2026-05-12",
+    title: "New Game: Billiards",
+    items: [
+      "Added Billiards to the Games Hub — a 3D billiards web game.",
+      "Added gameTagSports translation key for sports genre classification.",
+      "Added multi-language translations for Billiards title and description.",
+    ],
+  },
+  {
     version: "1.5.0",
     date: "2026-05-09",
     title: "Audio Engine + Interaction Polish",

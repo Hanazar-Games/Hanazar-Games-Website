@@ -27,6 +27,13 @@ const games = [
     href: "https://hanazar-games.github.io/3D-2048-webgame/",
     tag: "gameTagArcade",
     image: "/games/3d-2048.jpg"
+  },
+  {
+    title: "gameBilliardsTitle",
+    description: "gameBilliardsDesc",
+    href: "https://hanazar-games.github.io/Billiards/",
+    tag: "gameTagSports",
+    image: "/games/billiards.jpg"
   }
 ];
 
