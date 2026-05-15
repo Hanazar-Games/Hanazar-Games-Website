@@ -6,59 +6,31 @@ import type { CSSProperties } from "react";
 import { useEffect } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 
-const games = [
+const experiments = [
   {
-    title: "gameTicTacToeTitle",
-    description: "gameTicTacToeDesc",
-    href: "https://hanazar-games.github.io/Tic-Tac-Toe/",
-    tag: "gameTagStrategy",
-    image: "/games/tic-tac-toe.jpg"
-  },
-  {
-    title: "gameMinesweeperTitle",
-    description: "gameMinesweeperDesc",
-    href: "https://hanazar-games.github.io/Minesweeper/",
-    tag: "gameTagPuzzle",
-    image: "/games/minesweeper.jpg"
-  },
-  {
-    title: "game2048Title",
-    description: "game2048Desc",
-    href: "https://hanazar-games.github.io/3D-2048-webgame/",
-    tag: "gameTagArcade",
-    image: "/games/3d-2048.jpg"
-  },
-  {
-    title: "gameBilliardsTitle",
-    description: "gameBilliardsDesc",
-    href: "https://hanazar-games.github.io/Billiards/",
-    tag: "gameTagSports",
-    image: "/games/billiards.jpg"
-  },
-  {
-    title: "gameStellarDefenseTitle",
-    description: "gameStellarDefenseDesc",
+    title: "aigcKimiTitle",
+    description: "aigcKimiDesc",
     href: "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
-    tag: "gameTagShooter",
-    image: "/games/stellar-defense.jpg"
+    tag: "aigcTagKimi",
+    image: "/aigc/kimi-26-code.jpg"
   },
   {
-    title: "gameNeonSalvageTitle",
-    description: "gameNeonSalvageDesc",
+    title: "aigcGptMediumTitle",
+    description: "aigcGptMediumDesc",
     href: "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
-    tag: "gameTagAction",
-    image: "/games/neon-salvage.jpg"
+    tag: "aigcTagGptMedium",
+    image: "/aigc/gpt-55-medium.jpg"
   },
   {
-    title: "gameLumenDriftTitle",
-    description: "gameLumenDriftDesc",
+    title: "aigcGptMaxTitle",
+    description: "aigcGptMaxDesc",
     href: "https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project",
-    tag: "gameTagArcade",
-    image: "/games/lumen-drift.jpg"
+    tag: "aigcTagGptMax",
+    image: "/aigc/gpt-55-extrahigh.jpg"
   }
 ];
 
-export default function GamesPage() {
+export default function AigcPage() {
   const { tr } = useTranslation();
 
   useEffect(() => {
@@ -80,20 +52,20 @@ export default function GamesPage() {
 
   return (
     <main className="pageShell gamesShell">
-      <section className="gamesHero">
+      <section className="gamesHero aigcHero">
         <div className="gamesHeroInner">
-          <span className="gamesHeroEyebrow">{tr("gamesHeroEyebrow")}</span>
-          <h1 className="gamesHeroTitle">{tr("gamesHeroTitle")}</h1>
+          <span className="gamesHeroEyebrow">{tr("aigcHeroEyebrow")}</span>
+          <h1 className="gamesHeroTitle">{tr("aigcHeroTitle")}</h1>
           <p className="gamesHeroSubtitle">
-            {tr("gamesHeroSubtitle")}
+            {tr("aigcHeroSubtitle")}
           </p>
         </div>
       </section>
 
       <div className="gamesGrid">
-        {games.map((game, index) => (
+        {experiments.map((experiment, index) => (
           <article
-            key={game.title}
+            key={experiment.title}
             className={`gameCard ${
               index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
             }`}
@@ -102,25 +74,25 @@ export default function GamesPage() {
           >
             <div className="gameCardImageWrap">
               <Image
-                src={game.image}
-                alt={tr(game.title)}
+                src={experiment.image}
+                alt={tr(experiment.title)}
                 className="gameCardImage"
-                width={640}
-                height={360}
+                width={960}
+                height={540}
                 sizes="(max-width: 800px) 100vw, 33vw"
               />
             </div>
             <div className="gameCardBody">
-              <span className="gameCardTag">{tr(game.tag)}</span>
-              <h2>{tr(game.title)}</h2>
-              <p>{tr(game.description)}</p>
+              <span className="gameCardTag">{tr(experiment.tag)}</span>
+              <h2>{tr(experiment.title)}</h2>
+              <p>{tr(experiment.description)}</p>
               <a
                 className="gameCardButton"
-                href={game.href}
+                href={experiment.href}
                 target="_blank"
                 rel="noreferrer"
               >
-                {tr("gamePlayButton")}
+                {tr("aigcOpenButton")}
                 <span className="gameCardArrow">↗</span>
               </a>
             </div>
@@ -129,7 +101,7 @@ export default function GamesPage() {
       </div>
 
       <div className="gamesCta reveal revealFade" data-reveal>
-        <p>{tr("gamesMoreSoon")}</p>
+        <p>{tr("aigcMoreSoon")}</p>
         <Link href="/" className="gamesHomeButton">
           {tr("gamesBackHome")}
         </Link>

@@ -34,10 +34,10 @@ const productModules = [
     icon: true
   },
   {
-    title: "productConceptsTitle",
-    body: "productConceptsBody",
-    cta: "ctaViewGithub",
-    href: githubUrl,
+    title: "productAigcTitle",
+    body: "productAigcBody",
+    cta: "ctaExploreAigc",
+    href: "/aigc",
     icon: true
   }
 ];
@@ -96,7 +96,7 @@ const footerCtas = [
 const footerColumns = [
   {
     title: "footerColumnGames",
-    links: ["productFeaturedTitle", "footerWorldsChars", "productConceptsTitle", "footerUpcoming"]
+    links: ["productFeaturedTitle", "productWorldsTitle", "productAigcTitle", "footerUpcoming"]
   },
   {
     title: "footerColumnDocs",

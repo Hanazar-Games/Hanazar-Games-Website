@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "1.7.0",
+    date: "2026-05-15",
+    title: "AIGC Experiments + Games Hub Expansion",
+    items: [
+      "Added the AIGC Experiments page with Kimi 2.6 Code, GPT 5.5 Medium, and GPT 5.5 Extra High project entries.",
+      "Replaced the Products section Playable Concepts card with the AIGC Experiments entry point.",
+      "Added Stellar Defense, Neon Salvage, and Lumen Drift to the Games Hub with newly generated game cover art.",
+      "Updated Games Hub copy and multi-language translation keys for the new entries.",
+    ],
+  },
+  {
     version: "1.6.0",
     date: "2026-05-12",
     title: "New Game: Billiards",
