@@ -4,6 +4,16 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "1.8.0",
+    date: "2026-05-15",
+    title: "New Game: Doudizhu",
+    items: [
+      "Added Doudizhu (Dou Di Zhu) to the Games Hub — the classic Chinese card game.",
+      "Added gameTagCard translation key for card game genre classification.",
+      "Added multi-language translations for Doudizhu title and description.",
+    ],
+  },
+  {
     version: "1.7.0",
     date: "2026-05-15",
     title: "AIGC Experiments + Games Hub Expansion",

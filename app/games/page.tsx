@@ -55,6 +55,13 @@ const games = [
     href: "https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project",
     tag: "gameTagArcade",
     image: "/games/lumen-drift.jpg"
+  },
+  {
+    title: "gameDoudizhuTitle",
+    description: "gameDoudizhuDesc",
+    href: "https://hanazar-games.github.io/Doudizhu-webgame",
+    tag: "gameTagCard",
+    image: "/games/doudizhu.jpg"
   }
 ];
 
