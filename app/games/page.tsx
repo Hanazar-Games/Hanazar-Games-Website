@@ -62,6 +62,13 @@ const games = [
     href: "https://hanazar-games.github.io/Doudizhu-webgame",
     tag: "gameTagCard",
     image: "/games/doudizhu.jpg"
+  },
+  {
+    title: "gameMahjongTitle",
+    description: "gameMahjongDesc",
+    href: "https://hanazar-games.github.io/Mahjong-Webgame",
+    tag: "gameTagBoard",
+    image: "/games/mahjong.jpg"
   }
 ];
 

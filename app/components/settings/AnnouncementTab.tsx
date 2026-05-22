@@ -4,6 +4,16 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "1.9.0",
+    date: "2026-05-15",
+    title: "New Game: Mahjong",
+    items: [
+      "Added Mahjong to the Games Hub — the classic Chinese tile-based game with multiple regional rule sets.",
+      "Added gameTagBoard translation key for board game genre classification.",
+      "Added multi-language translations for Mahjong title and description.",
+    ],
+  },
+  {
     version: "1.8.0",
     date: "2026-05-15",
     title: "New Game: Doudizhu",
