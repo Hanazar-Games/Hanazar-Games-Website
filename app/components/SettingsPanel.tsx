@@ -36,6 +36,10 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const previousOverflowRef = useRef("");
   const { tr } = useTranslation();
 
   useEffect(() => {
@@ -57,19 +61,59 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (e.key !== "Tab" || !modalRef.current) return;
+
+      const focusable = Array.from(
+        modalRef.current.querySelectorAll<HTMLElement>(
+          "a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex='-1'])"
+        )
+      ).filter((element) => element.offsetParent !== null);
+
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+
+      if (!modalRef.current.contains(active)) {
+        e.preventDefault();
+        first.focus();
+        return;
+      }
+
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+        return;
+      }
+
+      if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
     },
     [onClose]
   );
 
   useEffect(() => {
     if (open) {
+      previousFocusRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+      previousOverflowRef.current = document.body.style.overflow;
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
+      requestAnimationFrame(() => closeButtonRef.current?.focus({ preventScroll: true }));
     }
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflowRef.current;
+      previousFocusRef.current?.focus({ preventScroll: true });
     };
   }, [open, handleKeyDown]);
 
@@ -95,14 +139,21 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     <div className={`settingsOverlay${animating ? " active" : ""}`} onClick={onClose}>
       <div
         className={`settingsModal${animating ? " active" : ""}`}
+        ref={modalRef}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="settings-title"
         aria-label={tr("ariaSettings")}
       >
         <div className="settingsModalHeader">
-          <h2>{tr("settingsTitle")}</h2>
-          <button className="settingsCloseBtn" onClick={onClose} aria-label={tr("ariaCloseSettings")}>
+          <h2 id="settings-title">{tr("settingsTitle")}</h2>
+          <button
+            className="settingsCloseBtn"
+            ref={closeButtonRef}
+            onClick={onClose}
+            aria-label={tr("ariaCloseSettings")}
+          >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />

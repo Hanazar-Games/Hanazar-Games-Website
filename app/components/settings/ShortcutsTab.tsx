@@ -3,14 +3,11 @@
 import { useTranslation } from "../../hooks/useTranslation";
 
 const shortcuts = [
-  { actionKey: "scOpenSettings", key: "Ctrl + ," },
+  { actionKey: "scOpenSettings", key: "Ctrl / Cmd + ," },
   { actionKey: "scCloseModal", key: "Escape" },
   { actionKey: "scNavigateTabs", key: "Tab / Shift + Tab" },
-  { actionKey: "scToggleTheme", key: "Ctrl + Shift + L" },
-  { actionKey: "scMute", key: "Ctrl + M" },
-  { actionKey: "scReset", key: "Ctrl + Shift + R" },
-  { actionKey: "scExport", key: "Ctrl + Shift + E" },
-  { actionKey: "scImport", key: "Ctrl + Shift + I" },
+  { actionKey: "scToggleTheme", key: "Ctrl / Cmd + Shift + L" },
+  { actionKey: "scMute", key: "Ctrl / Cmd + M" },
 ];
 
 export default function ShortcutsTab() {

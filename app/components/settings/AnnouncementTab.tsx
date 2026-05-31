@@ -1,8 +1,19 @@
 "use client";
 
-import { useTranslation } from "../../hooks/useTranslation";
-
 const changelog = [
+  {
+    version: "2.0.0",
+    date: "2026-05-31",
+    title: "Deep QA + Global Settings",
+    items: [
+      "Moved Settings into a site-wide launcher so every page can open the same settings modal.",
+      "Implemented the advertised global shortcuts for opening settings, toggling theme, and muting audio.",
+      "Added focus trapping and focus restoration to the settings modal for safer keyboard navigation.",
+      "Hardened settings import and localStorage loading with type validation, enum checks, and numeric clamping.",
+      "Improved BGM status feedback so off, muted, pending, and playing states are reflected accurately.",
+      "Updated the old release notice into the historical changelog below this release.",
+    ],
+  },
   {
     version: "1.9.0",
     date: "2026-05-15",
@@ -138,13 +149,28 @@ const changelog = [
 ];
 
 export default function AnnouncementTab() {
-  const { tr } = useTranslation();
+  const [latest, ...history] = changelog;
 
   return (
     <div className="settingsTabContent">
       <div className="changelogList">
-        {changelog.map((entry) => (
-          <div className="changelogEntry" key={entry.version}>
+        <div className="changelogEntry changelogEntryLatest" key={latest.version}>
+          <div className="changelogHeader">
+            <span className="changelogVersion">{latest.version}</span>
+            <span className="changelogDate">{latest.date}</span>
+          </div>
+          <h4 className="changelogTitle">{latest.title}</h4>
+          <ul className="changelogItems">
+            {latest.items.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="changelogHistoryLabel">History</div>
+
+        {history.map((entry) => (
+          <div className="changelogEntry changelogEntryHistory" key={entry.version}>
             <div className="changelogHeader">
               <span className="changelogVersion">{entry.version}</span>
               <span className="changelogDate">{entry.date}</span>

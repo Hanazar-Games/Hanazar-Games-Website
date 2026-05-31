@@ -56,6 +56,14 @@ body[data-theme="light"] .settingsModal {
   color: #1a1a1a;
 }
 
+body[data-theme="light"] .settingsFloatingButton {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.72)),
+    rgba(255, 255, 255, 0.86);
+  color: #1a1a1a;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.16);
+}
+
 body[data-theme="light"] .settingsTabBtn {
   color: #444;
 }
@@ -204,6 +212,7 @@ body[data-disable-ui-fade="true"] .reveal {
 }
 
 body[data-disable-btn-hover="true"] .heroNavButton:hover,
+body[data-disable-btn-hover="true"] .settingsFloatingButton:hover,
 body[data-disable-btn-hover="true"] .moduleButton:hover,
 body[data-disable-btn-hover="true"] .gameCardButton:hover,
 body[data-disable-btn-hover="true"] .settingsBtn:hover,
@@ -223,6 +232,7 @@ body[data-disable-modal-anim="true"] .settingsModal {
 .heroNavButton,
 .moduleButton,
 .gameCardButton,
+.settingsFloatingButton,
 .settingsBtn,
 .gameCard,
 .colorPreset,
@@ -237,6 +247,49 @@ body[data-disable-modal-anim="true"] .settingsModal {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.settingsFloatingButton {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 90;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035)),
+    rgba(9, 9, 9, 0.78);
+  color: var(--text);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.settingsFloatingButton:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.055)),
+    rgba(18, 18, 18, 0.88);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.settingsFloatingButton svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .pageShell {
@@ -457,11 +510,17 @@ a {
 .gameCardButton:focus-visible,
 .settingsBtn:focus-visible,
 .settingsCloseBtn:focus-visible,
+.settingsFloatingButton:focus-visible,
 .settingsTabBtn:focus-visible,
 .seg-btn:focus-visible,
 .colorPreset:focus-visible,
 .languageItem:focus-visible,
 .gamesHomeButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.switch input:focus-visible + .slider {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -1806,6 +1865,25 @@ a {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.changelogEntryLatest {
+  border-color: rgba(255, 255, 255, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025)),
+    rgba(255, 255, 255, 0.03);
+}
+
+.changelogEntryHistory {
+  opacity: 0.86;
+}
+
+.changelogHistoryLabel {
+  margin: 2px 0 -6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .changelogHeader {
   display: flex;
   align-items: center;
@@ -1934,6 +2012,13 @@ a {
 
   .settingsTabPanel {
     padding: 16px;
+  }
+
+  .settingsFloatingButton {
+    right: 14px;
+    bottom: 14px;
+    width: 42px;
+    height: 42px;
   }
 
   .colorPresetGrid {

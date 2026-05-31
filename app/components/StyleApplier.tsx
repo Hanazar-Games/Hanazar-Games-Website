@@ -1,10 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSettingsContext } from "./SettingsContext";
 
 export default function StyleApplier() {
   const { settings } = useSettingsContext();
+  const [systemTheme, setSystemTheme] = useState<"dark" | "light">(() => {
+    if (typeof window === "undefined") return "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  });
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const syncSystemTheme = () => setSystemTheme(media.matches ? "dark" : "light");
+
+    syncSystemTheme();
+    media.addEventListener("change", syncSystemTheme);
+    return () => media.removeEventListener("change", syncSystemTheme);
+  }, []);
 
   useEffect(() => {
     const body = document.body;
@@ -12,7 +25,7 @@ export default function StyleApplier() {
     // Theme
     let effectiveTheme = settings.theme;
     if (effectiveTheme === "auto") {
-      effectiveTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      effectiveTheme = systemTheme;
     }
     body.setAttribute("data-theme", effectiveTheme);
 
@@ -81,6 +94,7 @@ export default function StyleApplier() {
     settings.animUiFade,
     settings.animButtonHover,
     settings.animModal,
+    systemTheme,
   ]);
 
   return null;

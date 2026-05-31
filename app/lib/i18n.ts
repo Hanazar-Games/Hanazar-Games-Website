@@ -262,6 +262,8 @@ raw.ariaOpenSettings = T("Open settings", { "zh-CN": "打开设置", "zh-TW": "�
 raw.stPreviewSfx = T("Preview SFX", {});
 raw.stBgmReady = T("BGM will start after your next interaction.", {});
 raw.stBgmIdle = T("BGM is off.", {});
+raw.stBgmMuted = T("BGM is muted.", {});
+raw.stBgmPlaying = T("BGM is playing.", {});
 
 // Build final translations object
 export const t = (() => {

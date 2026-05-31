@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSettingsContext } from "../SettingsContext";
 import { useTranslation } from "../../hooks/useTranslation";
 
@@ -21,6 +22,7 @@ const bgmStyles = [
 export default function AudioTab() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
+  const [audioState, setAudioState] = useState({ unlocked: false, bgmActive: false });
   const selectedSfxStyle = sfxStyles.find(
     (style) => style.toLowerCase() === settings.sfxStyle.toLowerCase()
   ) ?? settings.sfxStyle;
@@ -30,6 +32,28 @@ export default function AudioTab() {
   const previewSfx = () => {
     window.dispatchEvent(new CustomEvent("hanazar:sfx-preview"));
   };
+  const bgmStatus = !settings.bgmEnabled
+    ? tr("stBgmIdle")
+    : settings.masterVolume <= 0 || settings.bgmVolume <= 0
+      ? tr("stBgmMuted")
+      : audioState.bgmActive
+        ? tr("stBgmPlaying")
+        : tr("stBgmReady");
+
+  useEffect(() => {
+    const handleAudioState = (event: Event) => {
+      const detail = (event as CustomEvent<{ unlocked: boolean; bgmActive: boolean }>).detail;
+      if (!detail) return;
+      setAudioState({
+        unlocked: detail.unlocked,
+        bgmActive: detail.bgmActive,
+      });
+    };
+
+    window.addEventListener("hanazar:audio-state", handleAudioState);
+    window.dispatchEvent(new Event("hanazar:audio-state-request"));
+    return () => window.removeEventListener("hanazar:audio-state", handleAudioState);
+  }, []);
 
   return (
     <div className="settingsTabContent">
@@ -52,7 +76,7 @@ export default function AudioTab() {
             {tr("stPreviewSfx")}
           </button>
           <span className="audioStatus">
-            {settings.bgmEnabled ? tr("stBgmReady") : tr("stBgmIdle")}
+            {bgmStatus}
           </span>
         </div>
       </div>

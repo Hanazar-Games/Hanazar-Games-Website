@@ -20,8 +20,13 @@ export default function OtherTab() {
     URL.revokeObjectURL(url);
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(exportJson());
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(exportJson());
+    } catch {
+      setImportArea(exportJson());
+      setShowImport(true);
+    }
   };
 
   const handleImport = () => {
@@ -36,7 +41,7 @@ export default function OtherTab() {
   };
 
   const handleClearCache = () => {
-    localStorage.removeItem("hanazar-settings-v1");
+    reset();
     alert(tr("stCacheCleared"));
   };
 

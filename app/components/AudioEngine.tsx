@@ -71,6 +71,15 @@ export default function AudioEngine() {
   const unlockedRef = useRef(false);
   const settingsRef = useRef(settings);
 
+  const publishAudioState = useCallback(() => {
+    window.dispatchEvent(new CustomEvent("hanazar:audio-state", {
+      detail: {
+        unlocked: unlockedRef.current,
+        bgmActive: Boolean(bgmRef.current),
+      },
+    }));
+  }, []);
+
   useEffect(() => {
     settingsRef.current = settings;
   }, [settings]);
@@ -90,7 +99,8 @@ export default function AudioEngine() {
     if (!ctx) return;
     if (ctx.state === "suspended") await ctx.resume();
     unlockedRef.current = true;
-  }, [getContext]);
+    publishAudioState();
+  }, [getContext, publishAudioState]);
 
   const playSfx = useCallback(() => {
     const current = settingsRef.current;
@@ -121,7 +131,8 @@ export default function AudioEngine() {
   const stopBgm = useCallback(() => {
     bgmRef.current?.stop();
     bgmRef.current = null;
-  }, []);
+    publishAudioState();
+  }, [publishAudioState]);
 
   const startBgm = useCallback(() => {
     const current = settingsRef.current;
@@ -172,7 +183,8 @@ export default function AudioEngine() {
         lfo.stop(end);
       },
     };
-  }, [getContext]);
+    publishAudioState();
+  }, [getContext, publishAudioState]);
 
   useEffect(() => {
     const interactiveSelector =
@@ -214,12 +226,14 @@ export default function AudioEngine() {
     window.addEventListener("pointerdown", handlePointerDown, { capture: true });
     window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("hanazar:sfx-preview", handlePreview);
+    window.addEventListener("hanazar:audio-state-request", publishAudioState);
     return () => {
       window.removeEventListener("pointerdown", handlePointerDown, { capture: true });
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("hanazar:sfx-preview", handlePreview);
+      window.removeEventListener("hanazar:audio-state-request", publishAudioState);
     };
-  }, [playSfx, startBgm, unlock]);
+  }, [playSfx, publishAudioState, startBgm, unlock]);
 
   useEffect(() => {
     if (!settings.bgmEnabled || settings.masterVolume <= 0 || settings.bgmVolume <= 0) {

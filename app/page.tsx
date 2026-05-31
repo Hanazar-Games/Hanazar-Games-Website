@@ -1,10 +1,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import SettingsPanel from "./components/SettingsPanel";
 import { useTranslation } from "./hooks/useTranslation";
 
 const githubUrl = "https://github.com/hzagaming";
@@ -117,7 +116,6 @@ const footerColumns = [
 ];
 
 export default function HomePage() {
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const { tr } = useTranslation();
 
   useEffect(() => {
@@ -185,15 +183,13 @@ export default function HomePage() {
             ))}
             <button
               className="heroNavButton"
-              onClick={() => setSettingsOpen(true)}
+              onClick={() => window.dispatchEvent(new Event("hanazar:open-settings"))}
               style={{ "--button-index": heroLinks.length } as CSSProperties}
               aria-label={tr("ariaOpenSettings")}
             >
               {tr("navSettings")}
             </button>
           </nav>
-
-          <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         </div>
       </section>
 
