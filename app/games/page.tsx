@@ -69,6 +69,20 @@ const games = [
     href: "https://hanazar-games.github.io/Mahjong-Webgame",
     tag: "gameTagBoard",
     image: "/games/mahjong.jpg"
+  },
+  {
+    title: "game24PointsTitle",
+    description: "game24PointsDesc",
+    href: "https://hanazar-games.github.io/24-Points-Webgame",
+    tag: "gameTagMath",
+    image: "/games/24-points.jpg"
+  },
+  {
+    title: "gameXiangQiTitle",
+    description: "gameXiangQiDesc",
+    href: "https://hanazar-games.github.io/XiangQi-webgame/",
+    tag: "gameTagChess",
+    image: "/games/xiangqi.jpg"
   }
 ];
 

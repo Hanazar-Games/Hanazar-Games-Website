@@ -2,6 +2,17 @@
 
 const changelog = [
   {
+    version: "2.1.0",
+    date: "2026-06-01",
+    title: "New Games: 24 Points + XiangQi",
+    items: [
+      "Added 24 Points to the Games Hub — a fast-paced math card game.",
+      "Added XiangQi (Chinese Chess) to the Games Hub — the classic strategy board game.",
+      "Added gameTagMath and gameTagChess translation keys for genre classification.",
+      "Added multi-language translations for both game titles and descriptions.",
+    ],
+  },
+  {
     version: "2.0.0",
     date: "2026-05-31",
     title: "Deep QA + Global Settings",
