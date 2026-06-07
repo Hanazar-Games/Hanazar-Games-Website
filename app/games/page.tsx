@@ -83,6 +83,27 @@ const games = [
     href: "https://hanazar-games.github.io/XiangQi-webgame/",
     tag: "gameTagChess",
     image: "/games/xiangqi.jpg"
+  },
+  {
+    title: "game2048OriginalTitle",
+    description: "game2048OriginalDesc",
+    href: "https://hanazar-games.github.io/2048-Original",
+    tag: "gameTagPuzzle",
+    image: "/games/2048-original.jpg"
+  },
+  {
+    title: "game2048NewEraTitle",
+    description: "game2048NewEraDesc",
+    href: "https://hanazar-games.github.io/2048-New-era/",
+    tag: "gameTagPuzzle",
+    image: "/games/2048-new-era.jpg"
+  },
+  {
+    title: "gameSudokuTitle",
+    description: "gameSudokuDesc",
+    href: "https://hanazar-games.github.io/Sudoku-Webgame",
+    tag: "gameTagPuzzle",
+    image: "/games/sudoku.jpg"
   }
 ];
 

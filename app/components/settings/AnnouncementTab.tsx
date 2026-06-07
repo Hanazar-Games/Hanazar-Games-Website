@@ -2,6 +2,17 @@
 
 const changelog = [
   {
+    version: "2.2.0",
+    date: "2026-06-01",
+    title: "New Games: 2048 Original + 2048 New Era + Sudoku",
+    items: [
+      "Added 2048 Original to the Games Hub — the classic number-merging puzzle.",
+      "Added 2048 New Era to the Games Hub — a modern reimagining with fresh visuals.",
+      "Added Sudoku to the Games Hub — the timeless 9×9 logic puzzle.",
+      "Added multi-language translations for all three new game titles and descriptions.",
+    ],
+  },
+  {
     version: "2.1.0",
     date: "2026-06-01",
     title: "New Games: 24 Points + XiangQi",
