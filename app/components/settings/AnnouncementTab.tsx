@@ -2,6 +2,16 @@
 
 const changelog = [
   {
+    version: "2.3.0",
+    date: "2026-06-01",
+    title: "New Game: Subway Surfers",
+    items: [
+      "Added Subway Surfers to the Games Hub — an endless runner through subway tunnels.",
+      "Added gameTagRunner translation key for runner/arcade genre classification.",
+      "Added multi-language translations for Subway Surfers title and description.",
+    ],
+  },
+  {
     version: "2.2.0",
     date: "2026-06-01",
     title: "New Games: 2048 Original + 2048 New Era + Sudoku",

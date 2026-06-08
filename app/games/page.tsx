@@ -104,6 +104,13 @@ const games = [
     href: "https://hanazar-games.github.io/Sudoku-Webgame",
     tag: "gameTagPuzzle",
     image: "/games/sudoku.jpg"
+  },
+  {
+    title: "gameSubwaySurfersTitle",
+    description: "gameSubwaySurfersDesc",
+    href: "https://hanazar-games.github.io/Subway-Surfers/",
+    tag: "gameTagRunner",
+    image: "/games/subway-surfers.jpg"
   }
 ];
 
