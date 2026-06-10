@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useSettingsContext } from "../SettingsContext";
 import { useTranslation } from "../../hooks/useTranslation";
 
@@ -9,51 +8,15 @@ const sfxStyles = [
   "Drum", "Piano", "Synth", "Chiptune", "Pluck", "Crystal"
 ];
 
-const bgmStyles = [
-  "Orchestral", "Ambient", "Electronic", "Piano", "Synthwave", "Nature",
-  "Jazz", "Meditation", "Cyber", "Lo-Fi", "Rock", "Blues",
-  "Folk", "Reggae", "Funk", "Soul", "Gospel", "Country",
-  "Celtic", "Oriental", "Tribal", "Space", "Underwater", "Rain",
-  "Wind Chimes", "Fireplace", "Night", "Sunrise", "Dream", "Energy",
-  "Battle", "Adventure", "Mystery", "Romance", "Nostalgia", "Hope",
-  "Epic", "Relax", "Study", "Focus"
-];
-
 export default function AudioTab() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
-  const [audioState, setAudioState] = useState({ unlocked: false, bgmActive: false });
   const selectedSfxStyle = sfxStyles.find(
     (style) => style.toLowerCase() === settings.sfxStyle.toLowerCase()
   ) ?? settings.sfxStyle;
-  const selectedBgmStyle = bgmStyles.find(
-    (style) => style.toLowerCase() === settings.bgmStyle.toLowerCase()
-  ) ?? settings.bgmStyle;
   const previewSfx = () => {
     window.dispatchEvent(new CustomEvent("hanazar:sfx-preview"));
   };
-  const bgmStatus = !settings.bgmEnabled
-    ? tr("stBgmIdle")
-    : settings.masterVolume <= 0 || settings.bgmVolume <= 0
-      ? tr("stBgmMuted")
-      : audioState.bgmActive
-        ? tr("stBgmPlaying")
-        : tr("stBgmReady");
-
-  useEffect(() => {
-    const handleAudioState = (event: Event) => {
-      const detail = (event as CustomEvent<{ unlocked: boolean; bgmActive: boolean }>).detail;
-      if (!detail) return;
-      setAudioState({
-        unlocked: detail.unlocked,
-        bgmActive: detail.bgmActive,
-      });
-    };
-
-    window.addEventListener("hanazar:audio-state", handleAudioState);
-    window.dispatchEvent(new Event("hanazar:audio-state-request"));
-    return () => window.removeEventListener("hanazar:audio-state", handleAudioState);
-  }, []);
 
   return (
     <div className="settingsTabContent">
@@ -75,9 +38,6 @@ export default function AudioTab() {
           <button className="settingsBtn" type="button" data-sfx-preview onClick={previewSfx}>
             {tr("stPreviewSfx")}
           </button>
-          <span className="audioStatus">
-            {bgmStatus}
-          </span>
         </div>
       </div>
 
@@ -119,47 +79,6 @@ export default function AudioTab() {
             </button>
           ))}
         </div>
-      </div>
-
-      <div className="settingGroup">
-        <div className="settingRow">
-          <span className="settingLabel" id="label-bgm">{tr("stBgm")}</span>
-          <label className="switch">
-            <input
-              type="checkbox"
-              checked={settings.bgmEnabled}
-              onChange={(e) => update("bgmEnabled", e.target.checked)}
-              aria-labelledby="label-bgm"
-            />
-            <span className="slider" />
-          </label>
-        </div>
-        <div className="sliderHeader">
-          <label className="settingLabel sub" htmlFor="bgm-vol">{tr("stBgmVolume")}</label>
-          <span className="sliderValue">{settings.bgmVolume}%</span>
-        </div>
-        <input
-          id="bgm-vol"
-          type="range"
-          className="rangeSlider"
-          min={0}
-          max={100}
-          value={settings.bgmVolume}
-          onChange={(e) => update("bgmVolume", Number(e.target.value))}
-        />
-        <span className="settingLabel sub">{tr("stBgmStyle")}</span>
-        <div className="segmented musicStyleGrid">
-          {bgmStyles.map((s) => (
-            <button
-              key={s}
-              className={`seg-btn${selectedBgmStyle === s ? " active" : ""}`}
-              onClick={() => update("bgmStyle", s)}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-        <p className="settingDesc">{tr("stBgmNote")}</p>
       </div>
     </div>
   );

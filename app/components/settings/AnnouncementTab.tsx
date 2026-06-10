@@ -2,6 +2,16 @@
 
 const changelog = [
   {
+    version: "2.3.1",
+    date: "2026-06-01",
+    title: "Settings Cleanup: Remove BGM and API",
+    items: [
+      "Removed BGM controls from Audio settings tab — only SFX remains.",
+      "Removed API settings tab entirely.",
+      "Cleaned up unused imports and simplified AudioTab code.",
+    ],
+  },
+  {
     version: "2.3.0",
     date: "2026-06-01",
     title: "New Game: Subway Surfers",

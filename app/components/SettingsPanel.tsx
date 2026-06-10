@@ -7,7 +7,7 @@ import LanguageTab from "./settings/LanguageTab";
 import AudioTab from "./settings/AudioTab";
 import AnimationTab from "./settings/AnimationTab";
 import PerformanceTab from "./settings/PerformanceTab";
-import ApiTab from "./settings/ApiTab";
+
 import ShortcutsTab from "./settings/ShortcutsTab";
 import OtherTab from "./settings/OtherTab";
 import AnnouncementTab from "./settings/AnnouncementTab";
@@ -19,7 +19,6 @@ const tabs = [
   { key: "audio", label: "tabAudio", icon: "A" },
   { key: "animation", label: "tabAnimation", icon: "N" },
   { key: "performance", label: "tabPerformance", icon: "P" },
-  { key: "api", label: "tabApi", icon: "I" },
   { key: "shortcuts", label: "tabShortcuts", icon: "K" },
   { key: "other", label: "tabOther", icon: "O" },
   { key: "announcement", label: "tabAnnouncement", icon: "B" },
@@ -124,7 +123,6 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       case "audio": return <AudioTab />;
       case "animation": return <AnimationTab />;
       case "performance": return <PerformanceTab />;
-      case "api": return <ApiTab />;
       case "shortcuts": return <ShortcutsTab />;
       case "other": return <OtherTab />;
       case "announcement": return <AnnouncementTab />;
