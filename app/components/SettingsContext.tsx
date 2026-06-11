@@ -16,9 +16,6 @@ export interface SettingsState {
   sfxEnabled: boolean;
   sfxVolume: number;
   sfxStyle: string;
-  bgmEnabled: boolean;
-  bgmVolume: number;
-  bgmStyle: string;
   // Animation
   animationsEnabled: boolean;
   animSpeed: number;
@@ -34,10 +31,6 @@ export interface SettingsState {
   aggressiveCache: boolean;
   devMode: boolean;
   maxConcurrent: number;
-  // API
-  apiBaseUrl: string;
-  apiTimeout: number;
-  apiRetries: number;
 }
 
 const defaultSettings: SettingsState = {
@@ -51,9 +44,6 @@ const defaultSettings: SettingsState = {
   sfxEnabled: true,
   sfxVolume: 70,
   sfxStyle: "Classic",
-  bgmEnabled: false,
-  bgmVolume: 30,
-  bgmStyle: "Ambient",
   animationsEnabled: true,
   animSpeed: 100,
   animUiFade: true,
@@ -67,9 +57,6 @@ const defaultSettings: SettingsState = {
   aggressiveCache: false,
   devMode: false,
   maxConcurrent: 4,
-  apiBaseUrl: "",
-  apiTimeout: 30000,
-  apiRetries: 3,
 };
 
 const STORAGE_KEY = "hanazar-settings-v1";
@@ -86,7 +73,6 @@ const optionSets = {
 
 const booleanKeys = [
   "sfxEnabled",
-  "bgmEnabled",
   "animationsEnabled",
   "animUiFade",
   "animButtonHover",
@@ -104,11 +90,8 @@ const numberRanges = {
   contrast: [80, 130],
   masterVolume: [0, 100],
   sfxVolume: [0, 100],
-  bgmVolume: [0, 100],
   animSpeed: [50, 150],
   maxConcurrent: [1, 10],
-  apiTimeout: [5000, 60000],
-  apiRetries: [0, 10],
 } as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -136,8 +119,6 @@ function normalizeSettings(input: unknown, base: SettingsState = defaultSettings
 
   if (typeof input.customFont === "string") next.customFont = input.customFont.slice(0, 120);
   if (typeof input.sfxStyle === "string") next.sfxStyle = input.sfxStyle.slice(0, 80);
-  if (typeof input.bgmStyle === "string") next.bgmStyle = input.bgmStyle.slice(0, 80);
-  if (typeof input.apiBaseUrl === "string") next.apiBaseUrl = input.apiBaseUrl.slice(0, 500);
 
   for (const key of booleanKeys) {
     if (typeof input[key] === "boolean") next[key] = input[key];

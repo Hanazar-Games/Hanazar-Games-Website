@@ -2,6 +2,18 @@
 
 const changelog = [
   {
+    version: "2.3.2",
+    date: "2026-06-01",
+    title: "QA Pass: Audio Cleanup + Polish",
+    items: [
+      "Removed all BGM engine code now that BGM controls are gone — legacy localStorage can no longer trigger hidden background audio.",
+      "Purged API settings fields from persisted state since the API tab was removed.",
+      "Reduced SFX spam: removed range sliders from the SFX trigger list and added 80 ms throttling for rapid interactions.",
+      "Fixed Games Hub reveal animation pattern so 15 cards now cycle left / fade / right instead of stacking on one direction.",
+      "Fixed Korean translations for footer links (Internal Archive, Press Kit, Contact Studio).",
+    ],
+  },
+  {
     version: "2.3.1",
     date: "2026-06-01",
     title: "Settings Cleanup: Remove BGM and API",
@@ -122,6 +134,17 @@ const changelog = [
   {
     version: "1.2.3",
     date: "2026-05-08",
+    title: "Bug Fix Release",
+    items: [
+      "Fixed: Clear Cache now only removes hanazar-settings-v1 instead of wiping all localStorage.",
+      "Fixed: Tab switching no longer re-mounts content panel — scroll position resets smoothly via ref.",
+      "Fixed: BGM style list trimmed from 40 to 12 curated options for better mobile UX.",
+      "Added: Custom dark scrollbar styling for settings panel, language list, and style grid.",
+    ],
+  },
+  {
+    version: "1.2.2",
+    date: "2026-05-08",
     title: "Full i18n Translation System",
     items: [
       "Wired up complete i18n translation across homepage, games page, settings modal, and all 10 settings tabs.",
@@ -129,17 +152,6 @@ const changelog = [
       "Dynamic html lang attribute updates for screen-reader accessibility when switching languages.",
       "All aria-labels translated (Settings, Close settings, Settings categories, Homepage sections, Open settings).",
       "Fixed previously untranslated footer link placeholders, theme buttons, font labels, and input placeholders.",
-    ],
-  },
-  {
-    version: "1.2.2",
-    date: "2026-05-08",
-    title: "Bug Fix Release",
-    items: [
-      "Fixed: Clear Cache now only removes hanazar-settings-v1 instead of wiping all localStorage.",
-      "Fixed: Tab switching no longer re-mounts content panel — scroll position resets smoothly via ref.",
-      "Fixed: BGM style list trimmed from 40 to 12 curated options for better mobile UX.",
-      "Added: Custom dark scrollbar styling for settings panel, language list, and style grid.",
     ],
   },
   {

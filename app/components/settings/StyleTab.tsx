@@ -13,12 +13,12 @@ const fontKeyMap: Record<string, string> = {
 };
 
 const presets = [
-  { key: "graphite", label: "Graphite", color: "#888888" },
-  { key: "ocean", label: "Ocean", color: "#4a90d9" },
-  { key: "emerald", label: "Emerald", color: "#50c878" },
-  { key: "amber", label: "Amber", color: "#ffbf00" },
-  { key: "rose", label: "Rose", color: "#e06c75" },
-  { key: "lavender", label: "Lavender", color: "#b4a7d6" },
+  { key: "graphite", labelKey: "presetGraphite", color: "#888888" },
+  { key: "ocean", labelKey: "presetOcean", color: "#4a90d9" },
+  { key: "emerald", labelKey: "presetEmerald", color: "#50c878" },
+  { key: "amber", labelKey: "presetAmber", color: "#ffbf00" },
+  { key: "rose", labelKey: "presetRose", color: "#e06c75" },
+  { key: "lavender", labelKey: "presetLavender", color: "#b4a7d6" },
 ];
 
 export default function StyleTab() {
@@ -74,10 +74,10 @@ export default function StyleTab() {
               key={p.key}
               className={`colorPreset${settings.colorPreset === p.key ? " active" : ""}`}
               onClick={() => update("colorPreset", p.key)}
-              title={p.label}
+              title={tr(p.labelKey)}
             >
               <span className="colorDot" style={{ background: p.color }} />
-              <span className="colorLabel">{p.label}</span>
+              <span className="colorLabel">{tr(p.labelKey)}</span>
             </button>
           ))}
         </div>

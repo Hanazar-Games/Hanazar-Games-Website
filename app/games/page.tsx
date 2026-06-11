@@ -114,6 +114,17 @@ const games = [
   }
 ];
 
+function revealClassForIndex(index: number): string {
+  switch (index % 3) {
+    case 0:
+      return "revealLeft";
+    case 1:
+      return "revealFade";
+    default:
+      return "revealRight";
+  }
+}
+
 export default function GamesPage() {
   const { tr } = useTranslation();
 
@@ -150,9 +161,7 @@ export default function GamesPage() {
         {games.map((game, index) => (
           <article
             key={game.title}
-            className={`gameCard ${
-              index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
-            }`}
+            className={`gameCard ${revealClassForIndex(index)}`}
             data-reveal
             style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
           >
