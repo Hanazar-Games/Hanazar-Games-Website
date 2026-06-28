@@ -163,7 +163,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loaded) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+      // Keep in-memory settings working when storage is unavailable.
+    }
   }, [settings, loaded]);
 
   const update = useCallback(<K extends keyof SettingsState>(key: K, value: SettingsState[K]) => {
@@ -172,7 +176,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   const reset = useCallback(() => {
     setSettings(defaultSettings);
-    localStorage.removeItem(STORAGE_KEY);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore storage errors
+    }
   }, []);
 
   const exportJson = useCallback(() => JSON.stringify(settings, null, 2), [settings]);

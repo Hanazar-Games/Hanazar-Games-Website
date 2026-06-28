@@ -1,10 +1,10 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "./hooks/useTranslation";
+import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
 
 const githubUrl = "https://github.com/hzagaming";
 const heroBackdropImage = "/IntroPic.jpg";
@@ -118,30 +118,7 @@ const footerColumns = [
 export default function HomePage() {
   const { tr } = useTranslation();
 
-  useEffect(() => {
-    const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealVisible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.16,
-        rootMargin: "0px 0px -10% 0px"
-      }
-    );
-
-    nodes.forEach((node) => observer.observe(node));
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  useRevealOnScroll();
 
   return (
     <main className="pageShell">

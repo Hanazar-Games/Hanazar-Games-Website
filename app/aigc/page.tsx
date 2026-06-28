@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { CSSProperties } from "react";
-import { useEffect } from "react";
 import { useTranslation } from "../hooks/useTranslation";
+import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 
 const experiments = [
   {
@@ -33,22 +33,7 @@ const experiments = [
 export default function AigcPage() {
   const { tr } = useTranslation();
 
-  useEffect(() => {
-    const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealVisible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.16, rootMargin: "0px 0px -10% 0px" }
-    );
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, []);
+  useRevealOnScroll();
 
   return (
     <main className="pageShell gamesShell">
