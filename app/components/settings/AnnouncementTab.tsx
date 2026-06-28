@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "../../hooks/useTranslation";
+
 const changelog = [
   {
     version: "2.3.2",
@@ -203,6 +205,7 @@ const changelog = [
 ];
 
 export default function AnnouncementTab() {
+  const { tr } = useTranslation();
   const [latest, ...history] = changelog;
 
   return (
@@ -221,7 +224,7 @@ export default function AnnouncementTab() {
           </ul>
         </div>
 
-        <div className="changelogHistoryLabel">History</div>
+        <div className="changelogHistoryLabel">{tr("changelogHistory")}</div>
 
         {history.map((entry) => (
           <div className="changelogEntry changelogEntryHistory" key={entry.version}>

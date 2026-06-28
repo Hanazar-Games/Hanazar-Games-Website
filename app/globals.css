@@ -127,21 +127,18 @@ body[data-theme="light"] .contentSection .sectionHeading h2 {
   color: #1a1a1a;
 }
 
-body[data-theme="light"] .documentModule,
-body[data-theme="light"] .updateModule,
+body[data-theme="light"] .infoCard,
 body[data-theme="light"] .contactModule {
   background: rgba(0,0,0,0.03);
   border-color: rgba(0,0,0,0.08);
 }
 
-body[data-theme="light"] .documentModule h3,
-body[data-theme="light"] .updateModule h3,
+body[data-theme="light"] .infoCard h3,
 body[data-theme="light"] .contactModule h3 {
   color: #1a1a1a;
 }
 
-body[data-theme="light"] .documentModule p,
-body[data-theme="light"] .updateModule p,
+body[data-theme="light"] .infoCard p,
 body[data-theme="light"] .contactModule p {
   color: #555;
 }
@@ -151,7 +148,7 @@ body[data-theme="light"] .footerCta {
   border-color: rgba(0,0,0,0.08);
 }
 
-body[data-theme="light"] .footerCta h4 {
+body[data-theme="light"] .footerCta span {
   color: #1a1a1a;
 }
 
@@ -1019,21 +1016,6 @@ a {
   padding: 96px 132px 64px;
 }
 
-.gamesBackLink {
-  display: inline-block;
-  margin-bottom: 28px;
-  color: var(--muted);
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  transition: color 0.2s ease;
-  opacity: 0;
-  animation: fadeInBody 1s ease 0.4s forwards;
-}
-
-.gamesBackLink:hover {
-  color: #ffffff;
-}
-
 .gamesHeroEyebrow {
   display: inline-block;
   margin-bottom: 22px;
@@ -1211,45 +1193,6 @@ a {
 .gamesHomeButton:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.24);
-}
-
-/* Contact Module Link */
-.contactModuleLink {
-  cursor: pointer;
-  text-decoration: none;
-  transition:
-    border-color 0.3s ease,
-    background 0.3s ease,
-    transform 0.3s ease;
-}
-
-.contactModuleLink:hover {
-  border-color: rgba(255, 255, 255, 0.22);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02)),
-    rgba(18, 18, 18, 0.98);
-  transform: translateY(-3px);
-}
-
-.contactModuleCta {
-  margin-top: auto;
-  width: fit-content;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--accent);
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.contactModuleLink:hover .contactModuleCta {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.26);
 }
 
 @media (max-width: 800px) {
@@ -1720,13 +1663,6 @@ a {
   font-family: monospace;
 }
 
-/* Music style grid */
-.musicStyleGrid {
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
 /* Inputs */
 .settingsInput {
   width: 100%;
@@ -1781,12 +1717,6 @@ a {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-}
-
-.audioStatus {
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.5;
 }
 
 .settingsBtn.primary {
@@ -2028,34 +1958,29 @@ a {
 
 /* Custom Scrollbar - Dark Theme */
 .settingsTabPanel::-webkit-scrollbar,
-.languageList::-webkit-scrollbar,
-.musicStyleGrid::-webkit-scrollbar {
+.languageList::-webkit-scrollbar {
   width: 6px;
 }
 
 .settingsTabPanel::-webkit-scrollbar-track,
-.languageList::-webkit-scrollbar-track,
-.musicStyleGrid::-webkit-scrollbar-track {
+.languageList::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .settingsTabPanel::-webkit-scrollbar-thumb,
-.languageList::-webkit-scrollbar-thumb,
-.musicStyleGrid::-webkit-scrollbar-thumb {
+.languageList::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 3px;
 }
 
 .settingsTabPanel::-webkit-scrollbar-thumb:hover,
-.languageList::-webkit-scrollbar-thumb:hover,
-.musicStyleGrid::-webkit-scrollbar-thumb:hover {
+.languageList::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.22);
 }
 
 /* Firefox */
 .settingsTabPanel,
-.languageList,
-.musicStyleGrid {
+.languageList {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
