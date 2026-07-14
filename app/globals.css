@@ -547,6 +547,65 @@ a {
   text-transform: uppercase;
 }
 
+.toolsGroups {
+  display: grid;
+  gap: 72px;
+}
+
+.toolsGroup {
+  display: grid;
+  gap: 24px;
+}
+
+.toolsGroupHeading {
+  min-height: 82px;
+  padding: 0 4px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.toolsGroupLabel {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.toolsGroupHeading h3 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.toolsGroupCount {
+  color: var(--muted);
+  font-size: 0.86rem;
+  letter-spacing: 0.2em;
+}
+
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.toolsGridMac {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.toolCard h4 {
+  margin: 0 0 12px;
+  font-size: 1.55rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
 .productsFrame {
   padding: 26px;
   border: 1px solid var(--line);
@@ -945,6 +1004,11 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .toolsGrid,
+  .toolsGridMac {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .footerCtaRow,
   .footerLinks {
     grid-template-columns: 1fr;
@@ -1252,6 +1316,20 @@ a {
 
   .gamesGrid {
     grid-template-columns: 1fr;
+  }
+
+  .toolsGrid,
+  .toolsGridMac {
+    grid-template-columns: 1fr;
+  }
+
+  .toolsGroups {
+    gap: 56px;
+  }
+
+  .toolsGroupHeading {
+    min-height: 72px;
+    padding-bottom: 16px;
   }
 
   .gameCard {

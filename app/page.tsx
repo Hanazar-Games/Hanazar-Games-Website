@@ -2,7 +2,6 @@
 
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useTranslation } from "./hooks/useTranslation";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
 
@@ -10,34 +9,65 @@ const githubUrl = "https://github.com/hzagaming";
 const heroBackdropImage = "/IntroPic.jpg";
 
 const heroLinks = [
-  { label: "navProducts", href: "#products" },
+  { label: "navTools", href: "#tools" },
   { label: "navAbout", href: "#about" },
   { label: "navDocuments", href: "#documents" },
   { label: "navUpdates", href: "#updates" },
   { label: "navContact", href: "#contact" }
 ];
 
-const productModules = [
+const toolGroups = [
   {
-    title: "productFeaturedTitle",
-    body: "productFeaturedBody",
-    cta: "ctaViewGithub",
-    href: githubUrl,
-    icon: true
+    title: "toolsWebTitle",
+    label: "toolsWebLabel",
+    tools: [
+      {
+        title: "toolAiugcTitle",
+        description: "toolAiugcDesc",
+        tag: "toolTagAiCreation",
+        cta: "ctaViewGithub",
+        href: "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
+        image: "/tools/aiugc-pipeline.jpg"
+      },
+      {
+        title: "toolOcMakerTitle",
+        description: "toolOcMakerDesc",
+        tag: "toolTagCharacter",
+        cta: "toolOpenButton",
+        href: "https://hzagaming.github.io/Original-Character-Maker/",
+        image: "/tools/oc-maker.jpg"
+      },
+      {
+        title: "toolRhythmTitle",
+        description: "toolRhythmDesc",
+        tag: "toolTagMusicAi",
+        cta: "ctaViewGithub",
+        href: "https://github.com/Mirako-Official/AI-Rhythm-Game",
+        image: "/tools/ai-rhythm-game.jpg"
+      }
+    ]
   },
   {
-    title: "productWorldsTitle",
-    body: "productWorldsBody",
-    cta: "ctaPlayNow",
-    href: "/games",
-    icon: true
-  },
-  {
-    title: "productAigcTitle",
-    body: "productAigcBody",
-    cta: "ctaExploreAigc",
-    href: "/aigc",
-    icon: true
+    title: "toolsMacTitle",
+    label: "toolsMacLabel",
+    tools: [
+      {
+        title: "toolClipoTitle",
+        description: "toolClipoDesc",
+        tag: "toolTagProductivity",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/Clipo",
+        image: "/tools/clipo.jpg"
+      },
+      {
+        title: "toolClassGodTitle",
+        description: "toolClassGodDesc",
+        tag: "toolTagUtility",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/ClassGod",
+        image: "/tools/classgod.jpg"
+      }
+    ]
   }
 ];
 
@@ -94,24 +124,38 @@ const footerCtas = [
 
 const footerColumns = [
   {
-    title: "footerColumnGames",
-    links: ["productFeaturedTitle", "productWorldsTitle", "productAigcTitle", "footerUpcoming"]
+    title: "footerColumnTools",
+    links: [
+      { title: "toolAiugcTitle", href: "https://github.com/Mirako-Official/New-Aiugc-Pipeline" },
+      { title: "toolOcMakerTitle", href: "https://hzagaming.github.io/Original-Character-Maker/" },
+      { title: "toolRhythmTitle", href: "https://github.com/Mirako-Official/AI-Rhythm-Game" },
+      { title: "toolClipoTitle", href: "https://github.com/hzagaming/Clipo" },
+      { title: "toolClassGodTitle", href: "https://github.com/hzagaming/ClassGod" }
+    ]
   },
   {
     title: "footerColumnDocs",
-    links: ["docDesignTitle", "docLoreTitle", "docVisualTitle", "footerInternalArchive"]
+    links: ["docDesignTitle", "docLoreTitle", "docVisualTitle", "footerInternalArchive"].map(
+      (title) => ({ title, href: githubUrl })
+    )
   },
   {
     title: "footerColumnUpdates",
-    links: ["updateDevlogTitle", "updateReleaseTitle", "footerAnnouncements", "footerRoadmap"]
+    links: ["updateDevlogTitle", "updateReleaseTitle", "footerAnnouncements", "footerRoadmap"].map(
+      (title) => ({ title, href: githubUrl })
+    )
   },
   {
     title: "footerColumnStudio",
-    links: ["sectionAbout", "navContact", "footerPressKit", "footerPartnerships"]
+    links: ["sectionAbout", "navContact", "footerPressKit", "footerPartnerships"].map(
+      (title) => ({ title, href: githubUrl })
+    )
   },
   {
     title: "footerColumnSupport",
-    links: ["footerSocialGithub", "footerSocialSteam", "contactCommunityTitle", "footerPrivacy"]
+    links: ["footerSocialGithub", "footerSocialSteam", "contactCommunityTitle", "footerPrivacy"].map(
+      (title) => ({ title, href: githubUrl })
+    )
   }
 ];
 
@@ -170,55 +214,70 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="contentSection productsSection" id="products">
+      <section className="contentSection toolsSection" id="tools">
         <div className="sectionHeading reveal revealFade" data-reveal>
           <span className="sectionIndex">01</span>
-          <h2>{tr("sectionProducts")}</h2>
+          <h2>{tr("sectionTools")}</h2>
         </div>
 
-        <div className="productsFrame reveal revealFade" data-reveal>
-          {productModules.map((module, index) => (
-            <article
-              key={module.title}
-              className={`productModule ${
-                index === 0
-                  ? "revealLeft"
-                  : index === 1
-                    ? "revealFade"
-                    : "revealRight"
-              }`}
-              data-reveal
-              style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
-            >
-              {module.icon ? (
-                <div className="moduleIconWrap">
-                  <Image
-                    src="/hanazar-emblem.svg"
-                    alt="Hanazar emblem"
-                    width={108}
-                    height={108}
-                  />
+        <div className="toolsGroups">
+          {toolGroups.map((group, groupIndex) => (
+            <div className="toolsGroup" key={group.title}>
+              <div
+                className={`toolsGroupHeading ${groupIndex === 0 ? "revealLeft" : "revealRight"}`}
+                data-reveal
+              >
+                <div>
+                  <span className="toolsGroupLabel">{tr(group.label)}</span>
+                  <h3>{tr(group.title)}</h3>
                 </div>
-              ) : null}
-              <h3>{tr(module.title)}</h3>
-              <p>{tr(module.body)}</p>
-              {module.href ? (
-                module.href.startsWith("/") ? (
-                  <Link className="moduleButton" href={module.href}>
-                    {tr(module.cta)}
-                  </Link>
-                ) : (
-                  <a
-                    className="moduleButton"
-                    href={module.href}
-                    target="_blank"
-                    rel="noreferrer"
+                <span className="toolsGroupCount">0{group.tools.length}</span>
+              </div>
+
+              <div className={`toolsGrid ${groupIndex === 1 ? "toolsGridMac" : ""}`}>
+                {group.tools.map((tool, index) => (
+                  <article
+                    key={tool.title}
+                    className={`gameCard toolCard ${
+                      index % 3 === 0
+                        ? "revealLeft"
+                        : index % 3 === 1
+                          ? "revealFade"
+                          : "revealRight"
+                    }`}
+                    data-reveal
+                    style={{
+                      "--reveal-delay": `${(groupIndex * 0.08) + (index * 0.12)}s`
+                    } as CSSProperties}
                   >
-                    {tr(module.cta)}
-                  </a>
-                )
-              ) : null}
-            </article>
+                    <div className="gameCardImageWrap">
+                      <Image
+                        src={tool.image}
+                        alt={tr(tool.title)}
+                        className="gameCardImage"
+                        width={1280}
+                        height={720}
+                        sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="gameCardBody">
+                      <span className="gameCardTag">{tr(tool.tag)}</span>
+                      <h4>{tr(tool.title)}</h4>
+                      <p>{tr(tool.description)}</p>
+                      <a
+                        className="gameCardButton"
+                        href={tool.href}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {tr(tool.cta)}
+                        <span className="gameCardArrow">↗</span>
+                      </a>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </section>
@@ -338,9 +397,9 @@ export default function HomePage() {
               <h3>{tr(column.title)}</h3>
               <ul>
                 {column.links.map((link) => (
-                  <li key={link}>
-                    <a href={githubUrl} target="_blank" rel="noreferrer">
-                      {tr(link)}
+                  <li key={link.title}>
+                    <a href={link.href} target="_blank" rel="noreferrer">
+                      {tr(link.title)}
                     </a>
                   </li>
                 ))}
