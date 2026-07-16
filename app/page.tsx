@@ -9,6 +9,8 @@ const githubUrl = "https://github.com/hzagaming";
 const heroBackdropImage = "/IntroPic.jpg";
 
 const heroLinks = [
+  { label: "navGames", href: "/games" },
+  { label: "navAigc", href: "/aigc" },
   { label: "navTools", href: "#tools" },
   { label: "navAbout", href: "#about" },
   { label: "navDocuments", href: "#documents" },
@@ -103,23 +105,29 @@ const updateModules = [
 
 const contactModules = [
   {
-    title: "contactSteamTitle",
-    body: "contactSteamBody"
+    title: "contactGamesTitle",
+    body: "contactGamesBody",
+    cta: "contactGamesCta",
+    href: "/games"
   },
   {
     title: "contactBusinessTitle",
-    body: "contactBusinessBody"
+    body: "contactBusinessRealBody",
+    cta: "contactEmailCta",
+    href: "mailto:hanazar@mirako.co"
   },
   {
     title: "contactCommunityTitle",
-    body: "contactCommunityBody"
+    body: "contactCommunityRealBody",
+    cta: "contactGithubCta",
+    href: githubUrl
   }
 ];
 
 const footerCtas = [
-  { title: "footerPlaySteam", href: githubUrl },
+  { title: "footerExploreGames", href: "/games" },
   { title: "footerViewProjects", href: githubUrl },
-  { title: "footerContactStudio", href: githubUrl }
+  { title: "footerContactStudio", href: "mailto:hanazar@mirako.co" }
 ];
 
 const footerColumns = [
@@ -136,26 +144,32 @@ const footerColumns = [
   {
     title: "footerColumnDocs",
     links: ["docDesignTitle", "docLoreTitle", "docVisualTitle", "footerInternalArchive"].map(
-      (title) => ({ title, href: githubUrl })
+      (title) => ({ title, href: "#documents" })
     )
   },
   {
     title: "footerColumnUpdates",
     links: ["updateDevlogTitle", "updateReleaseTitle", "footerAnnouncements", "footerRoadmap"].map(
-      (title) => ({ title, href: githubUrl })
+      (title) => ({ title, href: "#updates" })
     )
   },
   {
     title: "footerColumnStudio",
-    links: ["sectionAbout", "navContact", "footerPressKit", "footerPartnerships"].map(
-      (title) => ({ title, href: githubUrl })
-    )
+    links: [
+      { title: "sectionAbout", href: "#about" },
+      { title: "navContact", href: "#contact" },
+      { title: "footerPressKit", href: "mailto:hanazar@mirako.co" },
+      { title: "footerPartnerships", href: "mailto:hanazar@mirako.co" }
+    ]
   },
   {
     title: "footerColumnSupport",
-    links: ["footerSocialGithub", "footerSocialSteam", "contactCommunityTitle", "footerPrivacy"].map(
-      (title) => ({ title, href: githubUrl })
-    )
+    links: [
+      { title: "footerSocialGithub", href: githubUrl },
+      { title: "gamesHeroTitle", href: "/games" },
+      { title: "navAigc", href: "/aigc" },
+      { title: "navContact", href: "mailto:hanazar@mirako.co" }
+    ]
   }
 ];
 
@@ -204,6 +218,7 @@ export default function HomePage() {
             ))}
             <button
               className="heroNavButton"
+              type="button"
               onClick={() => window.dispatchEvent(new Event("hanazar:open-settings"))}
               style={{ "--button-index": heroLinks.length } as CSSProperties}
               aria-label={tr("ariaOpenSettings")}
@@ -268,7 +283,8 @@ export default function HomePage() {
                         className="gameCardButton"
                         href={tool.href}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
+                        aria-label={`${tr(tool.cta)}: ${tr(tool.title)}`}
                       >
                         {tr(tool.cta)}
                         <span className="gameCardArrow">↗</span>
@@ -349,8 +365,11 @@ export default function HomePage() {
 
         <div className="contactPanel reveal revealFade" data-reveal>
           {contactModules.map((item, index) => (
-            <article
+            <a
               key={item.title}
+              href={item.href}
+              target={item.href.startsWith("http") ? "_blank" : undefined}
+              rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
               className={`contactModule ${
                 index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
               }`}
@@ -359,7 +378,10 @@ export default function HomePage() {
             >
               <h3>{tr(item.title)}</h3>
               <p>{tr(item.body)}</p>
-            </article>
+              <span className="contactModuleCta">
+                {tr(item.cta)} <span aria-hidden="true">{item.href.startsWith("http") ? "↗" : "→"}</span>
+              </span>
+            </a>
           ))}
         </div>
       </section>
@@ -370,8 +392,8 @@ export default function HomePage() {
             <a
               key={item.title}
               href={item.href}
-              target="_blank"
-              rel="noreferrer"
+              target={item.href.startsWith("http") ? "_blank" : undefined}
+              rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
               className={`footerCta ${
                 index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
               }`}
@@ -379,7 +401,9 @@ export default function HomePage() {
               style={{ "--reveal-delay": `${index * 0.08}s` } as CSSProperties}
             >
               <span>{tr(item.title)}</span>
-              <span className="footerArrow">↗</span>
+              <span className="footerArrow" aria-hidden="true">
+                {item.href.startsWith("http") ? "↗" : "→"}
+              </span>
             </a>
           ))}
         </div>
@@ -398,7 +422,11 @@ export default function HomePage() {
               <ul>
                 {column.links.map((link) => (
                   <li key={link.title}>
-                    <a href={link.href} target="_blank" rel="noreferrer">
+                    <a
+                      href={link.href}
+                      target={link.href.startsWith("http") ? "_blank" : undefined}
+                      rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    >
                       {tr(link.title)}
                     </a>
                   </li>
@@ -410,13 +438,13 @@ export default function HomePage() {
 
         <div className="footerBottom reveal revealFade" data-reveal>
           <div className="footerSocials">
-            <a href={githubUrl} target="_blank" rel="noreferrer">
+            <a href={githubUrl} target="_blank" rel="noopener noreferrer">
               {tr("footerSocialGithub")}
             </a>
-            <a href={githubUrl} target="_blank" rel="noreferrer">
-              {tr("footerSocialSteam")}
+            <a href="/games">
+              {tr("gamesHeroTitle")}
             </a>
-            <a href={githubUrl} target="_blank" rel="noreferrer">
+            <a href="mailto:hanazar@mirako.co">
               {tr("footerSocialContact")}
             </a>
           </div>
@@ -424,14 +452,11 @@ export default function HomePage() {
           <div className="footerMeta">
             <p>{tr("footerCopyright")}</p>
             <div className="footerMetaLinks">
-              <a href={githubUrl} target="_blank" rel="noreferrer">
-                {tr("footerPrivacy")}
+              <a href="#about">
+                {tr("sectionAbout")}
               </a>
-              <a href={githubUrl} target="_blank" rel="noreferrer">
-                {tr("footerTerms")}
-              </a>
-              <a href={githubUrl} target="_blank" rel="noreferrer">
-                {tr("footerLinks")}
+              <a href="mailto:hanazar@mirako.co">
+                {tr("navContact")}
               </a>
             </div>
           </div>

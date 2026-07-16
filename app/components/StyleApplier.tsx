@@ -42,8 +42,8 @@ export default function StyleApplier() {
     // Color preset
     body.setAttribute("data-preset", settings.colorPreset);
 
-    // Contrast
-    body.style.filter = settings.contrast !== 100 ? `contrast(${settings.contrast}%)` : "";
+    // Contrast is scoped to content surfaces so fixed overlays remain viewport-bound.
+    body.style.setProperty("--ui-contrast", String(settings.contrast / 100));
 
     // Reduce animations
     if (settings.reduceAnimations || !settings.animationsEnabled) {
@@ -59,9 +59,15 @@ export default function StyleApplier() {
       body.removeAttribute("data-disable-blur");
     }
 
-    // Animation speed as CSS custom property (base 1s, scaled by animSpeed%)
-    const speedFactor = settings.animSpeed / 100;
-    body.style.setProperty("--anim-speed", String(speedFactor));
+    if (settings.disableDecorations) {
+      body.setAttribute("data-disable-decorations", "true");
+    } else {
+      body.removeAttribute("data-disable-decorations");
+    }
+
+    // CSS stores a duration multiplier: 50% speed = 2x duration, 150% = 0.67x.
+    const durationFactor = 100 / settings.animSpeed;
+    body.style.setProperty("--anim-speed", String(durationFactor));
 
     // Individual animation toggles
     if (!settings.animUiFade) {
@@ -90,6 +96,7 @@ export default function StyleApplier() {
     settings.animationsEnabled,
     settings.reduceAnimations,
     settings.disableBlur,
+    settings.disableDecorations,
     settings.animSpeed,
     settings.animUiFade,
     settings.animButtonHover,

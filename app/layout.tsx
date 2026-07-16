@@ -8,7 +8,7 @@ import SettingsLauncher from "./components/SettingsLauncher";
 
 export const metadata: Metadata = {
   title: "Hanazar Games",
-  description: "Welcome to Hanazar Games."
+  description: "Games, AIGC experiments, creative tools, and development notes from Hanazar Games."
 };
 
 export default function RootLayout({

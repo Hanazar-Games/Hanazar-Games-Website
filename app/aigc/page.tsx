@@ -38,6 +38,9 @@ export default function AigcPage() {
   return (
     <main className="pageShell gamesShell">
       <section className="gamesHero aigcHero">
+        <Link href="/" className="gamesHeroBack">
+          {tr("gamesBackHome")}
+        </Link>
         <div className="gamesHeroInner">
           <span className="gamesHeroEyebrow">{tr("aigcHeroEyebrow")}</span>
           <h1 className="gamesHeroTitle">{tr("aigcHeroTitle")}</h1>
@@ -75,7 +78,8 @@ export default function AigcPage() {
                 className="gameCardButton"
                 href={experiment.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label={`${tr("aigcOpenButton")}: ${tr(experiment.title)}`}
               >
                 {tr("aigcOpenButton")}
                 <span className="gameCardArrow">↗</span>

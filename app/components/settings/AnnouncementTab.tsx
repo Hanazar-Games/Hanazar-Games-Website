@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.4.0",
+    date: "2026-07-16",
+    title: "Site-wide UI, UX, Audio, and Accessibility Pass",
+    items: [
+      "Added opt-in procedural ambient BGM and interaction-aware sound effects with safer volume behavior.",
+      "Fixed mobile overflow, settings focus management, animation speed scaling, and contrast rendering for fixed controls.",
+      "Removed non-functional performance settings and replaced them with controls that immediately affect the interface.",
+      "Improved navigation, keyboard focus, reduced-motion support, real contact destinations, and responsive layouts.",
+    ],
+  },
+  {
     version: "2.3.2",
     date: "2026-06-01",
     title: "QA Pass: Audio Cleanup + Polish",

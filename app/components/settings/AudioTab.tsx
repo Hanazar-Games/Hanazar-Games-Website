@@ -35,7 +35,13 @@ export default function AudioTab() {
           onChange={(e) => update("masterVolume", Number(e.target.value))}
         />
         <div className="audioPreviewRow">
-          <button className="settingsBtn" type="button" data-sfx-preview onClick={previewSfx}>
+          <button
+            className="settingsBtn"
+            type="button"
+            data-sfx-preview
+            onClick={previewSfx}
+            disabled={!settings.sfxEnabled || settings.masterVolume === 0 || settings.sfxVolume === 0}
+          >
             {tr("stPreviewSfx")}
           </button>
         </div>
@@ -65,6 +71,7 @@ export default function AudioTab() {
           min={0}
           max={100}
           value={settings.sfxVolume}
+          disabled={!settings.sfxEnabled}
           onChange={(e) => update("sfxVolume", Number(e.target.value))}
         />
         <span className="settingLabel sub">{tr("stSfxStyle")}</span>
@@ -72,13 +79,47 @@ export default function AudioTab() {
           {sfxStyles.map((s) => (
             <button
               key={s}
+              type="button"
               className={`seg-btn${selectedSfxStyle === s ? " active" : ""}`}
               onClick={() => update("sfxStyle", s)}
+              aria-pressed={selectedSfxStyle === s}
             >
               {s}
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="settingGroup">
+        <div className="settingRow">
+          <div>
+            <span className="settingLabel" id="label-bgm">{tr("stBgm")}</span>
+            <p className="settingDesc compact">{tr("stBgmDesc")}</p>
+          </div>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={settings.bgmEnabled}
+              onChange={(e) => update("bgmEnabled", e.target.checked)}
+              aria-labelledby="label-bgm"
+            />
+            <span className="slider" />
+          </label>
+        </div>
+        <div className="sliderHeader">
+          <label className="settingLabel sub" htmlFor="bgm-vol">{tr("stBgmVolume")}</label>
+          <span className="sliderValue">{settings.bgmVolume}%</span>
+        </div>
+        <input
+          id="bgm-vol"
+          type="range"
+          className="rangeSlider"
+          min={0}
+          max={100}
+          value={settings.bgmVolume}
+          disabled={!settings.bgmEnabled}
+          onChange={(e) => update("bgmVolume", Number(e.target.value))}
+        />
       </div>
     </div>
   );

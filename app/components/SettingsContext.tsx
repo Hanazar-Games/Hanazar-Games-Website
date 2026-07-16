@@ -16,6 +16,8 @@ export interface SettingsState {
   sfxEnabled: boolean;
   sfxVolume: number;
   sfxStyle: string;
+  bgmEnabled: boolean;
+  bgmVolume: number;
   // Animation
   animationsEnabled: boolean;
   animSpeed: number;
@@ -25,12 +27,7 @@ export interface SettingsState {
   // Performance
   reduceAnimations: boolean;
   disableBlur: boolean;
-  lowResPreview: boolean;
-  lazyLoad: boolean;
-  disableParticles: boolean;
-  aggressiveCache: boolean;
-  devMode: boolean;
-  maxConcurrent: number;
+  disableDecorations: boolean;
 }
 
 const defaultSettings: SettingsState = {
@@ -44,6 +41,8 @@ const defaultSettings: SettingsState = {
   sfxEnabled: true,
   sfxVolume: 70,
   sfxStyle: "Classic",
+  bgmEnabled: false,
+  bgmVolume: 28,
   animationsEnabled: true,
   animSpeed: 100,
   animUiFade: true,
@@ -51,12 +50,7 @@ const defaultSettings: SettingsState = {
   animModal: true,
   reduceAnimations: false,
   disableBlur: false,
-  lowResPreview: false,
-  lazyLoad: false,
-  disableParticles: false,
-  aggressiveCache: false,
-  devMode: false,
-  maxConcurrent: 4,
+  disableDecorations: false,
 };
 
 const STORAGE_KEY = "hanazar-settings-v1";
@@ -73,25 +67,22 @@ const optionSets = {
 
 const booleanKeys = [
   "sfxEnabled",
+  "bgmEnabled",
   "animationsEnabled",
   "animUiFade",
   "animButtonHover",
   "animModal",
   "reduceAnimations",
   "disableBlur",
-  "lowResPreview",
-  "lazyLoad",
-  "disableParticles",
-  "aggressiveCache",
-  "devMode",
+  "disableDecorations",
 ] as const;
 
 const numberRanges = {
   contrast: [80, 130],
   masterVolume: [0, 100],
   sfxVolume: [0, 100],
+  bgmVolume: [0, 100],
   animSpeed: [50, 150],
-  maxConcurrent: [1, 10],
 } as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {

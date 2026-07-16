@@ -33,6 +33,7 @@ export default function StyleTab() {
           {(["dark", "light", "auto"] as const).map((t) => (
             <button
               key={t}
+              type="button"
               className={`seg-btn${settings.theme === t ? " active" : ""}`}
               onClick={() => update("theme", t)}
             >
@@ -48,6 +49,7 @@ export default function StyleTab() {
           {fontKeys.map((f) => (
             <button
               key={f}
+              type="button"
               className={`seg-btn${settings.font === f ? " active" : ""}`}
               onClick={() => update("font", f as typeof settings.font)}
             >
@@ -72,6 +74,7 @@ export default function StyleTab() {
           {presets.map((p) => (
             <button
               key={p.key}
+              type="button"
               className={`colorPreset${settings.colorPreset === p.key ? " active" : ""}`}
               onClick={() => update("colorPreset", p.key)}
               title={tr(p.labelKey)}

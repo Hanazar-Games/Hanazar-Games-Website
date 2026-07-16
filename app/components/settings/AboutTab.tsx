@@ -13,29 +13,29 @@ export default function AboutTab() {
           {tr("aboutProjectDesc")}
         </p>
 
-        <div className="aboutSection">
+        <div className="settingsAboutSection">
           <span className="settingLabel">{tr("aboutAuthor")}</span>
           <p className="aboutDesc">{tr("aboutAuthorName")}</p>
         </div>
 
-        <div className="aboutSection">
+        <div className="settingsAboutSection">
           <span className="settingLabel">{tr("aboutLinks")}</span>
           <div className="aboutLinks">
-            <a href="https://github.com/hzagaming" target="_blank" rel="noreferrer">
+            <a href="https://github.com/hzagaming" target="_blank" rel="noopener noreferrer">
               GitHub
             </a>
-            <a href="https://hzagaming.github.io/" target="_blank" rel="noreferrer">
+            <a href="https://hzagaming.github.io/" target="_blank" rel="noopener noreferrer">
               Live2D Portal
             </a>
-            <a href="https://hanazar-games.github.io/" target="_blank" rel="noreferrer">
+            <a href="https://hanazar-games.github.io/" target="_blank" rel="noopener noreferrer">
               Games Portal
             </a>
           </div>
         </div>
 
-        <div className="aboutSection">
+        <div className="settingsAboutSection">
           <span className="settingLabel">{tr("aboutVersion")}</span>
-          <p className="aboutDesc">2.3.2</p>
+          <p className="aboutDesc">2.4.0</p>
         </div>
 
         <div className="aboutFooter">

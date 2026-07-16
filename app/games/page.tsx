@@ -133,6 +133,9 @@ export default function GamesPage() {
   return (
     <main className="pageShell gamesShell">
       <section className="gamesHero">
+        <Link href="/" className="gamesHeroBack">
+          {tr("gamesBackHome")}
+        </Link>
         <div className="gamesHeroInner">
           <span className="gamesHeroEyebrow">{tr("gamesHeroEyebrow")}</span>
           <h1 className="gamesHeroTitle">{tr("gamesHeroTitle")}</h1>
@@ -168,7 +171,8 @@ export default function GamesPage() {
                 className="gameCardButton"
                 href={game.href}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label={`${tr("gamePlayButton")}: ${tr(game.title)}`}
               >
                 {tr("gamePlayButton")}
                 <span className="gameCardArrow">↗</span>

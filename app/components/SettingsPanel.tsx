@@ -12,6 +12,7 @@ import ShortcutsTab from "./settings/ShortcutsTab";
 import OtherTab from "./settings/OtherTab";
 import AnnouncementTab from "./settings/AnnouncementTab";
 import AboutTab from "./settings/AboutTab";
+import { useSettingsContext } from "./SettingsContext";
 
 const tabs = [
   { key: "style", label: "tabStyle", icon: "S" },
@@ -39,7 +40,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const previousOverflowRef = useRef("");
+  const previousMainAriaHiddenRef = useRef<string | null>(null);
+  const previousMainInertRef = useRef(false);
   const { tr } = useTranslation();
+  const { settings } = useSettingsContext();
+  const modalTransitionMs = (
+    !settings.animationsEnabled || settings.reduceAnimations || !settings.animModal
+  ) ? 0 : Math.round(350 * (100 / settings.animSpeed));
 
   useEffect(() => {
     if (open) {
@@ -47,10 +54,14 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       requestAnimationFrame(() => setAnimating(true));
     } else {
       setAnimating(false);
-      const timer = setTimeout(() => setVisible(false), 350);
+      if (modalTransitionMs === 0) {
+        setVisible(false);
+        return;
+      }
+      const timer = setTimeout(() => setVisible(false), modalTransitionMs);
       return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [modalTransitionMs, open]);
 
   useEffect(() => {
     if (panelRef.current) {
@@ -105,16 +116,36 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         ? document.activeElement
         : null;
       previousOverflowRef.current = document.body.style.overflow;
+      const main = document.querySelector<HTMLElement>("main");
+      if (main) {
+        previousMainAriaHiddenRef.current = main.getAttribute("aria-hidden");
+        previousMainInertRef.current = main.hasAttribute("inert");
+        main.setAttribute("aria-hidden", "true");
+        main.setAttribute("inert", "");
+      }
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
-      requestAnimationFrame(() => closeButtonRef.current?.focus({ preventScroll: true }));
     }
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflowRef.current;
+      const main = document.querySelector<HTMLElement>("main");
+      if (main) {
+        if (previousMainAriaHiddenRef.current === null) main.removeAttribute("aria-hidden");
+        else main.setAttribute("aria-hidden", previousMainAriaHiddenRef.current);
+        if (!previousMainInertRef.current) main.removeAttribute("inert");
+      }
       previousFocusRef.current?.focus({ preventScroll: true });
     };
   }, [open, handleKeyDown]);
+
+  useEffect(() => {
+    if (!open || !visible) return;
+    const frame = requestAnimationFrame(() => {
+      closeButtonRef.current?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, visible]);
 
   const renderTab = () => {
     switch (activeTab) {
@@ -129,6 +160,30 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       case "about": return <AboutTab />;
       default: return <StyleTab />;
     }
+  };
+
+  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const keyOffsets: Record<string, number> = {
+      ArrowRight: 1,
+      ArrowDown: 1,
+      ArrowLeft: -1,
+      ArrowUp: -1,
+    };
+    let nextIndex: number | null = null;
+
+    if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = tabs.length - 1;
+    else if (event.key in keyOffsets) {
+      nextIndex = (index + keyOffsets[event.key] + tabs.length) % tabs.length;
+    }
+
+    if (nextIndex === null) return;
+    event.preventDefault();
+    const nextTab = tabs[nextIndex];
+    setActiveTab(nextTab.key);
+    requestAnimationFrame(() => {
+      document.getElementById(`settings-tab-${nextTab.key}`)?.focus();
+    });
   };
 
   if (!visible) return null;
@@ -148,6 +203,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           <h2 id="settings-title">{tr("settingsTitle")}</h2>
           <button
             className="settingsCloseBtn"
+            type="button"
             ref={closeButtonRef}
             onClick={onClose}
             aria-label={tr("ariaCloseSettings")}
@@ -160,13 +216,23 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         </div>
 
         <div className="settingsModalBody">
-          <nav className="settingsTabNav" aria-label={tr("ariaSettingsCategories")}>
-            {tabs.map((tab) => (
+          <nav
+            className="settingsTabNav"
+            aria-label={tr("ariaSettingsCategories")}
+            role="tablist"
+          >
+            {tabs.map((tab, index) => (
               <button
                 key={tab.key}
+                id={`settings-tab-${tab.key}`}
+                type="button"
+                role="tab"
                 className={`settingsTabBtn${activeTab === tab.key ? " active" : ""}`}
                 onClick={() => setActiveTab(tab.key)}
-                aria-pressed={activeTab === tab.key}
+                onKeyDown={(event) => handleTabKeyDown(event, index)}
+                aria-selected={activeTab === tab.key}
+                aria-controls="settings-tab-panel"
+                tabIndex={activeTab === tab.key ? 0 : -1}
               >
                 <span className="settingsTabIcon">{tab.icon}</span>
                 <span className="settingsTabLabel">{tr(tab.label)}</span>
@@ -174,7 +240,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             ))}
           </nav>
 
-          <div className="settingsTabPanel" ref={panelRef}>
+          <div
+            className="settingsTabPanel"
+            id="settings-tab-panel"
+            ref={panelRef}
+            role="tabpanel"
+            aria-labelledby={`settings-tab-${activeTab}`}
+          >
             {renderTab()}
           </div>
         </div>

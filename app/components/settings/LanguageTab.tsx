@@ -24,6 +24,7 @@ export default function LanguageTab() {
           {languages.map((lang) => (
             <button
               key={lang.code}
+              type="button"
               className={`languageItem${settings.language === lang.code ? " active" : ""}`}
               onClick={() => update("language", lang.code)}
             >
