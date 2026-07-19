@@ -30,6 +30,11 @@ export interface SettingsState {
   disableDecorations: boolean;
 }
 
+export const sfxStyles = [
+  "Classic", "Electronic", "Retro", "Wood", "Bell", "Space",
+  "Drum", "Piano", "Synth", "Chiptune", "Pluck", "Crystal",
+] as const;
+
 const defaultSettings: SettingsState = {
   theme: "dark",
   font: "sans",
@@ -63,6 +68,7 @@ const optionSets = {
     "zh-CN", "zh-TW", "en", "ja", "ko", "fr", "de", "es", "ru", "pt",
     "it", "nl", "pl", "tr", "vi", "id", "uk", "el", "cs", "sv",
   ],
+  sfxStyle: sfxStyles,
 } as const;
 
 const booleanKeys = [
@@ -109,7 +115,7 @@ function normalizeSettings(input: unknown, base: SettingsState = defaultSettings
   if (isOneOf(input.language, optionSets.language)) next.language = input.language;
 
   if (typeof input.customFont === "string") next.customFont = input.customFont.slice(0, 120);
-  if (typeof input.sfxStyle === "string") next.sfxStyle = input.sfxStyle.slice(0, 80);
+  if (isOneOf(input.sfxStyle, optionSets.sfxStyle)) next.sfxStyle = input.sfxStyle;
 
   for (const key of booleanKeys) {
     if (typeof input[key] === "boolean") next[key] = input[key];
@@ -128,6 +134,7 @@ interface SettingsContextValue {
   settings: SettingsState;
   update: <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => void;
   reset: () => void;
+  clearCache: () => void;
   exportJson: () => string;
   importJson: (json: string) => boolean;
 }
@@ -168,9 +175,17 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const reset = useCallback(() => {
     setSettings(defaultSettings);
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultSettings));
     } catch {
       // ignore storage errors
+    }
+  }, []);
+
+  const clearCache = useCallback(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Keep the current in-memory settings when storage is unavailable.
     }
   }, []);
 
@@ -189,7 +204,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   }, [settings]);
 
   return (
-    <SettingsContext.Provider value={{ settings, update, reset, exportJson, importJson }}>
+    <SettingsContext.Provider value={{ settings, update, reset, clearCache, exportJson, importJson }}>
       {children}
     </SettingsContext.Provider>
   );

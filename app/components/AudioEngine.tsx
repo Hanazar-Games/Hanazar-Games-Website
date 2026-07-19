@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useSettingsContext, type SettingsState } from "./SettingsContext";
 
 type SfxKind = "click" | "navigate" | "toggle" | "close";
+export type BgmPlaybackState = "off" | "muted" | "waiting" | "playing" | "paused" | "unavailable";
 
 const sfxProfiles: Record<string, { wave: OscillatorType; start: number; end: number; duration: number }> = {
   Classic: { wave: "sine", start: 660, end: 440, duration: 0.11 },
@@ -51,7 +52,7 @@ function ambientVolume(settings: SettingsState) {
   return Math.min(0.035, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.035);
 }
 
-function getSfxKind(target: HTMLElement): SfxKind {
+function getSfxKind(target: Element): SfxKind {
   if (target.closest("a")) return "navigate";
   if (target.closest(".settingsCloseBtn, .danger")) return "close";
   if (target.closest("input[type='checkbox'], .settingsTabBtn, .seg-btn, .colorPreset, .languageItem")) {
@@ -67,6 +68,10 @@ export default function AudioEngine() {
   const settingsRef = useRef(settings);
   const lastSfxTimeRef = useRef(0);
 
+  const publishBgmState = useCallback((state: BgmPlaybackState) => {
+    window.dispatchEvent(new CustomEvent("hanazar:bgm-state", { detail: { state } }));
+  }, []);
+
   useEffect(() => {
     settingsRef.current = settings;
   }, [settings]);
@@ -76,10 +81,20 @@ export default function AudioEngine() {
     const audioWindow = window as Window &
       typeof globalThis & { webkitAudioContext?: typeof AudioContext };
     const AudioContextClass = audioWindow.AudioContext || audioWindow.webkitAudioContext;
-    if (!AudioContextClass) return null;
-    if (!audioRef.current) audioRef.current = new AudioContextClass();
+    if (!AudioContextClass) {
+      publishBgmState("unavailable");
+      return null;
+    }
+    if (!audioRef.current) {
+      try {
+        audioRef.current = new AudioContextClass();
+      } catch {
+        publishBgmState("unavailable");
+        return null;
+      }
+    }
     return audioRef.current;
-  }, []);
+  }, [publishBgmState]);
 
   const stopAmbient = useCallback(() => {
     const current = ambientRef.current;
@@ -109,23 +124,39 @@ export default function AudioEngine() {
   const syncAmbient = useCallback(() => {
     const ctx = audioRef.current;
     const currentSettings = settingsRef.current;
-    const shouldPlay = Boolean(
-      ctx &&
-      ctx.state === "running" &&
-      document.visibilityState === "visible" &&
-      currentSettings.bgmEnabled &&
-      currentSettings.masterVolume > 0 &&
-      currentSettings.bgmVolume > 0
-    );
 
-    if (!ctx || !shouldPlay) {
+    if (!currentSettings.bgmEnabled) {
       stopAmbient();
+      publishBgmState("off");
+      return;
+    }
+    if (currentSettings.masterVolume <= 0 || currentSettings.bgmVolume <= 0) {
+      stopAmbient();
+      publishBgmState("muted");
+      return;
+    }
+    if (document.visibilityState !== "visible") {
+      stopAmbient();
+      publishBgmState("paused");
+      return;
+    }
+    const audioWindow = window as Window &
+      typeof globalThis & { webkitAudioContext?: typeof AudioContext };
+    if (!audioWindow.AudioContext && !audioWindow.webkitAudioContext) {
+      stopAmbient();
+      publishBgmState("unavailable");
+      return;
+    }
+    if (!ctx || ctx.state !== "running") {
+      stopAmbient();
+      publishBgmState("waiting");
       return;
     }
 
     const volume = ambientVolume(currentSettings);
     if (ambientRef.current) {
       ambientRef.current.bus.gain.setTargetAtTime(volume, ctx.currentTime, 0.2);
+      publishBgmState("playing");
       return;
     }
 
@@ -182,14 +213,20 @@ export default function AudioEngine() {
       lfoDepth,
       chordTimer: window.setInterval(scheduleChord, 8000),
     };
-  }, [stopAmbient]);
+    publishBgmState("playing");
+  }, [publishBgmState, stopAmbient]);
 
   const unlock = useCallback(async () => {
     const ctx = getContext();
     if (!ctx) return;
-    if (ctx.state === "suspended") await ctx.resume();
+    try {
+      if (ctx.state === "suspended") await ctx.resume();
+    } catch {
+      publishBgmState("waiting");
+      return;
+    }
     syncAmbient();
-  }, [getContext, syncAmbient]);
+  }, [getContext, publishBgmState, syncAmbient]);
 
   const playSfx = useCallback((kind: SfxKind = "click") => {
     const current = settingsRef.current;
@@ -240,9 +277,14 @@ export default function AudioEngine() {
 
     const handlePointerDown = async (event: PointerEvent) => {
       const target = event.target;
+      if (!(target instanceof Element)) return;
+      const current = settingsRef.current;
+      const wantsSfx = current.sfxEnabled && current.masterVolume > 0 && current.sfxVolume > 0;
+      const wantsBgm = current.bgmEnabled && current.masterVolume > 0 && current.bgmVolume > 0;
+      const isAudioControl = Boolean(target.closest("[data-audio-unlock], [data-sfx-preview]"));
+      if (!wantsSfx && !wantsBgm && !isAudioControl) return;
       await unlock();
       if (
-        target instanceof HTMLElement &&
         !target.closest("[data-sfx-preview]") &&
         target.closest(interactiveSelector)
       ) {
@@ -251,11 +293,22 @@ export default function AudioEngine() {
     };
 
     const handleKeyDown = async (event: KeyboardEvent) => {
+      const modifier = event.ctrlKey || event.metaKey;
+      if (modifier && !event.shiftKey && event.key.toLowerCase() === "m") {
+        const current = settingsRef.current;
+        if (current.bgmEnabled || current.sfxEnabled) await unlock();
+        return;
+      }
       if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
       const target = event.target;
+      if (!(target instanceof Element)) return;
+      const current = settingsRef.current;
+      const wantsSfx = current.sfxEnabled && current.masterVolume > 0 && current.sfxVolume > 0;
+      const wantsBgm = current.bgmEnabled && current.masterVolume > 0 && current.bgmVolume > 0;
+      const isAudioControl = Boolean(target.closest("[data-audio-unlock], [data-sfx-preview]"));
+      if (!wantsSfx && !wantsBgm && !isAudioControl) return;
       await unlock();
       if (
-        target instanceof HTMLElement &&
         !target.closest("[data-sfx-preview]") &&
         target.closest(interactiveSelector)
       ) {
@@ -269,15 +322,18 @@ export default function AudioEngine() {
     };
 
     const handleVisibility = () => syncAmbient();
+    const handleStateRequest = () => syncAmbient();
 
     window.addEventListener("pointerdown", handlePointerDown, { capture: true });
     window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("hanazar:sfx-preview", handlePreview);
+    window.addEventListener("hanazar:bgm-state-request", handleStateRequest);
     document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       window.removeEventListener("pointerdown", handlePointerDown, { capture: true });
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("hanazar:sfx-preview", handlePreview);
+      window.removeEventListener("hanazar:bgm-state-request", handleStateRequest);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [playSfx, syncAmbient, unlock]);

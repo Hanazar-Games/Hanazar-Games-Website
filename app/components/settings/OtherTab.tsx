@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function OtherTab() {
-  const { reset, exportJson, importJson } = useSettingsContext();
+  const { reset, clearCache, exportJson, importJson } = useSettingsContext();
   const { tr } = useTranslation();
   const [importArea, setImportArea] = useState("");
   const [showImport, setShowImport] = useState(false);
@@ -55,7 +55,7 @@ export default function OtherTab() {
 
   const handleClearCache = () => {
     if (!window.confirm(tr("stClearCacheConfirm"))) return;
-    reset();
+    clearCache();
     setStatus(tr("stCacheCleared"));
   };
 

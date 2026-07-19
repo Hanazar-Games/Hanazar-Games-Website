@@ -1,22 +1,45 @@
 "use client";
 
-import { useSettingsContext } from "../SettingsContext";
+import { useEffect, useState } from "react";
+import { sfxStyles, useSettingsContext } from "../SettingsContext";
+import type { BgmPlaybackState } from "../AudioEngine";
 import { useTranslation } from "../../hooks/useTranslation";
 
-const sfxStyles = [
-  "Classic", "Electronic", "Retro", "Wood", "Bell", "Space",
-  "Drum", "Piano", "Synth", "Chiptune", "Pluck", "Crystal"
-];
+const bgmStateKeys: Record<BgmPlaybackState, string> = {
+  off: "stBgmStateOff",
+  muted: "stBgmStateMuted",
+  waiting: "stBgmStateWaiting",
+  playing: "stBgmStatePlaying",
+  paused: "stBgmStatePaused",
+  unavailable: "stBgmStateUnavailable",
+};
 
 export default function AudioTab() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
+  const [bgmState, setBgmState] = useState<BgmPlaybackState>(() => {
+    if (!settings.bgmEnabled) return "off";
+    if (settings.masterVolume === 0 || settings.bgmVolume === 0) return "muted";
+    return "waiting";
+  });
   const selectedSfxStyle = sfxStyles.find(
     (style) => style.toLowerCase() === settings.sfxStyle.toLowerCase()
   ) ?? settings.sfxStyle;
   const previewSfx = () => {
     window.dispatchEvent(new CustomEvent("hanazar:sfx-preview"));
   };
+
+  useEffect(() => {
+    const handleState = (event: Event) => {
+      const state = (event as CustomEvent<{ state?: BgmPlaybackState }>).detail?.state;
+      if (state && Object.prototype.hasOwnProperty.call(bgmStateKeys, state)) {
+        setBgmState(state);
+      }
+    };
+    window.addEventListener("hanazar:bgm-state", handleState);
+    window.dispatchEvent(new Event("hanazar:bgm-state-request"));
+    return () => window.removeEventListener("hanazar:bgm-state", handleState);
+  }, []);
 
   return (
     <div className="settingsTabContent">
@@ -50,7 +73,7 @@ export default function AudioTab() {
       <div className="settingGroup">
         <div className="settingRow">
           <span className="settingLabel" id="label-sfx">{tr("stSfx")}</span>
-          <label className="switch">
+          <label className="switch" data-audio-unlock>
             <input
               type="checkbox"
               checked={settings.sfxEnabled}
@@ -96,7 +119,7 @@ export default function AudioTab() {
             <span className="settingLabel" id="label-bgm">{tr("stBgm")}</span>
             <p className="settingDesc compact">{tr("stBgmDesc")}</p>
           </div>
-          <label className="switch">
+          <label className="switch" data-audio-unlock>
             <input
               type="checkbox"
               checked={settings.bgmEnabled}
@@ -120,6 +143,10 @@ export default function AudioTab() {
           disabled={!settings.bgmEnabled}
           onChange={(e) => update("bgmVolume", Number(e.target.value))}
         />
+        <p className={`audioState audioState-${bgmState}`} role="status" aria-live="polite">
+          <span className="audioStateDot" aria-hidden="true" />
+          {tr(bgmStateKeys[bgmState])}
+        </p>
       </div>
     </div>
   );

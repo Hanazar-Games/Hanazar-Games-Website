@@ -165,6 +165,18 @@ body[data-theme="light"] .footerCta {
   border-color: rgba(0,0,0,0.08);
 }
 
+body[data-theme="light"] .footerCtaRow,
+body[data-theme="light"] .contactPanel {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="light"] .contactModule {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.025), rgba(0, 0, 0, 0.008)),
+    rgba(255, 255, 255, 0.96);
+}
+
 body[data-theme="light"] .footerCta span {
   color: #1a1a1a;
 }
@@ -179,6 +191,51 @@ body[data-theme="light"] .footerColumn a {
 
 body[data-theme="light"] .footerColumn a:hover {
   color: #1a1a1a;
+}
+
+body[data-theme="light"] .footerSocials a:hover,
+body[data-theme="light"] .footerMetaLinks a:hover,
+body[data-theme="light"] .aboutLinks a:hover,
+body[data-theme="light"] .settingsCloseBtn:hover {
+  color: #111;
+}
+
+body[data-theme="light"] .changelogItems,
+body[data-theme="light"] .aboutDesc {
+  color: #555;
+}
+
+body[data-theme="light"] .changelogEntryLatest {
+  border-color: rgba(0, 0, 0, 0.14);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.012)),
+    rgba(255, 255, 255, 0.7);
+}
+
+body[data-theme="light"] .settingsBtn,
+body[data-theme="light"] .settingsCloseBtn {
+  background: rgba(0, 0, 0, 0.035);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #333;
+}
+
+body[data-theme="light"] .settingsBtn:hover,
+body[data-theme="light"] .settingsCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+body[data-theme="light"] .settingsBtn.danger {
+  border-color: rgba(177, 48, 59, 0.35);
+  color: #a52632;
+}
+
+body[data-theme="light"] .rangeSlider,
+body[data-theme="light"] .switch .slider {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+body[data-theme="light"] .switch input:checked + .slider {
+  background: rgba(0, 0, 0, 0.42);
 }
 
 body[data-theme="light"] .heroTitle,
@@ -204,7 +261,8 @@ body[data-reduce-motion="true"] *::after {
   transition-duration: 0.01ms !important;
 }
 
-body[data-reduce-motion="true"] .reveal {
+body[data-reduce-motion="true"] .reveal,
+body[data-reduce-motion="true"] [data-reveal] {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
@@ -229,11 +287,13 @@ body[data-disable-decorations="true"] .gamesHero::after {
 }
 
 /* ── Individual Animation Toggles ── */
-body[data-disable-ui-fade="true"] .reveal {
+body[data-disable-ui-fade="true"] .reveal,
+body[data-disable-ui-fade="true"] [data-reveal] {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
   transition: none !important;
+  animation: none !important;
 }
 
 body[data-disable-btn-hover="true"] .heroNavButton:hover,
@@ -969,26 +1029,28 @@ select:focus-visible {
   gap: 16px;
 }
 
-.reveal {
+.reveal,
+[data-reveal] {
   opacity: 0;
   filter: blur(8px);
-  transition:
-    opacity calc(1s * var(--anim-speed, 1)) ease,
-    transform calc(1s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1),
-    filter calc(0.9s * var(--anim-speed, 1)) ease;
-  transition-delay: var(--reveal-delay, 0s);
   will-change: opacity, transform, filter;
 }
 
 .revealFade {
+  --reveal-x: 0px;
+  --reveal-y: 28px;
   transform: translateY(28px);
 }
 
 .revealLeft {
+  --reveal-x: -44px;
+  --reveal-y: 0px;
   transform: translateX(-44px);
 }
 
 .revealRight {
+  --reveal-x: 44px;
+  --reveal-y: 0px;
   transform: translateX(44px);
 }
 
@@ -996,6 +1058,22 @@ select:focus-visible {
   opacity: 1;
   transform: translate(0, 0);
   filter: blur(0);
+  will-change: auto;
+  animation: scrollReveal calc(1s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1)
+    var(--reveal-delay, 0s) backwards;
+}
+
+@keyframes scrollReveal {
+  from {
+    opacity: 0;
+    transform: translate(var(--reveal-x, 0px), var(--reveal-y, 0px));
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+    filter: blur(0);
+  }
 }
 
 @keyframes fadeInTitle {
@@ -1069,7 +1147,6 @@ select:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .footerCtaRow,
   .footerCtaRow {
     grid-template-columns: 1fr;
   }
@@ -1644,9 +1721,14 @@ select:focus-visible {
 }
 
 .switch input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   opacity: 0;
-  width: 0;
-  height: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
 }
 
 .switch .slider {
@@ -1707,6 +1789,22 @@ select:focus-visible {
 .settingsBtn:disabled {
   opacity: 0.42;
   cursor: not-allowed;
+}
+
+.switch input:disabled,
+.switch input:disabled + .slider {
+  cursor: not-allowed;
+}
+
+.settingGroup.isDisabled > :not(.settingNotice) {
+  opacity: 0.5;
+}
+
+.settingNotice {
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-soft);
 }
 
 .settingsBtn:disabled:hover {
@@ -1902,6 +2000,54 @@ select:focus-visible {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.audioState {
+  margin: 2px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.audioStateDot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.audioState-playing {
+  color: var(--accent);
+}
+
+.audioState-waiting .audioStateDot {
+  animation: audioStatePulse calc(1.4s * var(--anim-speed, 1)) ease-in-out infinite;
+}
+
+@keyframes audioStatePulse {
+  50% { opacity: 0.22; }
+}
+
+.shortcutToast {
+  position: fixed;
+  right: 80px;
+  bottom: 24px;
+  z-index: 95;
+  max-width: min(320px, calc(100vw - 112px));
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--panel-strong);
+  color: var(--text);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+  font-size: 0.84rem;
+  line-height: 1.4;
+  animation: fadeInBody calc(0.2s * var(--anim-speed, 1)) ease both;
 }
 
 .settingsBtn.primary {
@@ -2154,6 +2300,11 @@ select:focus-visible {
     height: 42px;
   }
 
+  .shortcutToast {
+    right: 66px;
+    bottom: 14px;
+  }
+
   .colorPresetGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2178,7 +2329,8 @@ select:focus-visible {
     transition-duration: 0.01ms !important;
   }
 
-  .reveal {
+  .reveal,
+  [data-reveal] {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;

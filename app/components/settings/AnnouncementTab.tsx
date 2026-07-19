@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.4.1",
+    date: "2026-07-19",
+    title: "Deep QA: Audio Lifecycle, Light Theme, and Settings Reliability",
+    items: [
+      "Fixed SFX on SVG-based controls, hardened Web Audio unlock and failure handling, and added live BGM playback status.",
+      "Repaired low-contrast light-theme surfaces across Contact, footer actions, settings changelog, buttons, and hover states.",
+      "Made Clear Cache distinct from Reset, validated imported SFX styles, and restored the user's previous volume after unmuting.",
+      "Restored staggered reveals across Tools, Games, and content grids while improving reveal memory usage and reduced-motion behavior.",
+      "Improved modal focus trapping, switch hit targets, selection semantics, animation control states, and shortcut feedback.",
+    ],
+  },
+  {
     version: "2.4.0",
     date: "2026-07-16",
     title: "Site-wide UI, UX, Audio, and Accessibility Pass",

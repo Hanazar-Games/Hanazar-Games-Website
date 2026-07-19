@@ -36,6 +36,7 @@ export default function StyleTab() {
               type="button"
               className={`seg-btn${settings.theme === t ? " active" : ""}`}
               onClick={() => update("theme", t)}
+              aria-pressed={settings.theme === t}
             >
               {tr(`theme${t.charAt(0).toUpperCase() + t.slice(1)}` as string)}
             </button>
@@ -52,6 +53,7 @@ export default function StyleTab() {
               type="button"
               className={`seg-btn${settings.font === f ? " active" : ""}`}
               onClick={() => update("font", f as typeof settings.font)}
+              aria-pressed={settings.font === f}
             >
               {tr(fontKeyMap[f])}
             </button>
@@ -59,9 +61,11 @@ export default function StyleTab() {
         </div>
         {settings.font === "custom" && (
           <input
+            id="custom-font-name"
             type="text"
             className="settingsInput"
             placeholder={tr("stCustomFontPlaceholder")}
+            aria-label={tr("stCustomFontPlaceholder")}
             value={settings.customFont}
             onChange={(e) => update("customFont", e.target.value)}
           />
@@ -78,6 +82,7 @@ export default function StyleTab() {
               className={`colorPreset${settings.colorPreset === p.key ? " active" : ""}`}
               onClick={() => update("colorPreset", p.key)}
               title={tr(p.labelKey)}
+              aria-pressed={settings.colorPreset === p.key}
             >
               <span className="colorDot" style={{ background: p.color }} />
               <span className="colorLabel">{tr(p.labelKey)}</span>

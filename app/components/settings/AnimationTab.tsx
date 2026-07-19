@@ -6,6 +6,7 @@ import { useTranslation } from "../../hooks/useTranslation";
 export default function AnimationTab() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
+  const motionControlsDisabled = !settings.animationsEnabled || settings.reduceAnimations;
 
   return (
     <div className="settingsTabContent">
@@ -22,7 +23,7 @@ export default function AnimationTab() {
         </label>
       </div>
 
-      <div className="settingGroup">
+      <div className={`settingGroup${motionControlsDisabled ? " isDisabled" : ""}`}>
         <div className="sliderHeader">
           <label className="settingLabel" htmlFor="anim-speed">{tr("stAnimSpeed")}</label>
           <span className="sliderValue">{settings.animSpeed}%</span>
@@ -34,12 +35,16 @@ export default function AnimationTab() {
           min={50}
           max={150}
           value={settings.animSpeed}
+          disabled={motionControlsDisabled}
           onChange={(e) => update("animSpeed", Number(e.target.value))}
         />
         <p className="settingDesc">{tr("stAnimSpeedDesc")}</p>
+        {settings.reduceAnimations ? (
+          <p className="settingDesc settingNotice">{tr("stMotionOverridden")}</p>
+        ) : null}
       </div>
 
-      <div className="settingGroup">
+      <div className={`settingGroup${motionControlsDisabled ? " isDisabled" : ""}`}>
         <span className="settingLabel">{tr("stIndivEffects")}</span>
         {[
           { key: "animUiFade" as const, label: tr("stUiFade") },
@@ -52,6 +57,7 @@ export default function AnimationTab() {
               <input
                 type="checkbox"
                 checked={settings[item.key]}
+                disabled={motionControlsDisabled}
                 onChange={(e) => update(item.key, e.target.checked)}
                 aria-labelledby={`label-${item.key}`}
               />

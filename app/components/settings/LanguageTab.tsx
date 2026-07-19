@@ -27,6 +27,7 @@ export default function LanguageTab() {
               type="button"
               className={`languageItem${settings.language === lang.code ? " active" : ""}`}
               onClick={() => update("language", lang.code)}
+              aria-pressed={settings.language === lang.code}
             >
               <span className="languageName">{lang.name}</span>
               <span className="languageCode">{lang.code}</span>

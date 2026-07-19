@@ -40,6 +40,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const previousOverflowRef = useRef("");
+  const previousPaddingRightRef = useRef("");
   const previousMainAriaHiddenRef = useRef<string | null>(null);
   const previousMainInertRef = useRef(false);
   const { tr } = useTranslation();
@@ -82,7 +83,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         modalRef.current.querySelectorAll<HTMLElement>(
           "a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex='-1'])"
         )
-      ).filter((element) => element.offsetParent !== null);
+      ).filter((element) => element.offsetParent !== null && element.tabIndex >= 0);
 
       if (focusable.length === 0) return;
 
@@ -116,6 +117,12 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         ? document.activeElement
         : null;
       previousOverflowRef.current = document.body.style.overflow;
+      previousPaddingRightRef.current = document.body.style.paddingRight;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        const currentPadding = Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+        document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+      }
       const main = document.querySelector<HTMLElement>("main");
       if (main) {
         previousMainAriaHiddenRef.current = main.getAttribute("aria-hidden");
@@ -129,6 +136,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflowRef.current;
+      document.body.style.paddingRight = previousPaddingRightRef.current;
       const main = document.querySelector<HTMLElement>("main");
       if (main) {
         if (previousMainAriaHiddenRef.current === null) main.removeAttribute("aria-hidden");
@@ -197,7 +205,6 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-title"
-        aria-label={tr("ariaSettings")}
       >
         <div className="settingsModalHeader">
           <h2 id="settings-title">{tr("settingsTitle")}</h2>

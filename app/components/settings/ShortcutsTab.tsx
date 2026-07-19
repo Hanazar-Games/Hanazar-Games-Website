@@ -5,7 +5,7 @@ import { useTranslation } from "../../hooks/useTranslation";
 const shortcuts = [
   { actionKey: "scOpenSettings", key: "Ctrl / Cmd + ," },
   { actionKey: "scCloseModal", key: "Escape" },
-  { actionKey: "scNavigateTabs", key: "Tab / Shift + Tab" },
+  { actionKey: "scNavigateTabs", key: "Tab / Shift + Tab / Arrow Keys" },
   { actionKey: "scToggleTheme", key: "Ctrl / Cmd + Shift + L" },
   { actionKey: "scMute", key: "Ctrl / Cmd + M" },
 ];

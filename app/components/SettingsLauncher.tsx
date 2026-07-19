@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import SettingsPanel from "./SettingsPanel";
 import { useSettingsContext } from "./SettingsContext";
 import { useTranslation } from "../hooks/useTranslation";
@@ -18,11 +18,30 @@ function isEditableTarget(target: EventTarget | null) {
 
 export default function SettingsLauncher() {
   const [open, setOpen] = useState(false);
+  const [shortcutStatus, setShortcutStatus] = useState("");
+  const lastVolumeRef = useRef(80);
+  const statusTimerRef = useRef<number | null>(null);
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
 
   const openSettings = useCallback(() => setOpen(true), []);
   const closeSettings = useCallback(() => setOpen(false), []);
+  const showShortcutStatus = useCallback((message: string) => {
+    if (statusTimerRef.current !== null) window.clearTimeout(statusTimerRef.current);
+    setShortcutStatus(message);
+    statusTimerRef.current = window.setTimeout(() => {
+      setShortcutStatus("");
+      statusTimerRef.current = null;
+    }, 1600);
+  }, []);
+
+  useEffect(() => {
+    if (settings.masterVolume > 0) lastVolumeRef.current = settings.masterVolume;
+  }, [settings.masterVolume]);
+
+  useEffect(() => () => {
+    if (statusTimerRef.current !== null) window.clearTimeout(statusTimerRef.current);
+  }, []);
 
   useEffect(() => {
     window.addEventListener("hanazar:open-settings", openSettings);
@@ -45,19 +64,29 @@ export default function SettingsLauncher() {
 
       if (event.shiftKey && key === "l") {
         event.preventDefault();
-        update("theme", settings.theme === "light" ? "dark" : "light");
+        const currentTheme = document.body.dataset.theme ?? settings.theme;
+        const nextTheme = currentTheme === "light" ? "dark" : "light";
+        update("theme", nextTheme);
+        showShortcutStatus(tr(nextTheme === "light" ? "shortcutLightTheme" : "shortcutDarkTheme"));
         return;
       }
 
       if (!event.shiftKey && key === "m") {
         event.preventDefault();
-        update("masterVolume", settings.masterVolume > 0 ? 0 : 80);
+        if (settings.masterVolume > 0) {
+          lastVolumeRef.current = settings.masterVolume;
+          update("masterVolume", 0);
+          showShortcutStatus(tr("shortcutMuted"));
+        } else {
+          update("masterVolume", lastVolumeRef.current);
+          showShortcutStatus(tr("shortcutVolumeRestored"));
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [settings.masterVolume, settings.theme, update]);
+  }, [settings.masterVolume, settings.theme, showShortcutStatus, tr, update]);
 
   return (
     <>
@@ -74,6 +103,11 @@ export default function SettingsLauncher() {
         </svg>
       </button>
       <SettingsPanel open={open} onClose={closeSettings} />
+      {shortcutStatus ? (
+        <div className="shortcutToast" role="status" aria-live="polite">
+          {shortcutStatus}
+        </div>
+      ) : null}
     </>
   );
 }
