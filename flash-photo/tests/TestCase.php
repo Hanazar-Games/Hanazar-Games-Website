@@ -74,7 +74,11 @@ abstract class TestCase extends PhpUnitTestCase
         $this->database = new Database($this->config);
         $this->database->initialize(dirname(__DIR__) . '/database/schema.sql');
         $this->cleanupQueue = new RuntimeCleanupQueue($this->database);
-        $this->sessionRegistry = new SessionCleanupRegistry($this->config, $this->cleanupQueue);
+        $this->sessionRegistry = new SessionCleanupRegistry(
+            $this->config,
+            $this->database,
+            $this->cleanupQueue
+        );
         $logger = new Logger($this->config, $this->cleanupQueue);
         $this->storage = new FileStorage($this->config, $logger, $this->cleanupQueue);
         $this->service = new FlashService($this->config, $this->database, $this->storage, $logger);

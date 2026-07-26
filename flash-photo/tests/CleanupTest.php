@@ -231,20 +231,6 @@ final class CleanupTest extends TestCase
         self::assertNull($this->cleanupQueue->currentDue('session_delete', $reference));
     }
 
-    public function testSessionRegistrationActivatesOnlyAfterDurableSidecar(): void
-    {
-        $source = (string) file_get_contents(dirname(__DIR__) . '/app/SessionCleanupRegistry.php');
-        $pending = strpos($source, "scheduleNew('session_pending', \$reference, \$dueAt)");
-        $sidecar = strpos($source, '$this->createSidecar($reference, $sessionFileName);', $pending);
-        $activate = strpos($source, "'session_pending',\n                'session'", $sidecar);
-
-        self::assertIsInt($pending);
-        self::assertIsInt($sidecar);
-        self::assertIsInt($activate);
-        self::assertLessThan($sidecar, $pending);
-        self::assertLessThan($activate, $sidecar);
-    }
-
     public function testPendingCleanupClaimsDeletionBeforeRetiringSidecar(): void
     {
         $source = (string) file_get_contents(dirname(__DIR__) . '/scripts/cleanup.php');
@@ -260,29 +246,6 @@ final class CleanupTest extends TestCase
         self::assertLessThan($claim, $pendingLoop);
         self::assertLessThan($deleteLoop, $claim);
         self::assertLessThan($sidecarRemoval, $deleteLoop);
-    }
-
-    public function testDeferredPendingActivationPreservesIntendedExpiry(): void
-    {
-        $sessionId = str_repeat('v', 32);
-        $intendedDueAt = time() + 3600;
-        $reference = $this->sessionRegistry->track($sessionId, null, $intendedDueAt);
-        $deferredDueAt = $intendedDueAt + 60;
-        $statement = $this->database->pdo()->prepare(
-            "UPDATE cleanup_queue SET category = 'session_pending', due_at = :due
-             WHERE category = 'session' AND item_name = :reference"
-        );
-        $statement->execute(['due' => $deferredDueAt, 'reference' => $reference]);
-        $activate = new \ReflectionMethod($this->sessionRegistry, 'activateProvisioning');
-
-        self::assertTrue($activate->invoke(
-            $this->sessionRegistry,
-            $reference,
-            'sess_' . $sessionId,
-            $intendedDueAt
-        ));
-        self::assertNull($this->cleanupQueue->currentDue('session_pending', $reference));
-        self::assertSame($intendedDueAt, $this->cleanupQueue->currentDue('session', $reference));
     }
 
     public function testProvisioningRollbackNeverDeletesAnActiveSidecar(): void
@@ -312,15 +275,8 @@ final class CleanupTest extends TestCase
             $dueAt,
             $deleteDueAt
         ));
-        $activate = new \ReflectionMethod($this->sessionRegistry, 'activateProvisioning');
         $retire = new \ReflectionMethod($this->sessionRegistry, 'retireProvisioning');
 
-        self::assertFalse($activate->invoke(
-            $this->sessionRegistry,
-            $reference,
-            'sess_' . $sessionId,
-            $dueAt
-        ));
         self::assertTrue($retire->invoke($this->sessionRegistry, $reference));
         self::assertFileExists($sidecar);
         $deferredDueAt = $this->cleanupQueue->currentDue('session_delete', $reference);
@@ -641,8 +597,8 @@ final class CleanupTest extends TestCase
         $firstPath = $directory . '/' . $firstName;
         $secondPath = $directory . '/' . $secondName;
         file_put_contents($firstPath, json_encode(['started' => time(), 'count' => 1], JSON_THROW_ON_ERROR));
-        file_put_contents($secondPath, json_encode(['started' => time() - 120, 'count' => 1], JSON_THROW_ON_ERROR));
-        touch($secondPath, time() - 120);
+        file_put_contents($secondPath, json_encode(['started' => time() - 7200, 'count' => 1], JSON_THROW_ON_ERROR));
+        touch($secondPath, time() - 7200);
         $this->cleanupQueue->schedule('rate_limit', $firstName, $dueAt);
         $this->cleanupQueue->schedule('rate_limit', $secondName, $dueAt);
 

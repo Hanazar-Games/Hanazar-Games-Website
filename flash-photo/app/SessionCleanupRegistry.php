@@ -15,8 +15,11 @@ final class SessionCleanupRegistry
     private readonly string $sessionDirectory;
     private readonly string $sidecarDirectory;
 
-    public function __construct(Config $config, private readonly RuntimeCleanupQueue $cleanupQueue)
-    {
+    public function __construct(
+        Config $config,
+        private readonly Database $database,
+        private readonly RuntimeCleanupQueue $cleanupQueue
+    ) {
         $this->sessionDirectory = dirname($config->string('storage_path')) . '/sessions';
         $this->assertDirectory($this->sessionDirectory, 0700);
         $this->sidecarDirectory = $this->sessionDirectory . '/.cleanup';
@@ -49,16 +52,12 @@ final class SessionCleanupRegistry
                 continue;
             }
             try {
-                $this->createSidecar($reference, $sessionFileName);
+                $this->publishProvisioning($reference, $sessionFileName, $dueAt);
             } catch (\Throwable $exception) {
                 $this->retireProvisioning($reference);
                 throw $exception;
             }
-            if ($this->activateProvisioning($reference, $sessionFileName, $dueAt)) {
-                return $reference;
-            }
-            $this->retireProvisioning($reference);
-            throw new RuntimeException('Unable to activate Session cleanup reference.');
+            return $reference;
         }
         throw new RuntimeException('Unable to allocate Session cleanup reference.');
     }
@@ -183,28 +182,31 @@ final class SessionCleanupRegistry
         }
     }
 
-    private function activateProvisioning(
+    private function publishProvisioning(
         string $reference,
         string $sessionFileName,
         int $intendedDueAt
-    ): bool {
-        for ($attempt = 0; $attempt < 5; $attempt++) {
+    ): void {
+        $this->database->immediate(function (\PDO $_pdo) use (
+            $reference,
+            $sessionFileName,
+            $intendedDueAt
+        ): void {
             $pendingDueAt = $this->cleanupQueue->currentDue('session_pending', $reference);
             if ($pendingDueAt === null) {
-                break;
+                throw new RuntimeException('Session cleanup provisioning ownership was lost.');
             }
-            if ($this->cleanupQueue->transitionIfDue(
+            $this->createSidecar($reference, $sessionFileName);
+            if (!$this->cleanupQueue->transitionIfDue(
                 'session_pending',
                 'session',
                 $reference,
                 $pendingDueAt,
                 $intendedDueAt
             )) {
-                return true;
+                throw new RuntimeException('Unable to activate Session cleanup reference.');
             }
-        }
-        return $this->cleanupQueue->currentDue('session', $reference) !== null
-            && $this->sidecarMatches($reference, $sessionFileName);
+        });
     }
 
     private function retireProvisioning(string $reference): bool

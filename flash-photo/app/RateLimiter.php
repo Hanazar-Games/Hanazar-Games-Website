@@ -44,10 +44,14 @@ final class RateLimiter
         $window = $definition['window'];
         $key = hash_hmac('sha256', $scope . '|' . $identifier, $this->config->string('app_secret'));
         $path = $this->directory . '/' . $key . '.json';
-        $state = $this->synchronized(function () use ($path, $window): array {
+        $result = $this->synchronized(function () use ($path, $limit, $window): array {
             $now = time();
-            $this->cleanupQueue->schedule('rate_limit', basename($path), $now + $window);
             [$state, $originalStat] = $this->readState($path, $now, $window);
+            if ($state !== null
+                && $now - $state['started'] < $window
+                && $state['count'] > $limit) {
+                return ['state' => $state, 'first_exceeded' => false];
+            }
             if ($state === null || $now - $state['started'] >= $window) {
                 $state = ['started' => $now, 'count' => 0];
             }
@@ -58,13 +62,17 @@ final class RateLimiter
                 $state['started'] + $window,
             );
             $this->persistState($path, $state, $originalStat);
-            return $state;
+            return [
+                'state' => $state,
+                'first_exceeded' => $state['count'] === $limit + 1,
+            ];
         });
+        $state = $result['state'];
 
         if ($state['count'] > $limit) {
             $now = time();
             $retry = $window - ($now - (int) $state['started']);
-            $firstExceeded = $state['count'] === $limit + 1;
+            $firstExceeded = $result['first_exceeded'];
             if ($firstExceeded) {
                 $this->logger->info('rate_limit.triggered', [
                     'scope' => $scope,
@@ -82,9 +90,10 @@ final class RateLimiter
         $lock = @fopen($path, 'c+b');
         $pathStat = $this->exactStat($path);
         $openStat = is_resource($lock) ? @fstat($lock) : false;
+        $needsChmod = is_array($openStat) && (((int) $openStat['mode']) & 0777) !== 0600;
         if (!is_resource($lock)
             || !$this->isExactRegularFile($pathStat, $openStat)
-            || !@chmod($path, 0600)
+            || ($needsChmod && !@chmod($path, 0600))
             || !$this->isExactRegularFile($this->exactStat($path), $openStat, true)
             || !flock($lock, LOCK_EX)
             || !$this->isExactRegularFile($this->exactStat($path), $openStat, true)) {

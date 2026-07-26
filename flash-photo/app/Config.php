@@ -8,6 +8,9 @@ use InvalidArgumentException;
 
 final class Config
 {
+    private const MAX_RATE_LIMIT = 1_000_000;
+    private const MAX_RATE_LIMIT_WINDOW = 31_536_000;
+
     /** @param array<string, mixed> $values */
     private function __construct(private readonly array $values)
     {
@@ -236,6 +239,13 @@ final class Config
                 || $definition['limit'] < 1
                 || $definition['window'] < 1) {
                 throw new InvalidArgumentException('Every rate limit requires positive integer limit and window values.');
+            }
+            if ($definition['limit'] > self::MAX_RATE_LIMIT
+                || $definition['window'] > self::MAX_RATE_LIMIT_WINDOW
+                || $definition['window'] > PHP_INT_MAX - time()) {
+                throw new InvalidArgumentException(
+                    'Every rate limit requires limit <= 1000000 and window <= 31536000.'
+                );
             }
         }
     }

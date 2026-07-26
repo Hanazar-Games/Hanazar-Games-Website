@@ -612,65 +612,69 @@ try {
         $name = $item['item_name'];
         $dueAt = $item['due_at'];
         $path = rtrim($config->string('rate_limit_path'), '/') . '/' . $name;
+        $temporary = $path . '.tmp';
         $itemHash = substr(hash('sha256', $name), 0, 16);
         $cleanRateItem = static function () use (
             $cleanupQueue,
             $name,
             $dueAt,
             $path,
+            $temporary,
             $now,
             $maxWindow,
             $dryRun,
             $itemHash
         ): array {
             $stat = exactStat($path);
-            if ($stat === false) {
+            $temporaryStat = exactStat($temporary);
+            $fail = static function (string $message) use (
+                $cleanupQueue,
+                $name,
+                $dueAt,
+                $now,
+                $dryRun
+            ): array {
                 if (!$dryRun) {
-                    if (!unlinkExactFile($path)) {
-                        $cleanupQueue->deferIfDue(
-                            'rate_limit',
-                            $name,
-                            $dueAt,
-                            $now + CLEANUP_RETRY_DELAY
-                        );
-                        return [
-                            'status' => 'error',
-                            'message' => "rate_limit_files: unable to persist missing item {$itemHash}",
-                        ];
-                    }
-                    $cleanupQueue->removeIfDue('rate_limit', $name, $dueAt);
-                }
-                return ['status' => 'missing'];
-            }
-            if (!isRegularStat($stat)) {
-                if (!isSymlinkStat($stat)) {
-                    if (!$dryRun) {
-                        $cleanupQueue->deferIfDue(
-                            'rate_limit',
-                            $name,
-                            $dueAt,
-                            $now + CLEANUP_RETRY_DELAY
-                        );
-                    }
-                    return [
-                        'status' => 'error',
-                        'message' => "rate_limit_files: unable to inspect item {$itemHash}",
-                    ];
-                }
-                if ($dryRun) {
-                    return ['status' => 'removed'];
-                }
-                if (!unlinkExactFile($path)) {
                     $cleanupQueue->deferIfDue(
                         'rate_limit',
                         $name,
                         $dueAt,
                         $now + CLEANUP_RETRY_DELAY
                     );
-                    return [
-                        'status' => 'error',
-                        'message' => "rate_limit_files: unable to remove item {$itemHash}",
-                    ];
+                }
+                return ['status' => 'error', 'message' => $message];
+            };
+            if ($temporaryStat !== false
+                && !isRegularStat($temporaryStat)
+                && !isSymlinkStat($temporaryStat)) {
+                return $fail("rate_limit_files: unable to inspect temporary item {$itemHash}");
+            }
+            $removeBoth = static function () use ($path, $temporary): bool {
+                return unlinkExactFile($path)
+                    && unlinkExactFile($temporary)
+                    && exactStat($path) === false
+                    && exactStat($temporary) === false
+                    && syncDirectoryExact(dirname($path));
+            };
+            if ($stat === false) {
+                if ($dryRun) {
+                    return ['status' => $temporaryStat === false ? 'missing' : 'removed'];
+                }
+                if (!$removeBoth()) {
+                    return $fail("rate_limit_files: unable to remove interrupted item {$itemHash}");
+                }
+                $cleanupQueue->removeIfDue('rate_limit', $name, $dueAt);
+                return ['status' => $temporaryStat === false ? 'missing' : 'removed'];
+            }
+            if (!isRegularStat($stat)) {
+                if (!isSymlinkStat($stat)) {
+                    return $fail("rate_limit_files: unable to inspect item {$itemHash}");
+                }
+                if ($dryRun) {
+                    return ['status' => 'removed'];
+                }
+                if (!$removeBoth()) {
+                    return $fail("rate_limit_files: unable to remove item {$itemHash}");
                 }
                 $cleanupQueue->removeIfDue('rate_limit', $name, $dueAt);
                 return ['status' => 'removed'];
@@ -683,6 +687,10 @@ try {
             $freshUntil = max((int) $stat['mtime'] + $maxWindow, $started + $maxWindow);
             if ($freshUntil > $now) {
                 if (!$dryRun) {
+                    if ($temporaryStat !== false
+                        && (!unlinkExactFile($temporary) || exactStat($temporary) !== false)) {
+                        return $fail("rate_limit_files: unable to remove interrupted item {$itemHash}");
+                    }
                     $cleanupQueue->deferIfDue(
                         'rate_limit',
                         $name,
@@ -695,17 +703,8 @@ try {
             if ($dryRun) {
                 return ['status' => 'removed'];
             }
-            if (!unlinkExactFile($path)) {
-                $cleanupQueue->deferIfDue(
-                    'rate_limit',
-                    $name,
-                    $dueAt,
-                    $now + CLEANUP_RETRY_DELAY
-                );
-                return [
-                    'status' => 'error',
-                    'message' => "rate_limit_files: unable to remove item {$itemHash}",
-                ];
+            if (!$removeBoth()) {
+                return $fail("rate_limit_files: unable to remove item {$itemHash}");
             }
             $cleanupQueue->removeIfDue('rate_limit', $name, $dueAt);
             return ['status' => 'removed'];

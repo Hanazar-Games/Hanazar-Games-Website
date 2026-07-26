@@ -244,7 +244,7 @@ sudoedit /etc/flash-photo.env
 | `RATE_UPLOAD_LIMIT/WINDOW` | `20` / `3600` | 上传次数/窗口秒数 |
 | `RATE_PROBE_LIMIT/WINDOW` | `20` / `60` | 无效 token 探测次数/窗口秒数 |
 
-`WINDOW` 均为秒。设为零不是受支持的“关闭”方式；配置校验和限流语义要求正值。
+`WINDOW` 均为秒。`LIMIT` 必须在 `1..1000000`，`WINDOW` 必须在 `1..31536000`；设为零不是受支持的“关闭”方式。
 
 ### 3. 独立 PHP-FPM pool
 
@@ -348,11 +348,11 @@ sudo certbot renew --dry-run
 sudo -u www-data /bin/bash -c 'set -a; . /etc/flash-photo.env; set +a; exec /usr/bin/php /var/www/flash-photo/current/scripts/cleanup.php --dry-run --verbose --limit=500 --session-path=/var/lib/flash-photo/sessions'
 ```
 
-`--limit` 是每个独立数据库查询或清理队列分类最多检查的行数，不是删除成功数，也不是整次运行的全局总数。应用在创建 `.pending` 临时文件、限流状态和日志之前，先把严格校验后的 basename 与到期时间登记进 SQLite；Session 队列只保存不可用于重放 Cookie 的 64 位十六进制引用，引用在 `sessions/.cleanup` 的 `0600` sidecar 内映射到 Session 文件名。cleanup 按分类使用覆盖索引取出到期项，再只访问对应精确路径，不枚举运行目录。锁定、仍新鲜或暂时失败的首项会原子延期到队尾，因此不会永久饿死后续项；`--dry-run` 以 SQLite 只读打开标志和 `query_only` 运行，不删除文件、不改业务状态、不推进队列，也不切换 journal mode 或写入主数据库。SQLite 的只读 WAL 访问仍可能使用或维护 `-wal`/`-shm` 协调文件，因此数据库目录必须满足 SQLite 的访问要求；干净且已 checkpoint 的 WAL 数据库可在辅助文件缺失时打开并按需重建协调文件，仍依赖未 checkpoint WAL 内容却缺失或损坏辅助文件时则会安全失败，而不会回退为可写连接。
+`--limit` 是每个独立数据库查询或清理队列分类最多检查的行数，不是删除成功数，也不是整次运行的全局总数。应用在创建 `.pending` 临时文件、限流状态和日志之前，先把严格校验后的 basename 与到期时间登记进 SQLite；Session 队列只保存不可用于重放 Cookie 的 64 位十六进制引用，引用在 `sessions/.cleanup` 的 `0600` sidecar 内映射到 Session 文件名。cleanup 按分类使用覆盖索引取出到期项，再只访问对应精确路径，不枚举运行目录；限流正式状态及其确定性 `.tmp` 崩溃残留会在同一锁内一起收敛。锁定、仍新鲜或暂时失败的首项会原子延期到队尾，因此不会永久饿死后续项；`--dry-run` 以 SQLite 只读打开标志和 `query_only` 运行，不删除文件、不改业务状态、不推进队列，也不切换 journal mode 或写入主数据库。SQLite 的只读 WAL 访问仍可能使用或维护 `-wal`/`-shm` 协调文件，因此数据库目录必须满足 SQLite 的访问要求；干净且已 checkpoint 的 WAL 数据库可在辅助文件缺失时打开并按需重建协调文件，仍依赖未 checkpoint WAL 内容却缺失或损坏辅助文件时则会安全失败，而不会回退为可写连接。
 
 上传进程会持续锁住发布标记，提交成功后移除它；进程崩溃留下的标记至少一小时后才由 cleanup 非阻塞接管，并在 SQLite 写事务内再次确认 `storage_name`。数据库已有记录时只移除陈旧标记；没有记录时才删除对应随机文件和标记。符号链接永不跟随。手工放进运行目录、但未由应用登记的文件不属于此清理不变量，部署时必须以目录权限禁止其他写入者。
 
-每个到期限流项只在状态重检、条件队列更新和删除期间短暂持有全局限流锁，日志与终端输出均在锁外。Session 清理只接受精确的 `dirname(STORAGE_PATH)/sessions` 专用 sibling 及其 `0700` 的 `.cleanup`：显式 `--session-path` 不匹配会报错；省略参数时，仅当 PHP `session.save_path` 已精确指向该目录才会清理，否则安全跳过。Session 与 sidecar 均在非阻塞文件锁内复核，sidecar 文件及父目录变更在 Linux 上执行 `fsync`，SQLite/WAL/应用日志不会保存可重放的 Session ID。SQLite 以 `session_pending`、`session`、`session_delete` 三个非机密阶段记录文件系统操作：sidecar 持久化后才激活引用，Session 删除进入终态后可在崩溃重试中幂等移除 sidecar 和队列。SQLite 与文件系统无法组成同一原子事务；创建进程若在 sidecar 完成前崩溃，到期 cleanup 会有界移除缺失或残缺的 pending 引用；已有完整 sidecar 时会恢复后继续清理。无法映射的 Session 文件不能在“不枚举目录、数据库不保存 Session ID”的安全边界内自动定位，发现此类异常时应在维护窗口使全部管理 Session 失效并重新登录。`destroyed_at` 表示业务上已终止，`storage_deleted_at` 表示物理文件删除完成；物理删除失败会延期重试，只有两者满足原始保留截止条件后才会删除数据库记录。
+每个到期限流项只在状态重检、条件队列更新和删除期间短暂持有全局限流锁，日志与终端输出均在锁外；活动窗口首次超限后计数封顶，后续 429 不再重写状态或重复记录越界日志。Session 清理只接受精确的 `dirname(STORAGE_PATH)/sessions` 专用 sibling 及其 `0700` 的 `.cleanup`：显式 `--session-path` 不匹配会报错；省略参数时，仅当 PHP `session.save_path` 已精确指向该目录才会清理，否则安全跳过。Session 与 sidecar 均在非阻塞文件锁内复核，sidecar 文件及父目录变更在 Linux 上执行 `fsync`，SQLite/WAL/应用日志不会保存可重放的 Session ID。SQLite 以 `session_pending`、`session`、`session_delete` 三个非机密阶段记录文件系统操作：创建方通过 `BEGIN IMMEDIATE` 在 pending 所有权复核、sidecar 持久化和激活提交之间建立写入围栏，清理方先取得删除所有权时创建方不会再迟到发布；Session 删除进入终态后可在崩溃重试中幂等移除 sidecar 和队列。SQLite 与文件系统仍不是单一原子存储，但创建进程在提交前崩溃时，数据库会回滚到可恢复的 pending 阶段，由到期 cleanup 有界收敛。无法映射的 Session 文件不能在“不枚举目录、数据库不保存 Session ID”的安全边界内自动定位，发现此类异常时应在维护窗口使全部管理 Session 失效并重新登录。`destroyed_at` 表示业务上已终止，`storage_deleted_at` 表示物理文件删除完成；物理删除失败会延期重试，只有两者满足原始保留截止条件后才会删除数据库记录。
 
 安装项目内唯一维护的 service 与 timer：
 

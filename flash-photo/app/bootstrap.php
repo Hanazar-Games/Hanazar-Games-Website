@@ -161,7 +161,7 @@ register_shutdown_function(static function () use ($logger): void {
 $storage = new FileStorage($config, $logger, $cleanupQueue);
 $identity = new ClientIdentity($config);
 $rateLimiter = new RateLimiter($config, $logger, $cleanupQueue);
-$sessionRegistry = new SessionCleanupRegistry($config, $cleanupQueue);
+$sessionRegistry = new SessionCleanupRegistry($config, $database, $cleanupQueue);
 $assertDirectoryAccess($config->string('storage_path'));
 $assertDirectoryAccess($config->string('rate_limit_path'));
 $auth = new Auth($config, $database, $rateLimiter, $logger, $identity, $sessionRegistry);

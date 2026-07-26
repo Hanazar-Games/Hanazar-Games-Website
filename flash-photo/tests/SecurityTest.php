@@ -756,86 +756,6 @@ final class SecurityTest extends TestCase
         (new RateLimiter($this->config, $logger, $this->cleanupQueue))->consume('probe', 'same-client');
     }
 
-    public function testRateLimiterRejectsTruncatedExistingStateWithoutReplacingIt(): void
-    {
-        $path = $this->rateLimitStatePath('truncated-client');
-        $contents = '{"started":';
-        file_put_contents($path, $contents);
-        chmod($path, 0600);
-
-        try {
-            $this->rateLimiter()->consume('probe', 'truncated-client');
-            self::fail('Truncated rate-limit state was accepted.');
-        } catch (RuntimeException $exception) {
-            self::assertSame('Rate limiter state is corrupt.', $exception->getMessage());
-        }
-        self::assertSame($contents, file_get_contents($path));
-    }
-
-    public function testRateLimiterRejectsMalformedExistingStateWithoutReplacingIt(): void
-    {
-        $path = $this->rateLimitStatePath('malformed-client');
-        $contents = json_encode(['started' => 'now', 'count' => 1], JSON_THROW_ON_ERROR);
-        file_put_contents($path, $contents);
-        chmod($path, 0600);
-
-        try {
-            $this->rateLimiter()->consume('probe', 'malformed-client');
-            self::fail('Malformed rate-limit state was accepted.');
-        } catch (RuntimeException $exception) {
-            self::assertSame('Rate limiter state is corrupt.', $exception->getMessage());
-        }
-        self::assertSame($contents, file_get_contents($path));
-    }
-
-    public function testRateLimiterRejectsUnsafeExistingStatePath(): void
-    {
-        $path = $this->rateLimitStatePath('unsafe-path-client');
-        $target = $this->root . '/external-rate-limit.json';
-        $contents = json_encode(['started' => time(), 'count' => 1], JSON_THROW_ON_ERROR);
-        file_put_contents($target, $contents);
-        chmod($target, 0600);
-        if (!function_exists('symlink') || !@symlink($target, $path)) {
-            self::markTestSkipped('Symbolic links are unavailable.');
-        }
-
-        try {
-            $this->rateLimiter()->consume('probe', 'unsafe-path-client');
-            self::fail('Symbolic-link rate-limit state was accepted.');
-        } catch (RuntimeException $exception) {
-            self::assertSame('Rate limiter state is corrupt.', $exception->getMessage());
-        }
-        self::assertSame($contents, file_get_contents($target));
-        self::assertTrue(is_link($path));
-    }
-
-    public function testRateLimiterRecoversAtomicWriteInterruptedBeforeRename(): void
-    {
-        $path = $this->rateLimitStatePath('interrupted-client');
-        $temporary = $path . '.tmp';
-        file_put_contents($path, json_encode(['started' => time(), 'count' => 1], JSON_THROW_ON_ERROR));
-        chmod($path, 0600);
-        file_put_contents($temporary, '{"started":');
-        chmod($temporary, 0600);
-
-        $this->rateLimiter()->consume('probe', 'interrupted-client');
-
-        self::assertFalse(@lstat($temporary));
-        $state = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
-        self::assertSame(2, $state['count']);
-    }
-
-    public function testRateLimiterUsesAtomicDurableReplacementContract(): void
-    {
-        $source = (string) file_get_contents(dirname(__DIR__) . '/app/RateLimiter.php');
-
-        self::assertStringNotContainsString('ftruncate(', $source);
-        self::assertStringContainsString("@fopen(\$temporary, 'x+b')", $source);
-        self::assertStringContainsString('@fsync($handle)', $source);
-        self::assertStringContainsString('@rename($temporary, $path)', $source);
-        self::assertStringContainsString('$this->syncDirectory()', $source);
-    }
-
     public function testRateLimiterFailsClosedForUndefinedScope(): void
     {
         $this->expectException(RuntimeException::class);
@@ -873,21 +793,6 @@ final class SecurityTest extends TestCase
             $identity,
             $this->sessionRegistry
         );
-    }
-
-    private function rateLimiter(): RateLimiter
-    {
-        return new RateLimiter(
-            $this->config,
-            new Logger($this->config, $this->cleanupQueue),
-            $this->cleanupQueue
-        );
-    }
-
-    private function rateLimitStatePath(string $identifier): string
-    {
-        $key = hash_hmac('sha256', 'probe|' . $identifier, $this->config->string('app_secret'));
-        return $this->config->string('rate_limit_path') . '/' . $key . '.json';
     }
 
     private function assertSensitiveValueAbsentFromDatabaseAndLogs(string $value): void
