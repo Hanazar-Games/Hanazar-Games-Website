@@ -1,0 +1,17 @@
+[Unit]
+Description=Flash Photo expired content cleanup
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/flash-photo/current
+EnvironmentFile=/etc/flash-photo.env
+ExecStart=/usr/bin/php /var/www/flash-photo/current/scripts/cleanup.php --limit=500 --session-path=/var/lib/flash-photo/sessions
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/flash-photo /var/log/flash-photo

@@ -1,0 +1,4 @@
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+* * * * * www-data /bin/bash -c 'set -a; source /etc/flash-photo.env; set +a; exec /usr/bin/php /var/www/flash-photo/current/scripts/cleanup.php --limit=500 --session-path=/var/lib/flash-photo/sessions'
