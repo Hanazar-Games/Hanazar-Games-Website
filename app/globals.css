@@ -244,6 +244,46 @@ body[data-theme="light"] .heroSubtitle {
   text-shadow: 0 2px 20px rgba(0,0,0,0.5);
 }
 
+body[data-theme="light"] .gamesHeroTitle,
+body[data-theme="light"] .gamesHeroEyebrow {
+  color: #f4f4f4;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.48);
+}
+
+body[data-theme="light"] .gamesHeroSubtitle {
+  color: #bdbdbd;
+}
+
+body[data-theme="light"] .aboutSection .aboutPanel {
+  border-color: rgba(0, 0, 0, 0.09);
+  background:
+    radial-gradient(circle at top right, rgba(0, 0, 0, 0.045), transparent 30%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.025), rgba(0, 0, 0, 0.005)),
+    rgba(255, 255, 255, 0.96);
+}
+
+body[data-theme="light"] .aboutPanel p {
+  color: #555;
+}
+
+body[data-theme="light"] .colorPreset {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.025);
+}
+
+body[data-theme="light"] .colorPreset.active {
+  border-color: rgba(0, 0, 0, 0.34);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+body[data-theme="light"] .rangeSlider::-webkit-slider-thumb {
+  border: 1px solid rgba(0, 0, 0, 0.24);
+}
+
+body[data-theme="light"] .rangeSlider::-moz-range-thumb {
+  border: 1px solid rgba(0, 0, 0, 0.24);
+}
+
 /* ── Color Presets ── */
 body[data-preset="ocean"]   { --accent: #4a90d9; }
 body[data-preset="emerald"] { --accent: #50c878; }
@@ -251,6 +291,13 @@ body[data-preset="amber"]   { --accent: #ffbf00; }
 body[data-preset="rose"]    { --accent: #e06c75; }
 body[data-preset="lavender"]{ --accent: #b4a7d6; }
 body[data-preset="graphite"]{ --accent: #dddddd; }
+
+body[data-theme="light"][data-preset="ocean"]   { --accent: #1d66ad; }
+body[data-theme="light"][data-preset="emerald"] { --accent: #147a42; }
+body[data-theme="light"][data-preset="amber"]   { --accent: #805400; }
+body[data-theme="light"][data-preset="rose"]     { --accent: #ad3240; }
+body[data-theme="light"][data-preset="lavender"]{ --accent: #65509c; }
+body[data-theme="light"][data-preset="graphite"]{ --accent: #333333; }
 
 /* ── Reduced Motion ── */
 body[data-reduce-motion="true"] *,
@@ -1537,6 +1584,7 @@ select:focus-visible {
   flex-direction: column;
   width: min(900px, 92vw);
   max-height: 85vh;
+  max-height: 85dvh;
   border: 1px solid var(--line);
   border-radius: 28px;
   background:
@@ -1545,6 +1593,7 @@ select:focus-visible {
   filter: contrast(var(--ui-contrast, 1));
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+  overscroll-behavior: contain;
   opacity: 0;
   transform: translateY(28px) scale(0.98);
   transition:
@@ -2258,6 +2307,10 @@ select:focus-visible {
 }
 
 @media (max-width: 800px) {
+  .settingsModal {
+    max-height: calc(100dvh - 32px);
+  }
+
   .settingsModalBody {
     flex-direction: column;
   }

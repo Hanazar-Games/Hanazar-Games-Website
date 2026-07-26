@@ -95,6 +95,9 @@ export default function SettingsLauncher() {
         type="button"
         onClick={openSettings}
         aria-label={tr("ariaOpenSettings")}
+        aria-controls="project-settings-dialog"
+        aria-expanded={open}
+        aria-haspopup="dialog"
         title={tr("ariaOpenSettings")}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">

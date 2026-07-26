@@ -199,6 +199,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   return (
     <div className={`settingsOverlay${animating ? " active" : ""}`} onClick={onClose}>
       <div
+        id="project-settings-dialog"
         className={`settingsModal${animating ? " active" : ""}`}
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}

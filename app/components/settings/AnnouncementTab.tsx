@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.4.2",
+    date: "2026-07-26",
+    title: "Theme Contrast and Audio Feedback Polish",
+    items: [
+      "Fixed low-contrast Games and AIGC hero copy in light theme and strengthened light-theme accent colors and controls.",
+      "Made every SFX style selection preview the newly selected sound instead of the previous style.",
+      "Improved procedural BGM voicing with smoother four-note ambient chords.",
+      "Kept BGM playback status synchronized when the browser suspends or resumes Web Audio.",
+      "Improved dialog semantics and mobile dynamic-viewport sizing for the settings panel.",
+    ],
+  },
+  {
     version: "2.4.1",
     date: "2026-07-19",
     title: "Deep QA: Audio Lifecycle, Light Theme, and Settings Reliability",

@@ -25,8 +25,12 @@ export default function AudioTab() {
   const selectedSfxStyle = sfxStyles.find(
     (style) => style.toLowerCase() === settings.sfxStyle.toLowerCase()
   ) ?? settings.sfxStyle;
-  const previewSfx = () => {
-    window.dispatchEvent(new CustomEvent("hanazar:sfx-preview"));
+  const previewSfx = (style?: string) => {
+    window.dispatchEvent(new CustomEvent("hanazar:sfx-preview", { detail: { style } }));
+  };
+  const selectSfxStyle = (style: string) => {
+    update("sfxStyle", style);
+    previewSfx(style);
   };
 
   useEffect(() => {
@@ -62,7 +66,7 @@ export default function AudioTab() {
             className="settingsBtn"
             type="button"
             data-sfx-preview
-            onClick={previewSfx}
+            onClick={() => previewSfx()}
             disabled={!settings.sfxEnabled || settings.masterVolume === 0 || settings.sfxVolume === 0}
           >
             {tr("stPreviewSfx")}
@@ -103,8 +107,9 @@ export default function AudioTab() {
             <button
               key={s}
               type="button"
+              data-sfx-preview
               className={`seg-btn${selectedSfxStyle === s ? " active" : ""}`}
-              onClick={() => update("sfxStyle", s)}
+              onClick={() => selectSfxStyle(s)}
               aria-pressed={selectedSfxStyle === s}
             >
               {s}

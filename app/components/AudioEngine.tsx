@@ -88,6 +88,9 @@ export default function AudioEngine() {
     if (!audioRef.current) {
       try {
         audioRef.current = new AudioContextClass();
+        audioRef.current.onstatechange = () => {
+          window.dispatchEvent(new Event("hanazar:audio-context-state"));
+        };
       } catch {
         publishBgmState("unavailable");
         return null;
@@ -164,8 +167,12 @@ export default function AudioEngine() {
     const filter = ctx.createBiquadFilter();
     const lfo = ctx.createOscillator();
     const lfoDepth = ctx.createGain();
-    const ratios = [1, 1.5, 2];
-    const roots = [110, 130.81, 98, 146.83];
+    const chords = [
+      [110, 130.81, 164.81, 220],
+      [87.31, 110, 130.81, 174.61],
+      [130.81, 164.81, 196, 261.63],
+      [98, 123.47, 146.83, 196],
+    ];
     let chordIndex = 0;
 
     bus.gain.setValueAtTime(0.0001, ctx.currentTime);
@@ -180,13 +187,13 @@ export default function AudioEngine() {
     lfo.connect(lfoDepth);
     lfoDepth.connect(filter.frequency);
 
-    const oscillators = ratios.map((ratio, index) => {
+    const oscillators = chords[0].map((frequency, index) => {
       const oscillator = ctx.createOscillator();
       const voiceGain = ctx.createGain();
-      oscillator.type = index === 1 ? "triangle" : "sine";
-      oscillator.frequency.setValueAtTime(roots[0] * ratio, ctx.currentTime);
-      oscillator.detune.setValueAtTime(index === 0 ? -4 : index === 2 ? 4 : 0, ctx.currentTime);
-      voiceGain.gain.setValueAtTime([0.5, 0.22, 0.12][index], ctx.currentTime);
+      oscillator.type = index === 1 || index === 2 ? "triangle" : "sine";
+      oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+      oscillator.detune.setValueAtTime([-4, 0, 3, 6][index], ctx.currentTime);
+      voiceGain.gain.setValueAtTime([0.4, 0.2, 0.14, 0.07][index], ctx.currentTime);
       oscillator.connect(voiceGain);
       voiceGain.connect(bus);
       oscillator.start();
@@ -194,10 +201,10 @@ export default function AudioEngine() {
     });
 
     const scheduleChord = () => {
-      chordIndex = (chordIndex + 1) % roots.length;
+      chordIndex = (chordIndex + 1) % chords.length;
       const now = ctx.currentTime;
       oscillators.forEach((oscillator, index) => {
-        oscillator.frequency.setTargetAtTime(roots[chordIndex] * ratios[index], now, 1.8);
+        oscillator.frequency.setTargetAtTime(chords[chordIndex][index], now, 2.2);
       });
     };
 
@@ -211,7 +218,7 @@ export default function AudioEngine() {
       oscillators,
       lfo,
       lfoDepth,
-      chordTimer: window.setInterval(scheduleChord, 8000),
+      chordTimer: window.setInterval(scheduleChord, 9600),
     };
     publishBgmState("playing");
   }, [publishBgmState, stopAmbient]);
@@ -228,7 +235,7 @@ export default function AudioEngine() {
     syncAmbient();
   }, [getContext, publishBgmState, syncAmbient]);
 
-  const playSfx = useCallback((kind: SfxKind = "click") => {
+  const playSfx = useCallback((kind: SfxKind = "click", style?: string) => {
     const current = settingsRef.current;
     if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
 
@@ -239,7 +246,7 @@ export default function AudioEngine() {
     const ctx = getContext();
     if (!ctx || ctx.state !== "running") return;
 
-    const profile = getSfxProfile(current.sfxStyle);
+    const profile = getSfxProfile(style ?? current.sfxStyle);
     const signature = sfxKinds[kind];
     const start = profile.start * signature.pitch;
     const end = profile.end * signature.pitch;
@@ -316,24 +323,28 @@ export default function AudioEngine() {
       }
     };
 
-    const handlePreview = async () => {
+    const handlePreview = async (event: Event) => {
       await unlock();
-      playSfx("navigate");
+      const style = (event as CustomEvent<{ style?: string }>).detail?.style;
+      playSfx("navigate", style);
     };
 
     const handleVisibility = () => syncAmbient();
     const handleStateRequest = () => syncAmbient();
+    const handleContextState = () => syncAmbient();
 
     window.addEventListener("pointerdown", handlePointerDown, { capture: true });
     window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("hanazar:sfx-preview", handlePreview);
     window.addEventListener("hanazar:bgm-state-request", handleStateRequest);
+    window.addEventListener("hanazar:audio-context-state", handleContextState);
     document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       window.removeEventListener("pointerdown", handlePointerDown, { capture: true });
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("hanazar:sfx-preview", handlePreview);
       window.removeEventListener("hanazar:bgm-state-request", handleStateRequest);
+      window.removeEventListener("hanazar:audio-context-state", handleContextState);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [playSfx, syncAmbient, unlock]);
@@ -341,7 +352,10 @@ export default function AudioEngine() {
   useEffect(() => {
     return () => {
       stopAmbient();
-      audioRef.current?.close();
+      if (audioRef.current) {
+        audioRef.current.onstatechange = null;
+        audioRef.current.close();
+      }
     };
   }, [stopAmbient]);
 
