@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.5.0",
+    date: "2026-07-27",
+    title: "Games Hub Expansion and GitHub Pages Deployment",
+    items: [
+      "Added Guandan and Liar's Bar to the Games Hub with real in-game cover art.",
+      "Added a curated Games Hub to the homepage and a new Other Products section featuring LC300A Luochuan OS.",
+      "Added a GitHub Pages workflow, static export support, project base paths, and deployment-safe asset URLs.",
+      "Reduced SFX loudness and repetition while calming scroll, hover, blur, and card motion effects.",
+      "Centralized the game catalog so homepage and full Games Hub entries stay in sync.",
+    ],
+  },
+  {
     version: "2.4.2",
     date: "2026-07-26",
     title: "Theme Contrast and Audio Feedback Polish",

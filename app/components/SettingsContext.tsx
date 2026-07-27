@@ -44,7 +44,7 @@ const defaultSettings: SettingsState = {
   language: "en",
   masterVolume: 80,
   sfxEnabled: true,
-  sfxVolume: 70,
+  sfxVolume: 55,
   sfxStyle: "Classic",
   bgmEnabled: false,
   bgmVolume: 28,

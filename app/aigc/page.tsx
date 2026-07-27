@@ -5,6 +5,7 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
+import { assetPath } from "../lib/paths";
 
 const experiments = [
   {
@@ -62,7 +63,7 @@ export default function AigcPage() {
           >
             <div className="gameCardImageWrap">
               <Image
-                src={experiment.image}
+                src={assetPath(experiment.image)}
                 alt={tr(experiment.title)}
                 className="gameCardImage"
                 width={960}

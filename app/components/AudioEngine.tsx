@@ -28,7 +28,7 @@ const sfxKinds: Record<SfxKind, { pitch: number; direction?: "up"; volume: numbe
   close: { pitch: 0.7, volume: 0.76 },
 };
 
-const SFX_THROTTLE_MS = 72;
+const SFX_THROTTLE_MS = 110;
 
 interface AmbientNodes {
   bus: GainNode;
@@ -254,8 +254,8 @@ export default function AudioEngine() {
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     const volume = Math.min(
-      0.14,
-      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.18 * signature.volume
+      0.085,
+      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.105 * signature.volume
     );
 
     oscillator.type = profile.wave;

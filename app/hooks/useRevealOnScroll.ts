@@ -5,17 +5,23 @@ import { useEffect } from "react";
 export function useRevealOnScroll() {
   useEffect(() => {
     const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
+    const reveal = (node: HTMLElement) => {
+      node.classList.add("revealVisible");
+      node.classList.remove("revealPending");
+    };
 
     if (!("IntersectionObserver" in window)) {
-      nodes.forEach((node) => node.classList.add("revealVisible"));
+      nodes.forEach(reveal);
       return;
     }
+
+    nodes.forEach((node) => node.classList.add("revealPending"));
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("revealVisible");
+            reveal(entry.target as HTMLElement);
             observer.unobserve(entry.target);
           }
         });
@@ -27,8 +33,10 @@ export function useRevealOnScroll() {
     );
 
     nodes.forEach((node) => observer.observe(node));
+    const fallback = window.setTimeout(() => nodes.forEach(reveal), 1800);
 
     return () => {
+      window.clearTimeout(fallback);
       observer.disconnect();
     };
   }, []);
