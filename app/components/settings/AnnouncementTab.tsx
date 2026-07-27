@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.5.1",
+    date: "2026-07-27",
+    title: "Interaction and Audio Polish",
+    items: [
+      "Improved mobile settings navigation with a compact horizontal tab strip and larger touch targets.",
+      "Reduced modal motion, blur, SFX intensity, and ambient BGM loudness.",
+      "Prevented keyboard SFX when Enter or Space does not activate the focused control.",
+      "Improved decorative icon accessibility and modal interaction clarity.",
+    ],
+  },
+  {
     version: "2.5.0",
     date: "2026-07-27",
     title: "Games Hub Expansion and GitHub Pages Deployment",

@@ -83,7 +83,7 @@ export default function AigcPage() {
                 aria-label={`${tr("aigcOpenButton")}: ${tr(experiment.title)}`}
               >
                 {tr("aigcOpenButton")}
-                <span className="gameCardArrow">↗</span>
+                <span className="gameCardArrow" aria-hidden="true">↗</span>
               </a>
             </div>
           </article>

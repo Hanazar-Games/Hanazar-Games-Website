@@ -47,7 +47,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const { settings } = useSettingsContext();
   const modalTransitionMs = (
     !settings.animationsEnabled || settings.reduceAnimations || !settings.animModal
-  ) ? 0 : Math.round(350 * (100 / settings.animSpeed));
+  ) ? 0 : Math.round(280 * (100 / settings.animSpeed));
 
   useEffect(() => {
     if (open) {

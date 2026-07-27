@@ -28,7 +28,7 @@ const sfxKinds: Record<SfxKind, { pitch: number; direction?: "up"; volume: numbe
   close: { pitch: 0.7, volume: 0.76 },
 };
 
-const SFX_THROTTLE_MS = 110;
+const SFX_THROTTLE_MS = 130;
 
 interface AmbientNodes {
   bus: GainNode;
@@ -49,7 +49,7 @@ function getSfxProfile(style: string) {
 }
 
 function ambientVolume(settings: SettingsState) {
-  return Math.min(0.035, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.035);
+  return Math.min(0.03, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.03);
 }
 
 function getSfxKind(target: Element): SfxKind {
@@ -254,8 +254,8 @@ export default function AudioEngine() {
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     const volume = Math.min(
-      0.085,
-      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.105 * signature.volume
+      0.075,
+      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.09 * signature.volume
     );
 
     oscillator.type = profile.wave;
@@ -309,6 +309,10 @@ export default function AudioEngine() {
       if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
+      const interactive = target.closest(interactiveSelector);
+      if (!interactive) return;
+      if (event.key === " " && interactive.matches("a")) return;
+      if (event.key === "Enter" && interactive.matches("input[type='checkbox']")) return;
       const current = settingsRef.current;
       const wantsSfx = current.sfxEnabled && current.masterVolume > 0 && current.sfxVolume > 0;
       const wantsBgm = current.bgmEnabled && current.masterVolume > 0 && current.bgmVolume > 0;
@@ -317,7 +321,7 @@ export default function AudioEngine() {
       await unlock();
       if (
         !target.closest("[data-sfx-preview]") &&
-        target.closest(interactiveSelector)
+        interactive
       ) {
         playSfx(getSfxKind(target));
       }

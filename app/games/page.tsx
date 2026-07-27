@@ -69,7 +69,7 @@ export default function GamesPage() {
                 aria-label={`${tr("gamePlayButton")}: ${tr(game.title)}`}
               >
                 {tr("gamePlayButton")}
-                <span className="gameCardArrow">↗</span>
+                <span className="gameCardArrow" aria-hidden="true">↗</span>
               </a>
             </div>
           </article>
