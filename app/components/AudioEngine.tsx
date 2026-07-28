@@ -311,9 +311,20 @@ export default function AudioEngine() {
 
     const handleKeyDown = async (event: KeyboardEvent) => {
       const modifier = event.ctrlKey || event.metaKey;
+      const key = event.key.toLowerCase();
+      if (modifier && key === ",") {
+        await unlock();
+        playSfx("click");
+        return;
+      }
       if (modifier && !event.shiftKey && event.key.toLowerCase() === "m") {
         const current = settingsRef.current;
         if (current.bgmEnabled || current.sfxEnabled) await unlock();
+        return;
+      }
+      if (event.key === "Escape" && document.querySelector(".settingsModal")) {
+        await unlock();
+        playSfx("close");
         return;
       }
       if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;

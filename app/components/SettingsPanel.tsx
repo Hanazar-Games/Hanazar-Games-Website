@@ -190,7 +190,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     const nextTab = tabs[nextIndex];
     setActiveTab(nextTab.key);
     requestAnimationFrame(() => {
-      document.getElementById(`settings-tab-${nextTab.key}`)?.focus();
+      const tab = document.getElementById(`settings-tab-${nextTab.key}`);
+      tab?.focus();
+      tab?.scrollIntoView({ block: "nearest", inline: "nearest" });
     });
   };
 

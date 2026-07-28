@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.1",
+    date: "2026-07-28",
+    title: "Deployment Reliability and Deep QA",
+    items: [
+      "Aligned the GitHub Pages workflow with the current deployment action and protected active deployments from cancellation.",
+      "Added a static export preflight for required routes, project assets, base paths, and the new GPT-5.6-sol Ultra entry.",
+      "Upgraded Next.js and its transitive build dependencies to patched releases with a clean dependency audit.",
+      "Improved long AIGC title wrapping and keyboard navigation within the mobile settings tab strip.",
+      "Restored audio unlock when opening settings by keyboard and added Escape close feedback.",
+      "Deep-checked desktop and mobile routes, themes, settings, SFX, BGM, accessibility, and Pages project paths.",
+    ],
+  },
+  {
     version: "2.6.0",
     date: "2026-07-28",
     title: "GPT-5.6-sol Ultra AIGC Experiment",

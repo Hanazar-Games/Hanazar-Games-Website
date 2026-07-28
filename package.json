@@ -1,16 +1,23 @@
 {
   "name": "hanazargames-web",
   "private": true,
-  "version": "2.6.0",
+  "version": "2.6.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "verify:export": "node scripts/verify-static-export.mjs",
     "start": "next start"
   },
   "dependencies": {
-    "next": "latest",
+    "next": "16.2.12",
     "react": "latest",
     "react-dom": "latest"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.18",
+      "sharp": "0.35.0"
+    }
   },
   "devDependencies": {
     "@types/node": "latest",
