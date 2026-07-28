@@ -9,6 +9,13 @@ import { assetPath } from "../lib/paths";
 
 const experiments = [
   {
+    title: "aigcGpt56UltraTitle",
+    description: "aigcGpt56UltraDesc",
+    href: "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+    tag: "aigcTagGpt56Ultra",
+    image: "/aigc/gpt-56-sol-ultra.jpg"
+  },
+  {
     title: "aigcKimiTitle",
     description: "aigcKimiDesc",
     href: "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
@@ -51,13 +58,11 @@ export default function AigcPage() {
         </div>
       </section>
 
-      <div className="gamesGrid">
+      <div className="gamesGrid aigcGrid">
         {experiments.map((experiment, index) => (
           <article
             key={experiment.title}
-            className={`gameCard ${
-              index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"
-            }`}
+            className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}
             data-reveal
             style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
           >

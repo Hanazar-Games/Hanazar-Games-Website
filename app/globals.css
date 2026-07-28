@@ -383,8 +383,8 @@ a {
 
 .settingsFloatingButton {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
+  right: max(22px, env(safe-area-inset-right));
+  bottom: max(22px, env(safe-area-inset-bottom));
   z-index: 90;
   width: 46px;
   height: 46px;
@@ -404,6 +404,13 @@ a {
     border-color 0.2s ease,
     color 0.2s ease,
     transform 0.2s ease;
+}
+
+body:has(.gamesShell) .settingsFloatingButton {
+  position: absolute;
+  top: max(24px, env(safe-area-inset-top));
+  right: max(24px, env(safe-area-inset-right));
+  bottom: auto;
 }
 
 .settingsFloatingButton:hover {
@@ -1382,6 +1389,10 @@ select:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
+}
+
+.aigcGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .gameCard {
@@ -2422,15 +2433,21 @@ select:focus-visible {
   }
 
   .settingsFloatingButton {
-    right: 14px;
-    bottom: 14px;
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
     width: 44px;
     height: 44px;
   }
 
+  body:has(.gamesShell) .settingsFloatingButton {
+    top: max(14px, env(safe-area-inset-top));
+    right: max(14px, env(safe-area-inset-right));
+    bottom: auto;
+  }
+
   .shortcutToast {
-    right: 66px;
-    bottom: 14px;
+    right: max(66px, calc(env(safe-area-inset-right) + 58px));
+    bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .colorPresetGrid {

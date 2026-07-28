@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.0",
+    date: "2026-07-28",
+    title: "GPT-5.6-sol Ultra AIGC Experiment",
+    items: [
+      "Added GPT-5.6-sol-Ultra-AIGC-webgame to the AIGC Experiments archive.",
+      "Added a real Echo Relay project screenshot and localized project description.",
+      "Balanced the expanded AIGC gallery into a responsive two-column layout.",
+      "Prevented mobile settings controls from covering subpage cards and respected device safe areas.",
+      "Cleaned up SFX and ambient BGM nodes after playback to avoid long-session audio graph buildup.",
+    ],
+  },
+  {
     version: "2.5.1",
     date: "2026-07-27",
     title: "Interaction and Audio Polish",

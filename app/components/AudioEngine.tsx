@@ -34,6 +34,7 @@ interface AmbientNodes {
   bus: GainNode;
   filter: BiquadFilterNode;
   oscillators: OscillatorNode[];
+  voiceGains: GainNode[];
   lfo: OscillatorNode;
   lfoDepth: GainNode;
   chordTimer: number;
@@ -117,7 +118,9 @@ export default function AudioEngine() {
         } catch {
           // The node may already be stopped during teardown.
         }
+        oscillator.disconnect();
       });
+      current.voiceGains.forEach((gain) => gain.disconnect());
       current.bus.disconnect();
       current.filter.disconnect();
       current.lfoDepth.disconnect();
@@ -187,9 +190,11 @@ export default function AudioEngine() {
     lfo.connect(lfoDepth);
     lfoDepth.connect(filter.frequency);
 
+    const voiceGains: GainNode[] = [];
     const oscillators = chords[0].map((frequency, index) => {
       const oscillator = ctx.createOscillator();
       const voiceGain = ctx.createGain();
+      voiceGains.push(voiceGain);
       oscillator.type = index === 1 || index === 2 ? "triangle" : "sine";
       oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
       oscillator.detune.setValueAtTime([-4, 0, 3, 6][index], ctx.currentTime);
@@ -216,6 +221,7 @@ export default function AudioEngine() {
       bus,
       filter,
       oscillators,
+      voiceGains,
       lfo,
       lfoDepth,
       chordTimer: window.setInterval(scheduleChord, 9600),
@@ -270,6 +276,10 @@ export default function AudioEngine() {
 
     oscillator.connect(gain);
     gain.connect(ctx.destination);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    };
     oscillator.start(now);
     oscillator.stop(now + profile.duration + 0.02);
   }, [getContext]);

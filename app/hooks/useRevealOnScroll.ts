@@ -33,7 +33,10 @@ export function useRevealOnScroll() {
     );
 
     nodes.forEach((node) => observer.observe(node));
-    const fallback = window.setTimeout(() => nodes.forEach(reveal), 1800);
+    const fallback = window.setTimeout(() => {
+      nodes.forEach(reveal);
+      observer.disconnect();
+    }, 1800);
 
     return () => {
       window.clearTimeout(fallback);
