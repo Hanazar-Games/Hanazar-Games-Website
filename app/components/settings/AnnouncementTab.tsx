@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.2",
+    date: "2026-07-29",
+    title: "Accessibility and Release Integrity QA",
+    items: [
+      "Made the closing settings dialog inert and hidden from assistive technology until its exit animation finishes.",
+      "Removed a mobile keyboard-navigation race so selected settings tabs focus and scroll into view immediately.",
+      "Expanded the GitHub Pages preflight to require Guandan, Liar's Bar, LC300A, and GPT-5.6-sol Ultra links and cover assets.",
+      "Removed a duplicate decorative arrow announcement from Tools card links.",
+      "Verified every route across desktop, tablet, mobile, narrow, and landscape viewports in dark and light themes.",
+      "Stress-tested SFX and BGM preview, playback, rapid toggling, muting, and audio-node cleanup without leaks.",
+    ],
+  },
+  {
     version: "2.6.1",
     date: "2026-07-28",
     title: "Deployment Reliability and Deep QA",

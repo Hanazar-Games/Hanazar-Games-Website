@@ -10,6 +10,9 @@ const requiredFiles = [
   "404.html",
   "games/index.html",
   "aigc/index.html",
+  "games/guandan.jpg",
+  "games/liars-bar.jpg",
+  "products/lc300a.jpg",
   "aigc/gpt-56-sol-ultra.jpg",
 ];
 
@@ -25,9 +28,27 @@ for (const file of requiredFiles.filter((file) => file.endsWith(".html"))) {
   }
 }
 
-const aigcHtml = readFileSync(join("out", "aigc/index.html"), "utf8");
-if (!aigcHtml.includes("GPT-5.6-sol-Ultra-AIGC-webgame")) {
-  throw new Error("Missing GPT-5.6-sol Ultra AIGC project");
+const requiredContent = {
+  "index.html": [
+    "https://hanazar-games.github.io/Guandan-Webgame/",
+    "https://hanazar-games.github.io/Liars-Bar-webgame/",
+    "https://github.com/hzagaming/LC300A",
+  ],
+  "games/index.html": [
+    "https://hanazar-games.github.io/Guandan-Webgame/",
+    "https://hanazar-games.github.io/Liars-Bar-webgame/",
+  ],
+  "aigc/index.html": [
+    "GPT-5.6-sol-Ultra-AIGC-webgame",
+    "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+  ],
+};
+
+for (const [file, values] of Object.entries(requiredContent)) {
+  const html = readFileSync(join("out", file), "utf8");
+  for (const value of values) {
+    if (!html.includes(value)) throw new Error(`Missing ${value} in ${file}`);
+  }
 }
 
 console.log(`Static export verified for ${basePath}`);

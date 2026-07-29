@@ -189,11 +189,9 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     event.preventDefault();
     const nextTab = tabs[nextIndex];
     setActiveTab(nextTab.key);
-    requestAnimationFrame(() => {
-      const tab = document.getElementById(`settings-tab-${nextTab.key}`);
-      tab?.focus();
-      tab?.scrollIntoView({ block: "nearest", inline: "nearest" });
-    });
+    const tab = document.getElementById(`settings-tab-${nextTab.key}`);
+    tab?.focus();
+    tab?.scrollIntoView({ block: "nearest", inline: "nearest" });
   };
 
   if (!visible) return null;
@@ -205,9 +203,11 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         className={`settingsModal${animating ? " active" : ""}`}
         ref={modalRef}
         onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
+        role={open ? "dialog" : undefined}
+        aria-modal={open ? "true" : undefined}
+        aria-hidden={open ? undefined : true}
         aria-labelledby="settings-title"
+        inert={!open}
       >
         <div className="settingsModalHeader">
           <h2 id="settings-title">{tr("settingsTitle")}</h2>

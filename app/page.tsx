@@ -353,7 +353,7 @@ export default function HomePage() {
                         aria-label={`${tr(tool.cta)}: ${tr(tool.title)}`}
                       >
                         {tr(tool.cta)}
-                        <span className="gameCardArrow">↗</span>
+                        <span className="gameCardArrow" aria-hidden="true">↗</span>
                       </a>
                     </div>
                   </article>
