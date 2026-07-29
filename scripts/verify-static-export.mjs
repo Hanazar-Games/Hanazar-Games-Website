@@ -32,11 +32,14 @@ const requiredContent = {
   "index.html": [
     "https://hanazar-games.github.io/Guandan-Webgame/",
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
+    "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     "https://github.com/hzagaming/LC300A",
   ],
   "games/index.html": [
     "https://hanazar-games.github.io/Guandan-Webgame/",
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
+    "GPT-5.6-sol-Ultra-AIGC-webgame",
+    "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
   ],
   "aigc/index.html": [
     "GPT-5.6-sol-Ultra-AIGC-webgame",

@@ -50,7 +50,7 @@ function getSfxProfile(style: string) {
 }
 
 function ambientVolume(settings: SettingsState) {
-  return Math.min(0.03, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.03);
+  return Math.min(0.024, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.024);
 }
 
 function getSfxKind(target: Element): SfxKind {
@@ -260,8 +260,8 @@ export default function AudioEngine() {
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     const volume = Math.min(
-      0.075,
-      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.09 * signature.volume
+      0.06,
+      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.072 * signature.volume
     );
 
     oscillator.type = profile.wave;
@@ -276,12 +276,17 @@ export default function AudioEngine() {
 
     oscillator.connect(gain);
     gain.connect(ctx.destination);
-    oscillator.onended = () => {
+    let cleaned = false;
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
       oscillator.disconnect();
       gain.disconnect();
     };
+    oscillator.onended = cleanup;
     oscillator.start(now);
     oscillator.stop(now + profile.duration + 0.02);
+    window.setTimeout(cleanup, Math.ceil((profile.duration + 0.12) * 1000));
   }, [getContext]);
 
   useEffect(() => {

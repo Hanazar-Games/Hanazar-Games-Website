@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.3",
+    date: "2026-07-29",
+    title: "Games Hub and Interaction Refinement",
+    items: [
+      "Added GPT-5.6-sol-Ultra-AIGC-webgame to the homepage and full Games Hub with its Echo Relay cover art.",
+      "Fixed settings focus trapping so disabled audio and animation controls can no longer break keyboard wraparound.",
+      "Replaced long cumulative game-card reveal delays with short per-column timing for faster browsing.",
+      "Further softened interaction SFX and ambient BGM and added SFX cleanup when a browser audio clock stalls.",
+      "Expanded the GitHub Pages preflight to require the new Games Hub entry on both exported routes.",
+      "Rechecked responsive layouts, project assets, keyboard navigation, SFX, BGM, and static deployment output.",
+    ],
+  },
+  {
     version: "2.6.2",
     date: "2026-07-29",
     title: "Accessibility and Release Integrity QA",

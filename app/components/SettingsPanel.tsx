@@ -81,7 +81,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
 
       const focusable = Array.from(
         modalRef.current.querySelectorAll<HTMLElement>(
-          "a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex='-1'])"
+          "a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex='-1']):not([disabled])"
         )
       ).filter((element) => element.offsetParent !== null && element.tabIndex >= 0);
 

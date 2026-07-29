@@ -64,7 +64,7 @@ export default function AigcPage() {
             key={experiment.title}
             className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}
             data-reveal
-            style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
+            style={{ "--reveal-delay": `${(index % 2) * 0.06}s` } as CSSProperties}
           >
             <div className="gameCardImageWrap">
               <Image

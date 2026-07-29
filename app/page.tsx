@@ -263,7 +263,7 @@ export default function HomePage() {
               key={game.title}
               className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}
               data-reveal
-              style={{ "--reveal-delay": `${index * 0.08}s` } as CSSProperties}
+              style={{ "--reveal-delay": `${(index % 2) * 0.06}s` } as CSSProperties}
             >
               <div className="gameCardImageWrap">
                 <Image
@@ -328,7 +328,7 @@ export default function HomePage() {
                     }`}
                     data-reveal
                     style={{
-                      "--reveal-delay": `${(groupIndex * 0.08) + (index * 0.12)}s`
+                      "--reveal-delay": `${(index % 3) * 0.06}s`
                     } as CSSProperties}
                   >
                     <div className="gameCardImageWrap">

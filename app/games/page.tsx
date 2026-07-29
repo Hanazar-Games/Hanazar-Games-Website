@@ -45,7 +45,7 @@ export default function GamesPage() {
             key={game.title}
             className={`gameCard ${revealClassForIndex(index)}`}
             data-reveal
-            style={{ "--reveal-delay": `${index * 0.12}s` } as CSSProperties}
+            style={{ "--reveal-delay": `${(index % 3) * 0.06}s` } as CSSProperties}
           >
             <div className="gameCardImageWrap">
               <Image

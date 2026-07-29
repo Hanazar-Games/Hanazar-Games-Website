@@ -22,6 +22,13 @@ export const games: GameEntry[] = [
     image: "/games/liars-bar.jpg",
   },
   {
+    title: "aigcGpt56UltraTitle",
+    description: "aigcGpt56UltraDesc",
+    href: "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+    tag: "gameTagPuzzle",
+    image: "/aigc/gpt-56-sol-ultra.jpg",
+  },
+  {
     title: "gameTicTacToeTitle",
     description: "gameTicTacToeDesc",
     href: "https://hanazar-games.github.io/Tic-Tac-Toe/",
