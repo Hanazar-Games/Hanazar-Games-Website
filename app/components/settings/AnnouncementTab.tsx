@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.4",
+    date: "2026-07-30",
+    title: "Homepage Curation and Tools Restructure",
+    items: [
+      "Curated the homepage Games Hub and AIGC gallery to three focused projects each.",
+      "Reorganized Tools into Mac Tools, Web Tools, and Other Tools with responsive group layouts.",
+      "Moved LC300A Luochuan OS into Other Tools and removed its duplicate standalone section and navigation entry.",
+      "Balanced the three-card Games and AIGC desktop grids while retaining two-column tablet and single-column mobile layouts.",
+      "Expanded the GitHub Pages preflight to enforce the curated project sets and all three tool groups.",
+      "Deep-checked responsive UI, keyboard UX, themes, translations, SFX, BGM, assets, and static deployment output.",
+    ],
+  },
+  {
     version: "2.6.3",
     date: "2026-07-29",
     title: "Games Hub and Interaction Refinement",

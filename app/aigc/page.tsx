@@ -28,13 +28,6 @@ const experiments = [
     href: "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
     tag: "aigcTagGptMedium",
     image: "/aigc/gpt-55-medium.jpg"
-  },
-  {
-    title: "aigcGptMaxTitle",
-    description: "aigcGptMaxDesc",
-    href: "https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project",
-    tag: "aigcTagGptMax",
-    image: "/aigc/gpt-55-extrahigh.jpg"
   }
 ];
 

@@ -135,4 +135,4 @@ export const games: GameEntry[] = [
   },
 ];
 
-export const homepageGames = games.slice(0, 4);
+export const homepageGames = games.slice(0, 3);

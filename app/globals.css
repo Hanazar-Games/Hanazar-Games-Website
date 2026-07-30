@@ -753,6 +753,10 @@ select:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.toolsGridSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .toolCard h4 {
   margin: 0 0 12px;
   font-size: 1.55rem;
@@ -784,20 +788,16 @@ select:focus-visible {
 }
 
 .homepageGamesGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.otherProductsGrid {
-  display: grid;
-}
-
-.otherProductCard {
+.toolCardWide {
   min-height: 360px;
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
 }
 
-.otherProductCard .gameCardImageWrap {
+.toolCardWide .gameCardImageWrap {
   height: 100%;
   min-height: 360px;
   aspect-ratio: auto;
@@ -1253,6 +1253,10 @@ select:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .toolsGridSingle {
+    grid-template-columns: 1fr;
+  }
+
   .footerCtaRow {
     grid-template-columns: 1fr;
   }
@@ -1392,7 +1396,7 @@ select:focus-visible {
 }
 
 .aigcGrid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .gameCard {
@@ -1621,11 +1625,11 @@ select:focus-visible {
     min-height: auto;
   }
 
-  .otherProductCard {
+  .toolCardWide {
     grid-template-columns: 1fr;
   }
 
-  .otherProductCard .gameCardImageWrap {
+  .toolCardWide .gameCardImageWrap {
     min-height: 0;
     aspect-ratio: 16 / 9;
   }

@@ -34,6 +34,9 @@ const requiredContent = {
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     "https://github.com/hzagaming/LC300A",
+    "Mac Tools",
+    "Web Tools",
+    "Other Tools",
   ],
   "games/index.html": [
     "https://hanazar-games.github.io/Guandan-Webgame/",
@@ -44,6 +47,8 @@ const requiredContent = {
   "aigc/index.html": [
     "GPT-5.6-sol-Ultra-AIGC-webgame",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+    "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
+    "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
   ],
 };
 
@@ -51,6 +56,18 @@ for (const [file, values] of Object.entries(requiredContent)) {
   const html = readFileSync(join("out", file), "utf8");
   for (const value of values) {
     if (!html.includes(value)) throw new Error(`Missing ${value} in ${file}`);
+  }
+}
+
+const forbiddenContent = {
+  "index.html": ["https://hanazar-games.github.io/Tic-Tac-Toe/"],
+  "aigc/index.html": ["https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project"],
+};
+
+for (const [file, values] of Object.entries(forbiddenContent)) {
+  const html = readFileSync(join("out", file), "utf8");
+  for (const value of values) {
+    if (html.includes(value)) throw new Error(`Unexpected ${value} in ${file}`);
   }
 }
 

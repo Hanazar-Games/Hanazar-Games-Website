@@ -14,24 +14,34 @@ const heroLinks = [
   { label: "navGames", href: "#games" },
   { label: "navAigc", href: "aigc/" },
   { label: "navTools", href: "#tools" },
-  { label: "navOtherProducts", href: "#other-products" },
   { label: "navAbout", href: "#about" },
   { label: "navUpdates", href: "#updates" },
   { label: "navContact", href: "#contact" }
 ];
 
-const otherProducts = [
-  {
-    title: "productLc300aTitle",
-    description: "productLc300aDesc",
-    tag: "productTagOperatingSystem",
-    cta: "ctaViewGithub",
-    href: "https://github.com/hzagaming/LC300A",
-    image: "/products/lc300a.jpg",
-  },
-];
-
 const toolGroups = [
+  {
+    title: "toolsMacTitle",
+    label: "toolsMacLabel",
+    tools: [
+      {
+        title: "toolClipoTitle",
+        description: "toolClipoDesc",
+        tag: "toolTagProductivity",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/Clipo",
+        image: "/tools/clipo.jpg"
+      },
+      {
+        title: "toolClassGodTitle",
+        description: "toolClassGodDesc",
+        tag: "toolTagUtility",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/ClassGod",
+        image: "/tools/classgod.jpg"
+      }
+    ]
+  },
   {
     title: "toolsWebTitle",
     label: "toolsWebLabel",
@@ -63,24 +73,16 @@ const toolGroups = [
     ]
   },
   {
-    title: "toolsMacTitle",
-    label: "toolsMacLabel",
+    title: "toolsOtherTitle",
+    label: "toolsOtherLabel",
     tools: [
       {
-        title: "toolClipoTitle",
-        description: "toolClipoDesc",
-        tag: "toolTagProductivity",
+        title: "productLc300aTitle",
+        description: "productLc300aDesc",
+        tag: "productTagOperatingSystem",
         cta: "ctaViewGithub",
-        href: "https://github.com/hzagaming/Clipo",
-        image: "/tools/clipo.jpg"
-      },
-      {
-        title: "toolClassGodTitle",
-        description: "toolClassGodDesc",
-        tag: "toolTagUtility",
-        cta: "ctaViewGithub",
-        href: "https://github.com/hzagaming/ClassGod",
-        image: "/tools/classgod.jpg"
+        href: "https://github.com/hzagaming/LC300A",
+        image: "/products/lc300a.jpg"
       }
     ]
   }
@@ -151,7 +153,8 @@ const footerColumns = [
       { title: "toolOcMakerTitle", href: "https://hzagaming.github.io/Original-Character-Maker/" },
       { title: "toolRhythmTitle", href: "https://github.com/Mirako-Official/AI-Rhythm-Game" },
       { title: "toolClipoTitle", href: "https://github.com/hzagaming/Clipo" },
-      { title: "toolClassGodTitle", href: "https://github.com/hzagaming/ClassGod" }
+      { title: "toolClassGodTitle", href: "https://github.com/hzagaming/ClassGod" },
+      { title: "productLc300aTitle", href: "https://github.com/hzagaming/LC300A" }
     ]
   },
   {
@@ -272,7 +275,7 @@ export default function HomePage() {
                   className="gameCardImage"
                   width={1280}
                   height={720}
-                  sizes="(max-width: 800px) 100vw, 50vw"
+                  sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
                 />
               </div>
               <div className="gameCardBody">
@@ -305,7 +308,9 @@ export default function HomePage() {
           {toolGroups.map((group, groupIndex) => (
             <div className="toolsGroup" key={group.title}>
               <div
-                className={`toolsGroupHeading ${groupIndex === 0 ? "revealLeft" : "revealRight"}`}
+                className={`toolsGroupHeading ${
+                  groupIndex === 0 ? "revealLeft" : groupIndex === 1 ? "revealFade" : "revealRight"
+                }`}
                 data-reveal
               >
                 <div>
@@ -315,11 +320,17 @@ export default function HomePage() {
                 <span className="toolsGroupCount">0{group.tools.length}</span>
               </div>
 
-              <div className={`toolsGrid ${groupIndex === 1 ? "toolsGridMac" : ""}`}>
+              <div className={`toolsGrid${
+                group.tools.length === 1
+                  ? " toolsGridSingle"
+                  : group.tools.length === 2
+                    ? " toolsGridMac"
+                    : ""
+              }`}>
                 {group.tools.map((tool, index) => (
                   <article
                     key={tool.title}
-                    className={`gameCard toolCard ${
+                    className={`gameCard toolCard${group.tools.length === 1 ? " toolCardWide" : ""} ${
                       index % 3 === 0
                         ? "revealLeft"
                         : index % 3 === 1
@@ -338,7 +349,9 @@ export default function HomePage() {
                         className="gameCardImage"
                         width={1280}
                         height={720}
-                        sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
+                        sizes={group.tools.length === 1
+                          ? "(max-width: 980px) 100vw, 54vw"
+                          : "(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"}
                       />
                     </div>
                     <div className="gameCardBody">
@@ -364,52 +377,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="contentSection otherProductsSection" id="other-products">
-        <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">03</span>
-          <h2>{tr("sectionOtherProducts")}</h2>
-        </div>
-
-        <div className="sectionIntro reveal revealFade" data-reveal>
-          <p>{tr("otherProductsIntro")}</p>
-        </div>
-
-        <div className="otherProductsGrid">
-          {otherProducts.map((product) => (
-            <article className="gameCard otherProductCard reveal revealFade" data-reveal key={product.title}>
-              <div className="gameCardImageWrap">
-                <Image
-                  src={assetPath(product.image)}
-                  alt={tr(product.title)}
-                  className="gameCardImage"
-                  width={1280}
-                  height={720}
-                  sizes="(max-width: 800px) 100vw, 48vw"
-                />
-              </div>
-              <div className="gameCardBody">
-                <span className="gameCardTag">{tr(product.tag)}</span>
-                <h3>{tr(product.title)}</h3>
-                <p>{tr(product.description)}</p>
-                <a
-                  className="gameCardButton"
-                  href={product.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${tr(product.cta)}: ${tr(product.title)}`}
-                >
-                  {tr(product.cta)}
-                  <span className="gameCardArrow" aria-hidden="true">↗</span>
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="contentSection aboutSection" id="about">
         <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">04</span>
+          <span className="sectionIndex">03</span>
           <h2>{tr("sectionAbout")}</h2>
         </div>
 
@@ -422,7 +392,7 @@ export default function HomePage() {
 
       <section className="contentSection documentsSection" id="documents">
         <div className="sectionHeading reveal revealRight" data-reveal>
-          <span className="sectionIndex">05</span>
+          <span className="sectionIndex">04</span>
           <h2>{tr("sectionDocuments")}</h2>
         </div>
 
@@ -445,7 +415,7 @@ export default function HomePage() {
 
       <section className="contentSection updatesSection" id="updates">
         <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">06</span>
+          <span className="sectionIndex">05</span>
           <h2>{tr("sectionUpdates")}</h2>
         </div>
 
@@ -468,7 +438,7 @@ export default function HomePage() {
 
       <section className="contentSection contactSection" id="contact">
         <div className="sectionHeading reveal revealRight" data-reveal>
-          <span className="sectionIndex">07</span>
+          <span className="sectionIndex">06</span>
           <h2>{tr("sectionContact")}</h2>
         </div>
 
