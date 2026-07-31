@@ -35,7 +35,7 @@ export default function AboutTab() {
 
         <div className="settingsAboutSection">
           <span className="settingLabel">{tr("aboutVersion")}</span>
-          <p className="aboutDesc">2.6.4</p>
+          <p className="aboutDesc">2.6.5</p>
         </div>
 
         <div className="aboutFooter">

@@ -12,6 +12,7 @@ const requiredFiles = [
   "aigc/index.html",
   "games/guandan.jpg",
   "games/liars-bar.jpg",
+  "games/coreball.jpg",
   "products/lc300a.jpg",
   "aigc/gpt-56-sol-ultra.jpg",
 ];
@@ -43,6 +44,8 @@ const requiredContent = {
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "GPT-5.6-sol-Ultra-AIGC-webgame",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+    "Coreball",
+    "https://hanazar-games.github.io/Core-Ball-Webgame/",
   ],
   "aigc/index.html": [
     "GPT-5.6-sol-Ultra-AIGC-webgame",

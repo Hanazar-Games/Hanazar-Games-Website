@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.5",
+    date: "2026-07-31",
+    title: "Coreball Games Hub Update",
+    items: [
+      "Added Coreball (见缝插针) to the full Games Hub with a dedicated original cover and localized project details.",
+      "Kept the homepage Games Hub focused on its existing three featured projects.",
+      "Expanded the GitHub Pages preflight to require the Coreball link and cover asset in the exported Games Hub.",
+      "Rechecked responsive layouts, themes, keyboard UX, SFX, BGM, assets, and static deployment output.",
+    ],
+  },
+  {
     version: "2.6.4",
     date: "2026-07-30",
     title: "Homepage Curation and Tools Restructure",

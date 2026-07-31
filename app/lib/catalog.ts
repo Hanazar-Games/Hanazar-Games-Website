@@ -29,6 +29,13 @@ export const games: GameEntry[] = [
     image: "/aigc/gpt-56-sol-ultra.jpg",
   },
   {
+    title: "gameCoreballTitle",
+    description: "gameCoreballDesc",
+    href: "https://hanazar-games.github.io/Core-Ball-Webgame/",
+    tag: "gameTagArcade",
+    image: "/games/coreball.jpg",
+  },
+  {
     title: "gameTicTacToeTitle",
     description: "gameTicTacToeDesc",
     href: "https://hanazar-games.github.io/Tic-Tac-Toe/",
