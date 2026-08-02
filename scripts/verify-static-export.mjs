@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const repositoryName = process.env.GITHUB_REPOSITORY?.split("/").pop();
@@ -16,9 +16,18 @@ const requiredFiles = [
   "products/lc300a.jpg",
   "aigc/gpt-56-sol-ultra.jpg",
 ];
+const forbiddenFiles = [
+  "HanazarIntroAnimation.mp4",
+  "hanazar-emblem.svg",
+  "aigc/gpt-55-extrahigh.jpg",
+];
 
 for (const file of requiredFiles) {
   if (!existsSync(join("out", file))) throw new Error(`Missing static export: ${file}`);
+}
+
+for (const file of forbiddenFiles) {
+  if (existsSync(join("out", file))) throw new Error(`Obsolete static asset exported: ${file}`);
 }
 
 for (const file of requiredFiles.filter((file) => file.endsWith(".html"))) {
@@ -74,4 +83,17 @@ for (const [file, values] of Object.entries(forbiddenContent)) {
   }
 }
 
-console.log(`Static export verified for ${basePath}`);
+function directorySize(path) {
+  return readdirSync(path, { withFileTypes: true }).reduce((total, entry) => {
+    const entryPath = join(path, entry.name);
+    return total + (entry.isDirectory() ? directorySize(entryPath) : statSync(entryPath).size);
+  }, 0);
+}
+
+const exportSize = directorySize("out");
+const maximumExportSize = 12 * 1024 * 1024;
+if (exportSize > maximumExportSize) {
+  throw new Error(`Static export exceeds 12 MiB: ${(exportSize / 1024 / 1024).toFixed(2)} MiB`);
+}
+
+console.log(`Static export verified for ${basePath} (${(exportSize / 1024 / 1024).toFixed(2)} MiB)`);

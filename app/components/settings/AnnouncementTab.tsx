@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.6.6",
+    date: "2026-08-02",
+    title: "Deployment Payload and Full-System QA",
+    items: [
+      "Removed an unused 18 MB intro video and two orphaned legacy images from the GitHub Pages payload.",
+      "Added export guards that reject obsolete assets and prevent the static deployment artifact from silently exceeding 12 MiB.",
+      "Verified all routes across six desktop, tablet, mobile, narrow, and landscape viewports without overflow, broken assets, or console errors.",
+      "Rechecked themes, translations, settings persistence, focus management, shortcuts, every SFX profile, and BGM lifecycle cleanup.",
+      "Confirmed the latest main-branch GitHub Pages deployment and all featured game pages are reachable.",
+    ],
+  },
+  {
     version: "2.6.5",
     date: "2026-07-31",
     title: "Coreball Games Hub Update",
