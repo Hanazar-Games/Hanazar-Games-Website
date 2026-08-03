@@ -8,3 +8,6 @@ pnpm-debug.log*
 .DS_Store
 *.blend1
 *.tsbuildinfo
+chat/vendor
+chat/.phpunit.cache
+chat/storage

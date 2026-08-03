@@ -1,0 +1,141 @@
+:root {
+  color-scheme: dark;
+  --bg: #080a0f;
+  --panel: rgba(17, 20, 29, 0.88);
+  --panel-solid: #11141d;
+  --line: rgba(255, 255, 255, 0.1);
+  --text: #f7f4ed;
+  --muted: #9ca3af;
+  --accent: #e7bc6a;
+  --accent-soft: rgba(231, 188, 106, 0.14);
+  --danger: #ef7d7d;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+button, input, textarea { color: inherit; font: inherit; }
+button { cursor: pointer; }
+[hidden] { display: none !important; }
+
+.ambient {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(124, 88, 255, 0.13), transparent 36%),
+    radial-gradient(circle at 80% 82%, rgba(231, 188, 106, 0.09), transparent 32%);
+  pointer-events: none;
+}
+
+.skipLink { position: fixed; left: 1rem; top: -4rem; z-index: 10; background: var(--accent); color: #111; padding: .75rem 1rem; }
+.skipLink:focus { top: 1rem; }
+.appFrame { position: relative; min-height: 100dvh; }
+.eyebrow { margin: 0; color: var(--accent); font-size: .7rem; font-weight: 800; letter-spacing: .24em; }
+.muted { color: var(--muted); }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+
+.loginView {
+  width: min(92vw, 430px);
+  min-height: 100dvh;
+  margin: auto;
+  display: grid;
+  align-content: center;
+  gap: 1rem;
+  padding: 3rem 0;
+}
+.brandMark { width: 3.25rem; height: 3.25rem; display: grid; place-items: center; border: 1px solid var(--accent); color: var(--accent); font-family: Georgia, serif; font-size: 1.5rem; transform: rotate(45deg); }
+.brandMark span { display: block; transform: rotate(-45deg); }
+.loginView h1 { margin: .25rem 0 0; font-family: Georgia, serif; font-size: clamp(2rem, 7vw, 3.4rem); font-weight: 500; }
+.loginView > p { margin: 0; line-height: 1.7; }
+.loginForm { display: grid; gap: .65rem; margin-top: 1rem; padding: 1.4rem; border: 1px solid var(--line); background: var(--panel); backdrop-filter: blur(18px); }
+.loginForm label, dialog label { color: var(--muted); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+input, textarea { width: 100%; border: 1px solid var(--line); background: rgba(255, 255, 255, .04); padding: .85rem .95rem; outline: none; }
+input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.primaryButton, .sendButton { border: 0; background: var(--accent); color: #17130b; font-weight: 800; padding: .85rem 1.1rem; }
+.statusText { min-height: 1.5rem; color: var(--danger); }
+.backLink { color: var(--muted); text-decoration: none; font-size: .85rem; }
+.backLink:hover { color: var(--text); }
+
+.chatView { height: 100dvh; display: grid; grid-template-columns: 320px 1fr; overflow: hidden; }
+.sidebar { z-index: 2; min-width: 0; min-height: 0; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; border-right: 1px solid var(--line); background: rgba(10, 12, 18, .92); backdrop-filter: blur(20px); }
+.sideHeader, .conversationHeader { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.5rem; border-bottom: 1px solid var(--line); }
+.sideHeader h1, .conversationHeader h2 { margin: .2rem 0 0; font-family: Georgia, serif; font-weight: 500; }
+.connectionDot { width: .65rem; height: .65rem; border-radius: 50%; background: #8b5360; box-shadow: 0 0 0 4px rgba(139, 83, 96, .12); }
+.connectionDot.connected { background: #7fd1a1; box-shadow: 0 0 0 4px rgba(127, 209, 161, .12); }
+.sideActions { display: grid; grid-template-columns: 1fr auto; gap: .5rem; padding: 1rem; }
+.sideActions button, .audioToggles button, .ghostButton, .mobileOnly { border: 1px solid var(--line); background: transparent; padding: .7rem; }
+.sideActions button:hover, .ghostButton:hover { border-color: var(--accent); color: var(--accent); }
+.roomList { min-height: 0; overflow-y: auto; padding: 0 .65rem; }
+.roomButton { position: relative; width: 100%; min-height: 4.25rem; display: grid; gap: .3rem; text-align: left; border: 0; border-left: 2px solid transparent; background: transparent; padding: .8rem 1rem; }
+.roomButton span { color: var(--muted); font-size: .75rem; }
+.roomButton:hover, .roomButton.active { background: var(--accent-soft); border-left-color: var(--accent); }
+.unreadBadge { position: absolute; right: .8rem; top: 50%; transform: translateY(-50%); min-width: 1.25rem; padding: .12rem .35rem; border-radius: 1rem; background: var(--accent); color: #111; text-align: center; font-size: .7rem; }
+.emptyState { color: var(--muted); padding: 1.5rem; line-height: 1.6; }
+.sideFooter { display: grid; gap: .8rem; padding: 1rem; border-top: 1px solid var(--line); }
+.audioToggles { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.audioToggles button { color: var(--muted); font-size: .75rem; }
+
+.conversation { min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto auto; background: rgba(8, 10, 15, .74); }
+.conversationHeader { min-height: 85px; justify-content: flex-start; }
+.conversationHeader p { margin: .25rem 0 0; font-size: .78rem; }
+.messageList { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: .75rem; padding: 2rem max(1.2rem, 6vw); }
+.message { align-self: flex-start; max-width: min(72%, 700px); }
+.message p { margin: 0; padding: .75rem 1rem; border: 1px solid var(--line); background: var(--panel-solid); line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message p a { color: var(--accent); text-underline-offset: .2em; }
+.messageAuthor { display: block; margin: 0 0 .28rem .15rem; color: var(--accent); font-size: .7rem; font-weight: 700; }
+.message time { display: block; margin-top: .3rem; color: var(--muted); font-size: .67rem; }
+.message.own { align-self: flex-end; }
+.message.own p { border-color: rgba(231, 188, 106, .28); background: var(--accent-soft); }
+.message.own time { text-align: right; }
+.deletedMessage { color: var(--muted); font-style: italic; }
+.messageActions { display: flex; justify-content: flex-end; gap: .35rem; margin-top: .3rem; opacity: .55; }
+.messageActions:hover, .messageActions:focus-within { opacity: 1; }
+.messageActions button { border: 0; background: transparent; color: var(--muted); padding: .2rem .35rem; font-size: .68rem; }
+.messageActions button:hover { color: var(--accent); }
+.typingText { min-height: 1.8rem; padding: .2rem max(1.2rem, 6vw); color: var(--muted); font-size: .76rem; }
+.composer { position: relative; display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: end; padding: 1rem max(1.2rem, 6vw) 1.4rem; border-top: 1px solid var(--line); }
+.composer textarea { resize: none; min-height: 48px; max-height: 160px; padding-right: 6rem; line-height: 1.4; }
+.characterCount { position: absolute; right: calc(max(1.2rem, 6vw) + 5.5rem); bottom: 2.25rem; color: var(--muted); font-size: .65rem; }
+.sendButton { min-height: 48px; }
+button:disabled, textarea:disabled { opacity: .45; cursor: not-allowed; }
+
+dialog { width: min(92vw, 480px); max-height: 90dvh; padding: 0; border: 1px solid var(--line); background: var(--panel-solid); color: var(--text); }
+dialog::backdrop { background: rgba(0, 0, 0, .75); backdrop-filter: blur(5px); }
+.dialogCard { max-height: 90dvh; overflow-y: auto; display: grid; gap: .85rem; padding: 1.25rem; }
+.dialogCard header { display: flex; justify-content: space-between; align-items: center; }
+.dialogCard h2 { margin: 0; font-family: Georgia, serif; font-weight: 500; }
+.dialogCard header button { border: 0; background: transparent; color: var(--muted); font-size: 1.6rem; }
+.dialogCard section, .dialogCard form { display: grid; gap: .7rem; }
+.modeSwitch { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); }
+.modeSwitch button { border: 0; background: transparent; padding: .7rem; color: var(--muted); }
+.modeSwitch button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
+.selectedMembers { margin: 0; min-height: 1.4rem; color: var(--muted); font-size: .75rem; line-height: 1.5; }
+.userResults { max-height: 300px; overflow: auto; display: grid; gap: .35rem; }
+.userResults button { min-height: 44px; border: 1px solid var(--line); background: transparent; text-align: left; padding: .8rem; }
+.userResults button:hover { border-color: var(--accent); }
+.userResults button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.toast { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 8; max-width: 340px; padding: .85rem 1rem; border: 1px solid var(--line); background: var(--panel-solid); opacity: 0; transform: translateY(1rem); pointer-events: none; transition: .2s ease; }
+.toast.visible { opacity: 1; transform: none; }
+.mobileOnly { display: none; }
+.sidebarBackdrop { display: none; }
+
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+@media (max-width: 760px) {
+  .chatView { grid-template-columns: 1fr; }
+  .sidebar { position: fixed; inset: 0 15% 0 0; transform: translateX(-105%); transition: transform .22s ease; box-shadow: 1rem 0 3rem rgba(0, 0, 0, .45); }
+  .roomsOpen .sidebar { transform: none; }
+  .sidebarBackdrop { position: fixed; z-index: 1; inset: 0; display: block; width: 100%; border: 0; background: rgba(0, 0, 0, .55); }
+  .mobileOnly { display: inline-block; }
+  .message { max-width: 88%; }
+  .messageList { padding-block: 1.2rem; }
+}
+
+@media (max-height: 600px) {
+  .loginView { align-content: start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .001ms !important; animation-duration: .001ms !important; }
+}

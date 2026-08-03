@@ -44,6 +44,7 @@ const requiredContent = {
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     "https://github.com/hzagaming/LC300A",
+    "https://chat.hanazargames.com/",
     "Mac Tools",
     "Web Tools",
     "Other Tools",
@@ -81,6 +82,13 @@ for (const [file, values] of Object.entries(forbiddenContent)) {
   for (const value of values) {
     if (html.includes(value)) throw new Error(`Unexpected ${value} in ${file}`);
   }
+}
+
+const packageVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
+const announcements = readFileSync("app/components/settings/AnnouncementTab.tsx", "utf8");
+const announcementVersion = announcements.match(/version: "([^"]+)"/)?.[1];
+if (announcementVersion !== packageVersion) {
+  throw new Error(`Latest announcement ${announcementVersion ?? "missing"} does not match package ${packageVersion}`);
 }
 
 function directorySize(path) {

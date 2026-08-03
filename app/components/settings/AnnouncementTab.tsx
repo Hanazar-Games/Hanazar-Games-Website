@@ -4,6 +4,42 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.7.2",
+    date: "2026-08-03",
+    title: "Chat Recovery and Full-Site QA",
+    items: [
+      "Added one-time CSRF renewal and retry so Chat writes recover safely after another tab refreshes the session.",
+      "Fixed partial Chat startup after transient room-loading failures and added automatic room recovery through the event loop.",
+      "Activated the existing general API rate policy while preserving dedicated login and long-poll protections.",
+      "Improved mobile sidebar focus isolation, empty-draft typing cleanup, composer height reset, and audio-node teardown.",
+      "Rechecked the homepage, Games Hub, AIGC Lab, Tools, Other Products, Chat entry, static export, and low-volume SFX/BGM behavior.",
+    ],
+  },
+  {
+    version: "2.7.1",
+    date: "2026-08-02",
+    title: "Chat Reliability and Deployment QA",
+    items: [
+      "Fixed Chat heartbeat startup, expired-session recovery, CSRF renewal, retained event cursors, and long-poll resynchronization.",
+      "Hardened message retry idempotency, rapid room switching, group member search, typing throttling, and stale asynchronous responses.",
+      "Improved mobile sidebar dismissal, compact viewport scrolling, dialog tabs, focus states, touch targets, and archived-room controls.",
+      "Further reduced homepage and Chat SFX/BGM output, prevented duplicate notification sounds, and paused audio while the page is hidden.",
+      "Repaired cron environment loading, private PHP-FPM error logging, hidden first-admin password input, and verified the GitHub Pages export path.",
+    ],
+  },
+  {
+    version: "2.7.0",
+    date: "2026-08-02",
+    title: "Hanazar Chat Platform",
+    items: [
+      "Added a dedicated Chat entry to the homepage navigation and footer.",
+      "Built the self-hosted PHP 8.2 and SQLite chat service with secure authentication, CSRF protection, persistent rate limits, and hardened sessions.",
+      "Added private and group rooms, strict room roles, message pagination, edit/delete tombstones, read receipts, presence, typing state, and bounded event polling.",
+      "Created a responsive accessible chat interface with safe URL rendering, opt-in low-volume Web Audio, and full browser lifecycle recovery.",
+      "Added Nginx, PHP-FPM, systemd, cron, backup, cleanup, integrity-check, and first-admin deployment tooling for chat.hanazargames.com.",
+    ],
+  },
+  {
     version: "2.6.6",
     date: "2026-08-02",
     title: "Deployment Payload and Full-System QA",

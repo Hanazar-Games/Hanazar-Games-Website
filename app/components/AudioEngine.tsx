@@ -28,7 +28,7 @@ const sfxKinds: Record<SfxKind, { pitch: number; direction?: "up"; volume: numbe
   close: { pitch: 0.7, volume: 0.76 },
 };
 
-const SFX_THROTTLE_MS = 130;
+const SFX_THROTTLE_MS = 160;
 
 interface AmbientNodes {
   bus: GainNode;
@@ -50,7 +50,7 @@ function getSfxProfile(style: string) {
 }
 
 function ambientVolume(settings: SettingsState) {
-  return Math.min(0.024, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.024);
+  return Math.min(0.018, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.018);
 }
 
 function getSfxKind(target: Element): SfxKind {
@@ -260,8 +260,8 @@ export default function AudioEngine() {
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     const volume = Math.min(
-      0.06,
-      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.072 * signature.volume
+      0.04,
+      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.048 * signature.volume
     );
 
     oscillator.type = profile.wave;

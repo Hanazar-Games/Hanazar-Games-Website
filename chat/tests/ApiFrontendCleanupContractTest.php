@@ -70,6 +70,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
         self::assertMatchesRegularExpression('~X[-_]CSRF[-_]TOKEN|HTTP_X_CSRF_TOKEN~i', $api);
         self::assertMatchesRegularExpression('~csrf_(?:invalid|mismatch|missing)|invalid_csrf~i', $api);
         self::assertMatchesRegularExpression('~hash_equals\s*\(~', $api);
+        self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]api[\'\"]~', $api);
         self::assertMatchesRegularExpression('~json_last_error|JSON_THROW_ON_ERROR~', $api);
     }
 
@@ -191,6 +192,21 @@ final class ApiFrontendCleanupContractTest extends TestCase
         self::assertMatchesRegularExpression('~(?:resync|sync|poll)\s*\(~i', $javascript);
     }
 
+    public function testFrontendRecoversCsrfChatInitializationAndAudioNodes(): void
+    {
+        $javascript = $this->readRequired('public/assets/app.js');
+
+        self::assertMatchesRegularExpression('~csrf_invalid[\s\S]{0,800}/auth/session~', $javascript);
+        self::assertMatchesRegularExpression('~csrf_invalid[\s\S]{0,1200}retry~i', $javascript);
+        self::assertStringContainsString('roomsLoaded', $javascript);
+        self::assertMatchesRegularExpression('~!state\.roomsLoaded[\s\S]{0,300}loadRooms\s*\(~', $javascript);
+        self::assertMatchesRegularExpression('~\.onended\s*=[\s\S]{0,300}\.disconnect\s*\(~', $javascript);
+        self::assertMatchesRegularExpression('~messageInput\.value\.trim\s*\(\s*\)[\s\S]{0,120}stopTyping\s*\(~', $javascript);
+        self::assertMatchesRegularExpression('~messageInput\.style\.height\s*=\s*[\'\"]auto[\'\"]~', $javascript);
+        self::assertStringContainsString('.inert', $javascript);
+        self::assertStringContainsString('matchMedia', $javascript);
+    }
+
     public function testCleanupIsDryRunnableLockedIdempotentAndAdvancesTheEventFloor(): void
     {
         $cleanup = $this->readRequired('scripts/cleanup.php');
@@ -273,6 +289,8 @@ final class ApiFrontendCleanupContractTest extends TestCase
         foreach (['cleanup.php', 'backup.php', 'check.php'] as $job) {
             self::assertStringContainsString($job, $cron);
         }
+        self::assertStringContainsString('/srv/hanazar-chat/shared/chat.env', $cron);
+        self::assertMatchesRegularExpression('~set\s+-a~', $cron);
     }
 
     public function testNginxExposesOnlyThePublicRootAndSuppressesSensitiveRequestLogs(): void

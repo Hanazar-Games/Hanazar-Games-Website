@@ -17,6 +17,17 @@ final class RoomPermissionTest extends TestCase
         $this->assertHttpStatus(409, fn () => $this->user('alice'));
     }
 
+    public function testDisplayNamesRejectInvalidUtf8ControlsAndUnicodeWhitespace(): void
+    {
+        foreach (["\u{00A0}\u{3000}", "bad\0name", "\xC3\x28"] as $index => $displayName) {
+            $this->assertHttpStatus(422, fn () => $this->users->create([
+                'username' => 'display_' . $index,
+                'display_name' => $displayName,
+                'password' => 'Test-password-123!',
+            ]));
+        }
+    }
+
     public function testDmCreationIsUniqueAndIdempotentInBothDirections(): void
     {
         $alice = $this->user('alice');
@@ -33,6 +44,17 @@ final class RoomPermissionTest extends TestCase
             422,
             fn () => $this->rooms->createDm($this->contextFor($alice['id']), $alice['id'])
         );
+    }
+
+    public function testDmCannotBeLeftInAnUnrecoverableState(): void
+    {
+        $alice = $this->user('alice');
+        $bob = $this->user('bob');
+        $context = $this->contextFor($alice['id']);
+        $room = $this->rooms->createDm($context, $bob['id']);
+
+        $this->assertHttpStatus(409, fn () => $this->rooms->leave($context, $room['id']));
+        self::assertSame($room['id'], $this->rooms->createDm($context, $bob['id'])['id']);
     }
 
     public function testGroupHasExactlyOneOwner(): void
@@ -55,6 +77,16 @@ final class RoomPermissionTest extends TestCase
             )
         );
         self::assertSame(1, $this->activeRoleCount($room['id'], 'owner'));
+    }
+
+    public function testNamesRejectInvalidUtf8ControlsAndUnicodeWhitespace(): void
+    {
+        $owner = $this->user('owner');
+        $context = $this->contextFor($owner['id']);
+
+        foreach (["\u{00A0}\u{3000}", "bad\0name", "\xC3\x28"] as $name) {
+            $this->assertHttpStatus(422, fn () => $this->rooms->createGroup($context, $name));
+        }
     }
 
     public function testOwnerCanManageGroupAndCannotLeaveBeforeTransfer(): void

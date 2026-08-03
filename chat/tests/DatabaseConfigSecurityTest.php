@@ -46,6 +46,15 @@ final class DatabaseConfigSecurityTest extends TestCase
         Config::fromArray($public);
     }
 
+    public function testConfigNormalizesPathsBeforeCheckingPublicRootIsolation(): void
+    {
+        $values = $this->validConfigValues();
+        $values['DB_PATH'] = dirname($values['PUBLIC_ROOT']) . '/shared/../public/chat.sqlite';
+
+        $this->expectException(InvalidArgumentException::class);
+        Config::fromArray($values);
+    }
+
     public function testConfigRejectsWeakOrMalformedSecrets(): void
     {
         foreach (['change-me', 'base64:not-valid!', 'base64:' . base64_encode('too short')] as $secret) {

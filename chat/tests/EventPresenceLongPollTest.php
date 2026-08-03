@@ -135,6 +135,18 @@ final class EventPresenceLongPollTest extends TestCase
         self::assertSame('event_cursor_expired', $exception->errorCode());
     }
 
+    public function testFreshCursorNeverStartsBehindRetentionFloor(): void
+    {
+        $user = $this->createUser('fresh-cursor');
+        $context = $this->contextFor((int) $user['id']);
+        $this->database->connection()->exec(
+            "UPDATE app_meta SET value = '500' WHERE key = 'events_floor_id'",
+        );
+
+        self::assertSame(500, $this->events->cursor($context));
+        self::assertSame([], $this->events->fetch($context, 500)['events']);
+    }
+
     public function testEmptyPollIsBoundedAndSleepsOutsideDatabaseTransactions(): void
     {
         $user = $this->createUser('bounded-poll');

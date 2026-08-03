@@ -8,11 +8,13 @@ import { homepageGames } from "./lib/catalog";
 import { assetPath } from "./lib/paths";
 
 const githubUrl = "https://github.com/hzagaming";
+const chatUrl = "https://chat.hanazargames.com/";
 const heroBackdropImage = "/IntroPic.jpg";
 
 const heroLinks = [
   { label: "navGames", href: "#games" },
   { label: "navAigc", href: "aigc/" },
+  { label: "navChat", href: chatUrl },
   { label: "navTools", href: "#tools" },
   { label: "navAbout", href: "#about" },
   { label: "navUpdates", href: "#updates" },
@@ -184,6 +186,7 @@ const footerColumns = [
       { title: "footerSocialGithub", href: githubUrl },
       { title: "gamesHeroTitle", href: "games/" },
       { title: "navAigc", href: "aigc/" },
+      { title: "navChat", href: chatUrl },
       { title: "navContact", href: "mailto:hanazar@mirako.co" }
     ]
   }
@@ -227,6 +230,8 @@ export default function HomePage() {
                 key={link.href}
                 className="heroNavButton"
                 href={link.href}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
                 style={{ "--button-index": index } as CSSProperties}
               >
                 {tr(link.label)}
@@ -522,6 +527,9 @@ export default function HomePage() {
             </a>
             <a href="games/">
               {tr("gamesHeroTitle")}
+            </a>
+            <a href={chatUrl} target="_blank" rel="noopener noreferrer">
+              {tr("navChat")}
             </a>
             <a href="mailto:hanazar@mirako.co">
               {tr("footerSocialContact")}

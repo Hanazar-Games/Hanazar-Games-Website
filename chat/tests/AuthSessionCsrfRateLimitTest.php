@@ -274,6 +274,17 @@ final class AuthSessionCsrfRateLimitTest extends TestCase
         self::assertSame($freshAccepted - 1, $remainingAccepted);
     }
 
+    public function testGeneralApiPolicyIsBounded(): void
+    {
+        $identifier = 'general-api-policy';
+        for ($attempt = 0; $attempt < 120; ++$attempt) {
+            $this->rateLimiter->consume('api', $identifier, self::NOW);
+        }
+
+        $this->expectException(RateLimitException::class);
+        $this->rateLimiter->consume('api', $identifier, self::NOW);
+    }
+
     /** @return array{0: Auth, 1: SessionManager, 2: Csrf} */
     private function authBundle(Config $config): array
     {

@@ -276,10 +276,12 @@ final class MessageReadPaginationTest extends TestCase
         $bobContext = $this->contextFor($bob['id']);
 
         $advanced = $this->messages->markRead($bobContext, $roomId, $second['id']);
+        $readEvents = $this->eventCount($roomId, 'room.read');
         $staleRetry = $this->messages->markRead($bobContext, $roomId, $first['id']);
 
         self::assertSame($second['id'], $advanced['last_read_message_id']);
         self::assertSame($second['id'], $staleRetry['last_read_message_id']);
+        self::assertSame($readEvents, $this->eventCount($roomId, 'room.read'));
         $this->assertHttpError(
             422,
             'invalid_read_cursor',
@@ -361,5 +363,15 @@ final class MessageReadPaginationTest extends TestCase
     private function nonce(int $value): string
     {
         return sprintf('00000000-0000-4000-8000-%012d', $value);
+    }
+
+    private function eventCount(int $roomId, string $type): int
+    {
+        $statement = $this->database->connection()->prepare(
+            'SELECT COUNT(*) FROM user_events WHERE room_id = :room_id AND event_type = :type',
+        );
+        $statement->execute(['room_id' => $roomId, 'type' => $type]);
+
+        return (int) $statement->fetchColumn();
     }
 }
