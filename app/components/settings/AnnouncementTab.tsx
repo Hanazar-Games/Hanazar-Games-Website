@@ -4,6 +4,20 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.7.3",
+    date: "2026-08-05",
+    title: "Deployment-safe Chat Entry and Full-Site QA",
+    items: [
+      "Replaced the unconfigured Chat subdomain link with an internal status route that works on GitHub Pages and the main Vercel domain.",
+      "Restored the missing three-project AIGC preview on the homepage and kept its complete archive available as a dedicated route.",
+      "Added a deployment-ready HTTPS service switch so the real PHP Chat login can be enabled without changing homepage source code.",
+      "Documented the separate PHP 8.2, persistent SQLite, TLS, and DNS requirements instead of presenting the backend as already online.",
+      "Removed reduced-motion animation delays and corrected Chat status translations for a faster, clearer accessible experience.",
+      "Updated the PostCSS override to 8.5.23, clearing two moderate dependency advisories without forcing a broader Next.js upgrade.",
+      "Rechecked responsive layouts, themes, project counts, images, SFX/BGM lifecycle, PHP syntax, and the complete static export.",
+    ],
+  },
+  {
     version: "2.7.2",
     date: "2026-08-03",
     title: "Chat Recovery and Full-Site QA",

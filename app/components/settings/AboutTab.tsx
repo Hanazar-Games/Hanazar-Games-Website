@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "../../hooks/useTranslation";
+import packageInfo from "../../../package.json";
 
 export default function AboutTab() {
   const { tr } = useTranslation();
@@ -35,7 +36,7 @@ export default function AboutTab() {
 
         <div className="settingsAboutSection">
           <span className="settingLabel">{tr("aboutVersion")}</span>
-          <p className="aboutDesc">2.6.6</p>
+          <p className="aboutDesc">{packageInfo.version}</p>
         </div>
 
         <div className="aboutFooter">

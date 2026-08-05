@@ -143,3 +143,27 @@ export const games: GameEntry[] = [
 ];
 
 export const homepageGames = games.slice(0, 3);
+
+export const aigcExperiments: GameEntry[] = [
+  {
+    title: "aigcGpt56UltraTitle",
+    description: "aigcGpt56UltraDesc",
+    href: "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+    tag: "aigcTagGpt56Ultra",
+    image: "/aigc/gpt-56-sol-ultra.jpg",
+  },
+  {
+    title: "aigcKimiTitle",
+    description: "aigcKimiDesc",
+    href: "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
+    tag: "aigcTagKimi",
+    image: "/aigc/kimi-26-code.jpg",
+  },
+  {
+    title: "aigcGptMediumTitle",
+    description: "aigcGptMediumDesc",
+    href: "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
+    tag: "aigcTagGptMedium",
+    image: "/aigc/gpt-55-medium.jpg",
+  },
+];

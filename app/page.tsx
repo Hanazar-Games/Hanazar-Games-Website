@@ -4,16 +4,16 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "./hooks/useTranslation";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
-import { homepageGames } from "./lib/catalog";
+import { aigcExperiments, homepageGames } from "./lib/catalog";
 import { assetPath } from "./lib/paths";
 
 const githubUrl = "https://github.com/hzagaming";
-const chatUrl = "https://chat.hanazargames.com/";
+const chatUrl = "chat/";
 const heroBackdropImage = "/IntroPic.jpg";
 
 const heroLinks = [
   { label: "navGames", href: "#games" },
-  { label: "navAigc", href: "aigc/" },
+  { label: "navAigc", href: "#aigc" },
   { label: "navChat", href: chatUrl },
   { label: "navTools", href: "#tools" },
   { label: "navAbout", href: "#about" },
@@ -303,9 +303,60 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="contentSection toolsSection" id="tools">
+      <section className="contentSection homepageAigcSection" id="aigc">
         <div className="sectionHeading reveal revealFade" data-reveal>
           <span className="sectionIndex">02</span>
+          <h2>{tr("aigcHeroTitle")}</h2>
+        </div>
+
+        <div className="sectionIntro reveal revealFade" data-reveal>
+          <p>{tr("aigcHeroSubtitle")}</p>
+          <a className="sectionTextLink" href="aigc/">
+            {tr("ctaExploreAigc")} <span aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div className="gamesGrid homepageAigcGrid">
+          {aigcExperiments.map((experiment, index) => (
+            <article
+              key={experiment.title}
+              className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}
+              data-reveal
+              style={{ "--reveal-delay": `${(index % 2) * 0.06}s` } as CSSProperties}
+            >
+              <div className="gameCardImageWrap">
+                <Image
+                  src={assetPath(experiment.image)}
+                  alt={tr(experiment.title)}
+                  className="gameCardImage"
+                  width={1280}
+                  height={720}
+                  sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
+                />
+              </div>
+              <div className="gameCardBody">
+                <span className="gameCardTag">{tr(experiment.tag)}</span>
+                <h3>{tr(experiment.title)}</h3>
+                <p>{tr(experiment.description)}</p>
+                <a
+                  className="gameCardButton"
+                  href={experiment.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${tr("aigcOpenButton")}: ${tr(experiment.title)}`}
+                >
+                  {tr("aigcOpenButton")}
+                  <span className="gameCardArrow" aria-hidden="true">↗</span>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="contentSection toolsSection" id="tools">
+        <div className="sectionHeading reveal revealFade" data-reveal>
+          <span className="sectionIndex">03</span>
           <h2>{tr("sectionTools")}</h2>
         </div>
 
@@ -384,7 +435,7 @@ export default function HomePage() {
 
       <section className="contentSection aboutSection" id="about">
         <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">03</span>
+          <span className="sectionIndex">04</span>
           <h2>{tr("sectionAbout")}</h2>
         </div>
 
@@ -397,7 +448,7 @@ export default function HomePage() {
 
       <section className="contentSection documentsSection" id="documents">
         <div className="sectionHeading reveal revealRight" data-reveal>
-          <span className="sectionIndex">04</span>
+          <span className="sectionIndex">05</span>
           <h2>{tr("sectionDocuments")}</h2>
         </div>
 
@@ -420,7 +471,7 @@ export default function HomePage() {
 
       <section className="contentSection updatesSection" id="updates">
         <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">05</span>
+          <span className="sectionIndex">06</span>
           <h2>{tr("sectionUpdates")}</h2>
         </div>
 
@@ -443,7 +494,7 @@ export default function HomePage() {
 
       <section className="contentSection contactSection" id="contact">
         <div className="sectionHeading reveal revealRight" data-reveal>
-          <span className="sectionIndex">06</span>
+          <span className="sectionIndex">07</span>
           <h2>{tr("sectionContact")}</h2>
         </div>
 
@@ -528,7 +579,7 @@ export default function HomePage() {
             <a href="games/">
               {tr("gamesHeroTitle")}
             </a>
-            <a href={chatUrl} target="_blank" rel="noopener noreferrer">
+            <a href={chatUrl}>
               {tr("navChat")}
             </a>
             <a href="mailto:hanazar@mirako.co">

@@ -5,31 +5,8 @@ import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
+import { aigcExperiments } from "../lib/catalog";
 import { assetPath } from "../lib/paths";
-
-const experiments = [
-  {
-    title: "aigcGpt56UltraTitle",
-    description: "aigcGpt56UltraDesc",
-    href: "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
-    tag: "aigcTagGpt56Ultra",
-    image: "/aigc/gpt-56-sol-ultra.jpg"
-  },
-  {
-    title: "aigcKimiTitle",
-    description: "aigcKimiDesc",
-    href: "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
-    tag: "aigcTagKimi",
-    image: "/aigc/kimi-26-code.jpg"
-  },
-  {
-    title: "aigcGptMediumTitle",
-    description: "aigcGptMediumDesc",
-    href: "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
-    tag: "aigcTagGptMedium",
-    image: "/aigc/gpt-55-medium.jpg"
-  }
-];
 
 export default function AigcPage() {
   const { tr } = useTranslation();
@@ -52,7 +29,7 @@ export default function AigcPage() {
       </section>
 
       <div className="gamesGrid aigcGrid">
-        {experiments.map((experiment, index) => (
+        {aigcExperiments.map((experiment, index) => (
           <article
             key={experiment.title}
             className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}

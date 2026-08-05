@@ -18,6 +18,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_CHAT_SERVICE_URL: ${{ vars.NEXT_PUBLIC_CHAT_SERVICE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -4,12 +4,24 @@ import { join } from "node:path";
 const repositoryName = process.env.GITHUB_REPOSITORY?.split("/").pop();
 if (!repositoryName) throw new Error("GITHUB_REPOSITORY is required");
 
+function httpsUrl(value) {
+  if (!value) return null;
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
 const basePath = `/${repositoryName}`;
+const chatServiceUrl = httpsUrl(process.env.NEXT_PUBLIC_CHAT_SERVICE_URL);
 const requiredFiles = [
   "index.html",
   "404.html",
   "games/index.html",
   "aigc/index.html",
+  "chat/index.html",
   "games/guandan.jpg",
   "games/liars-bar.jpg",
   "games/coreball.jpg",
@@ -40,11 +52,14 @@ for (const file of requiredFiles.filter((file) => file.endsWith(".html"))) {
 
 const requiredContent = {
   "index.html": [
+    "href=\"chat/\"",
+    "href=\"#aigc\"",
     "https://hanazar-games.github.io/Guandan-Webgame/",
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
+    "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
+    "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
     "https://github.com/hzagaming/LC300A",
-    "https://chat.hanazargames.com/",
     "Mac Tools",
     "Web Tools",
     "Other Tools",
@@ -63,6 +78,12 @@ const requiredContent = {
     "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
     "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
   ],
+  "chat/index.html": [
+    "Hanazar Chat",
+    chatServiceUrl ? "Service available" : "Deployment pending",
+    "https://github.com/Hanazar-Games/Hanazar-Games-Website/tree/main/chat",
+    ...(chatServiceUrl ? ["Open Chat", `href="${chatServiceUrl}"`] : []),
+  ],
 };
 
 for (const [file, values] of Object.entries(requiredContent)) {
@@ -73,7 +94,10 @@ for (const [file, values] of Object.entries(requiredContent)) {
 }
 
 const forbiddenContent = {
-  "index.html": ["https://hanazar-games.github.io/Tic-Tac-Toe/"],
+  "index.html": [
+    "https://hanazar-games.github.io/Tic-Tac-Toe/",
+    "https://chat.hanazargames.com/",
+  ],
   "aigc/index.html": ["https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project"],
 };
 
