@@ -9,12 +9,14 @@ import { assetPath } from "./lib/paths";
 
 const githubUrl = "https://github.com/hzagaming";
 const chatUrl = "chat/";
+const transferUrl = "transfer/";
 const heroBackdropImage = "/IntroPic.jpg";
 
 const heroLinks = [
   { label: "navGames", href: "#games" },
   { label: "navAigc", href: "#aigc" },
   { label: "navChat", href: chatUrl },
+  { label: "navTransfer", href: transferUrl },
   { label: "navTools", href: "#tools" },
   { label: "navAbout", href: "#about" },
   { label: "navUpdates", href: "#updates" },
@@ -187,6 +189,7 @@ const footerColumns = [
       { title: "gamesHeroTitle", href: "games/" },
       { title: "navAigc", href: "aigc/" },
       { title: "navChat", href: chatUrl },
+      { title: "navTransfer", href: transferUrl },
       { title: "navContact", href: "mailto:hanazar@mirako.co" }
     ]
   }
@@ -581,6 +584,9 @@ export default function HomePage() {
             </a>
             <a href={chatUrl}>
               {tr("navChat")}
+            </a>
+            <a href={transferUrl}>
+              {tr("navTransfer")}
             </a>
             <a href="mailto:hanazar@mirako.co">
               {tr("footerSocialContact")}

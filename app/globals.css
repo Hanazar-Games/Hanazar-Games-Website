@@ -115,9 +115,23 @@ body[data-theme="light"] .gameCard {
   border-color: rgba(0,0,0,0.08);
 }
 
-body[data-theme="light"] .chatStatusCard {
+body[data-theme="light"] .peerCard {
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(0, 0, 0, 0.09);
+}
+
+body[data-theme="light"] .peerField input,
+body[data-theme="light"] .peerField textarea,
+body[data-theme="light"] .peerMessageLog,
+body[data-theme="light"] .peerTransferItem,
+body[data-theme="light"] .peerFilePicker {
+  color: #1a1a1a;
+  background: rgba(0, 0, 0, 0.035);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+body[data-theme="light"] .peerMessage-outgoing {
+  background: rgba(0, 0, 0, 0.08);
 }
 
 body[data-theme="light"] .gameCard p {
@@ -1358,185 +1372,508 @@ select:focus-visible {
     linear-gradient(180deg, #090909 0%, #050505 100%);
 }
 
-.chatStatusHero {
-  min-height: 56svh;
+.peerHero {
+  min-height: 52svh;
   background:
-    radial-gradient(circle at 50% 30%, rgba(231, 188, 106, 0.1), transparent 34%),
+    radial-gradient(circle at 50% 30%, rgba(106, 178, 231, 0.1), transparent 34%),
     linear-gradient(180deg, #0b0c11 0%, #050505 100%);
 }
 
-.chatStatusHeroInner {
-  width: min(100%, 820px);
+.peerHero-transfer {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(125, 211, 173, 0.1), transparent 35%),
+    linear-gradient(180deg, #09100e 0%, #050505 100%);
 }
 
-.chatStatusBadge {
+.peerHeroInner {
+  width: min(100%, 900px);
+}
+
+.peerStatus {
   width: fit-content;
-  margin: 0 auto 24px;
+  margin: 0 auto 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   padding: 8px 14px;
-  border: 1px solid rgba(231, 188, 106, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 999px;
-  color: #d8c49b;
-  background: rgba(231, 188, 106, 0.07);
+  color: #c5c5c5;
+  background: rgba(255, 255, 255, 0.04);
   font-size: 0.76rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.chatStatusBadge span {
+.peerStatus span {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #d6ad5d;
-  box-shadow: 0 0 0 4px rgba(214, 173, 93, 0.12);
+  background: #b5b5b5;
+  box-shadow: 0 0 0 4px rgba(181, 181, 181, 0.1);
 }
 
-.chatStatusBadge.ready {
+.peerStatus-connected {
   color: #9fd8b7;
   border-color: rgba(127, 209, 161, 0.28);
   background: rgba(127, 209, 161, 0.07);
 }
 
-.chatStatusBadge.ready span {
+.peerStatus-connected span {
   background: #7fd1a1;
   box-shadow: 0 0 0 4px rgba(127, 209, 161, 0.12);
 }
 
-.chatStatusContent {
+.peerStatus-failed,
+.peerStatus-disconnected {
+  color: #e5a6a6;
+  border-color: rgba(223, 126, 126, 0.28);
+  background: rgba(223, 126, 126, 0.07);
+}
+
+.peerStatus-failed span,
+.peerStatus-disconnected span {
+  background: #df7e7e;
+}
+
+.peerMemberLink {
+  min-height: 44px;
+  margin-top: 22px;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  color: #ededed;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.peerContent {
   position: relative;
   z-index: 2;
-  width: min(100%, 1000px);
-  margin: -56px auto 0;
+  width: min(100%, 1180px);
+  margin: -38px auto 0;
   padding: 0 24px 112px;
 }
 
-.chatStatusGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+.peerPrivacyNote {
+  max-width: 800px;
+  margin: 0 auto 18px;
+  padding: 13px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--panel-strong) 88%, transparent);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  text-align: center;
 }
 
-.chatStatusCard {
-  min-height: 260px;
+.peerCard {
   padding: 30px;
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: 22px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
     rgba(12, 12, 14, 0.97);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.22);
 }
 
-.chatStatusIndex {
-  display: block;
-  margin-bottom: 34px;
+.peerCardHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.peerCardIndex {
+  display: inline-block;
+  margin-bottom: 10px;
   color: var(--muted);
   font-size: 0.72rem;
   letter-spacing: 0.2em;
 }
 
-.chatStatusCard h2 {
-  margin: 0 0 12px;
-  font-size: 1.45rem;
+.peerCard h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.55rem);
   font-weight: 500;
 }
 
-.chatStatusCard strong {
-  display: inline-block;
-  margin-bottom: 18px;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+.peerCardIntro {
+  max-width: 760px;
+  margin: 14px 0 24px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.peerNameField {
+  max-width: 420px;
+  margin-bottom: 24px;
+}
+
+.peerPairingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.peerPairingStep {
+  min-width: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel-soft);
+}
+
+.peerStepLabel,
+.peerField > span,
+.peerFileLimit,
+.peerPeerName {
+  color: var(--muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
-.chatStatusOnline {
-  color: #7fd1a1;
-}
-
-.chatStatusWaiting {
-  color: #d6ad5d;
-}
-
-.chatStatusCard p,
-.chatStatusNote {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.7;
-}
-
-.chatStatusActions {
-  margin-top: 28px;
+.peerField {
+  width: 100%;
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.chatStatusPrimary,
-.chatStatusSecondary {
-  min-height: 48px;
+.peerField input,
+.peerField textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  outline: none;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.22);
+  line-height: 1.55;
+}
+
+.peerField textarea {
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+
+.peerField input::placeholder,
+.peerField textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 72%, transparent);
+}
+
+.peerButton,
+.peerFilePicker {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 22px;
+  padding: 10px 17px;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: 12px;
   color: var(--text);
   background: var(--panel-soft);
-  font-size: 0.84rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
 }
 
-.chatStatusPrimary {
-  color: #17130b;
-  background: #e7bc6a;
-  border-color: #e7bc6a;
-}
-
-.chatStatusPrimary:hover,
-.chatStatusSecondary:hover {
-  transform: translateY(-2px);
+.peerButton:hover:not(:disabled),
+.peerFilePicker:hover:not([aria-disabled="true"]) {
   border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.chatStatusNote {
-  max-width: 700px;
-  margin: 24px auto 0;
-  text-align: center;
+.peerButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.peerFilePicker[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.peerButtonPrimary {
+  color: #0d1110;
+  border-color: #a9d9c2;
+  background: #a9d9c2;
+}
+
+.peerButtonPrimary:hover:not(:disabled) {
+  border-color: #c5ead9;
+  background: #c5ead9;
+}
+
+.peerButtonQuiet {
+  flex: 0 0 auto;
   font-size: 0.82rem;
 }
 
-@media (max-width: 720px) {
-  .chatStatusHero {
-    min-height: 60svh;
-  }
+.peerLiveNotice {
+  min-height: 1.5em;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
 
-  .chatStatusContent {
-    margin-top: -32px;
-    padding-inline: 16px;
-  }
+.peerWorkspace {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: start;
+  gap: 20px;
+}
 
-  .chatStatusGrid {
+.peerWorkspaceChat {
+  grid-template-columns: minmax(0, 820px);
+  justify-content: center;
+}
+
+.peerMessageLog {
+  min-height: 330px;
+  max-height: 520px;
+  margin-top: 22px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+  scrollbar-width: thin;
+}
+
+.peerEmptyState {
+  margin: auto;
+  max-width: 320px;
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.peerMessage {
+  width: fit-content;
+  max-width: min(86%, 620px);
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-soft);
+  overflow-wrap: anywhere;
+}
+
+.peerMessage-outgoing {
+  align-self: flex-end;
+  background: rgba(169, 217, 194, 0.1);
+}
+
+.peerMessageMeta {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.peerMessageMeta strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.peerMessage p {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.55;
+}
+
+.peerComposer {
+  margin-top: 16px;
+}
+
+.peerComposerActions {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.peerComposerActions > span {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.peerFileControls {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.peerFilePicker {
+  min-width: 0;
+  justify-content: flex-start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.peerFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.peerFileInput:focus-visible + .peerFilePicker {
+  outline: 2px solid rgba(255, 255, 255, 0.82);
+  outline-offset: 3px;
+}
+
+.peerTransferList {
+  min-height: 260px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.peerTransferItem {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.peerTransferMeta,
+.peerTransferBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.peerTransferMeta strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.peerTransferMeta span,
+.peerTransferBottom {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.peerTransferItem progress {
+  width: 100%;
+  height: 6px;
+  margin: 12px 0 8px;
+  display: block;
+  accent-color: #a9d9c2;
+}
+
+.peerTransferBottom a {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.peerFooterActions {
+  min-height: 60px;
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.peerFooterActions .peerLiveNotice {
+  margin: 0;
+}
+
+@media (max-width: 840px) {
+  .peerPairingGrid,
+  .peerWorkspace {
     grid-template-columns: 1fr;
   }
 
-  .chatStatusCard {
-    min-height: 0;
-    padding: 24px;
+  .peerWorkspaceChat {
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  .peerHero {
+    min-height: 56svh;
   }
 
-  .chatStatusIndex {
-    margin-bottom: 24px;
+  .gamesHeroInner.peerHeroInner {
+    padding: 82px 20px 48px;
   }
 
-  .chatStatusPrimary,
-  .chatStatusSecondary {
+  .peerHero .gamesHeroTitle {
+    font-size: clamp(2.4rem, 13vw, 3.7rem);
+  }
+
+  .peerContent {
+    margin-top: -24px;
+    padding-inline: 0;
+  }
+
+  .peerCard {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .peerCardHeading,
+  .peerFooterActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .peerButtonQuiet,
+  .peerFooterActions .peerButton {
     width: 100%;
+  }
+
+  .peerPairingStep {
+    padding: 15px;
+  }
+
+  .peerPairingStep > .peerButton {
+    width: 100%;
+  }
+
+  .peerMessageLog {
+    min-height: 280px;
+  }
+
+  .peerMessage {
+    max-width: 94%;
+  }
+
+  .peerFileControls {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.8.0",
+    date: "2026-08-05",
+    title: "Peer Chat, File Transfer Assistant, and Deployment QA",
+    items: [
+      "Replaced the Chat status placeholder with a working WebRTC peer Chat that runs directly on GitHub Pages.",
+      "Added a File Transfer Assistant for direct text, TXT, and regular file sharing between two computers.",
+      "Added manual offer-and-answer pairing, encrypted data channels, 64 KiB chunks, backpressure, progress feedback, and a 50 MiB per-file limit.",
+      "Kept messages and files in browser memory only, added safe local download links, and enabled TXT transcript export.",
+      "Added Chat and Transfer entries to the homepage and retained the optional HTTPS member Chat service switch.",
+      "Simplified the new responsive UI, softened default SFX/BGM output, and rechecked static deployment, themes, accessibility, and transfer recovery.",
+    ],
+  },
+  {
     version: "2.7.3",
     date: "2026-08-05",
     title: "Deployment-safe Chat Entry and Full-Site QA",

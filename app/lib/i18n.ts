@@ -40,22 +40,7 @@ const raw: Record<string, { en: string } & Partial<Record<LangCode, string>>> = 
   navGames: T("Games", { "zh-CN": "游戏", "zh-TW": "遊戲", ja: "ゲーム", ko: "게임", fr: "Jeux", de: "Spiele", es: "Juegos", ru: "Игры", pt: "Jogos" }),
   navAigc: T("AIGC Lab", { "zh-CN": "AIGC 实验室", "zh-TW": "AIGC 實驗室", ja: "AIGC ラボ", ko: "AIGC 랩", fr: "Labo AIGC", de: "AIGC-Labor", es: "Laboratorio AIGC", ru: "Лаборатория AIGC", pt: "Laboratório AIGC" }),
   navChat: T("Chat", { "zh-CN": "聊天", "zh-TW": "聊天", ja: "チャット", ko: "채팅", fr: "Chat", de: "Chat", es: "Chat", ru: "Чат", pt: "Chat" }),
-  chatStatusEyebrow: T("Secure messaging", { "zh-CN": "安全通讯", "zh-TW": "安全通訊", ja: "セキュアメッセージ", ko: "보안 메시징" }),
-  chatStatusPending: T("Deployment pending", { "zh-CN": "部署准备中", "zh-TW": "部署準備中", ja: "デプロイ準備中", ko: "배포 준비 중" }),
-  chatStatusReady: T("Service available", { "zh-CN": "服务可用", "zh-TW": "服務可用", ja: "サービス利用可能", ko: "서비스 사용 가능" }),
-  chatStatusTitle: T("Hanazar Chat", {}),
-  chatStatusPendingBody: T("The secure Chat application is ready in the repository, but its PHP server and public DNS are not connected yet. This page remains available while deployment is completed.", { "zh-CN": "安全 Chat 应用已在仓库中准备完成，但 PHP 服务器与公共 DNS 尚未接通。部署完成前，此页面会保持可访问。", "zh-TW": "安全 Chat 應用已在儲存庫中準備完成，但 PHP 伺服器與公共 DNS 尚未接通。部署完成前，此頁面會保持可存取。", ja: "安全な Chat アプリはリポジトリ内で準備済みですが、PHP サーバーと公開 DNS はまだ接続されていません。デプロイ完了まで、このページは引き続き利用できます。", ko: "보안 Chat 앱은 저장소에 준비되어 있지만 PHP 서버와 공개 DNS는 아직 연결되지 않았습니다. 배포가 완료될 때까지 이 페이지는 계속 이용할 수 있습니다." }),
-  chatStatusReadyBody: T("The secure Chat service is configured and ready to open in a separate tab.", { "zh-CN": "安全 Chat 服务已配置完成，可在新标签页中打开。", "zh-TW": "安全 Chat 服務已設定完成，可在新分頁中開啟。", ja: "安全な Chat サービスの設定が完了し、新しいタブで開けます。", ko: "보안 Chat 서비스 구성이 완료되어 새 탭에서 열 수 있습니다." }),
-  chatStatusEntryTitle: T("Public entry", { "zh-CN": "公共入口", "zh-TW": "公共入口", ja: "公開エントリー", ko: "공개 진입점" }),
-  chatStatusOnline: T("Online", { "zh-CN": "在线", "zh-TW": "上線", ja: "オンライン", ko: "온라인" }),
-  chatStatusEntryBody: T("The homepage and this status route work on both GitHub Pages and the main Vercel domain without relying on an unconfigured subdomain.", { "zh-CN": "主页和此状态页面可同时运行在 GitHub Pages 与主 Vercel 域名上，不再依赖尚未配置的子域名。", "zh-TW": "首頁和此狀態頁面可同時執行於 GitHub Pages 與主 Vercel 網域，不再依賴尚未設定的子網域。", ja: "ホームページとこのステータスページは、未設定のサブドメインに依存せず GitHub Pages とメインの Vercel ドメインの両方で動作します。", ko: "홈페이지와 이 상태 경로는 구성되지 않은 하위 도메인에 의존하지 않고 GitHub Pages와 기본 Vercel 도메인 모두에서 작동합니다." }),
-  chatStatusBackendTitle: T("PHP chat service", { "zh-CN": "PHP Chat 服务", "zh-TW": "PHP Chat 服務", ja: "PHP Chat サービス", ko: "PHP Chat 서비스" }),
-  chatStatusWaiting: T("Waiting for deployment", { "zh-CN": "等待部署", "zh-TW": "等待部署", ja: "デプロイ待ち", ko: "배포 대기 중" }),
-  chatStatusBackendPending: T("A PHP 8.2 server, persistent SQLite storage, TLS, and a DNS record are required before member login can be enabled.", { "zh-CN": "启用成员登录前，需要准备 PHP 8.2 服务器、持久化 SQLite 存储、TLS 证书与 DNS 记录。", "zh-TW": "啟用成員登入前，需要準備 PHP 8.2 伺服器、持久化 SQLite 儲存、TLS 憑證與 DNS 記錄。", ja: "メンバーログインを有効にするには、PHP 8.2 サーバー、永続 SQLite ストレージ、TLS、DNS レコードが必要です。", ko: "멤버 로그인을 활성화하려면 PHP 8.2 서버, 영구 SQLite 저장소, TLS 및 DNS 레코드가 필요합니다." }),
-  chatStatusBackendReady: T("The external service URL is configured. Open Chat to continue to the private login.", { "zh-CN": "外部服务地址已配置。打开 Chat 即可进入私人登录。", "zh-TW": "外部服務位址已設定。開啟 Chat 即可進入私人登入。", ja: "外部サービス URL が設定済みです。Chat を開いてプライベートログインへ進んでください。", ko: "외부 서비스 URL이 구성되었습니다. Chat을 열어 비공개 로그인으로 이동하세요." }),
-  chatStatusOpen: T("Open Chat", { "zh-CN": "打开 Chat", "zh-TW": "開啟 Chat", ja: "Chat を開く", ko: "Chat 열기" }),
-  chatStatusGuide: T("Deployment guide", { "zh-CN": "部署指南", "zh-TW": "部署指南", ja: "デプロイガイド", ko: "배포 가이드" }),
-  chatStatusNote: T("GitHub Pages hosts this status entry only; it cannot execute PHP or provide persistent SQLite sessions.", { "zh-CN": "GitHub Pages 仅托管此状态入口；它无法执行 PHP，也无法提供持久化 SQLite 会话。", "zh-TW": "GitHub Pages 僅託管此狀態入口；它無法執行 PHP，也無法提供持久化 SQLite 工作階段。", ja: "GitHub Pages がホストするのはこのステータス入口のみで、PHP の実行や永続 SQLite セッションの提供はできません。", ko: "GitHub Pages는 이 상태 진입점만 호스팅하며 PHP 실행이나 영구 SQLite 세션을 제공할 수 없습니다." }),
+  navTransfer: T("Transfer", { "zh-CN": "传输助手", "zh-TW": "傳輸助手", ja: "転送", ko: "전송" }),
   navTools: T("Tools", { "zh-CN": "工具", "zh-TW": "工具", ja: "ツール", ko: "도구", fr: "Outils", de: "Tools", es: "Herramientas", ru: "Инструменты", pt: "Ferramentas" }),
   navAbout: T("About", { "zh-CN": "关于", "zh-TW": "關於", ja: "概要", ko: "소개", fr: "À propos", de: "Über", es: "Acerca de", ru: "О нас", pt: "Sobre" }),
   navDocuments: T("Documents", { "zh-CN": "文档", "zh-TW": "文件", ja: "ドキュメント", ko: "문서", fr: "Documents", de: "Dokumente", es: "Documentos", ru: "Документы", pt: "Documentos" }),
@@ -205,6 +190,71 @@ raw.gameSubwaySurfersTitle = T("Subway Surfers", { "zh-CN": "地铁跑酷", "zh-
 raw.gameSubwaySurfersDesc = T("An endless runner through subway tunnels. Dodge trains, collect coins, and see how far you can go.", { "zh-CN": "无尽跑酷穿越地铁隧道。躲避列车，收集金币，看看你能跑多远。", "zh-TW": "無盡跑酷穿越地鐵隧道。躲避列車，收集金幣，看看你能跑多遠。", ja: "地下鉄トンネルを駆け抜けるエンドレスランナー。電車を避け、コインを集め、どこまで走れるか挑戦しましょう。", ko: "지하철 터널을 달리는 무한 러너입니다. 열차를 피하고 동전을 모으며 얼마나 멀리 갈 수 있는지 도전하세요.", fr: "Un runner infini à travers les tunnels du métro. Esquivez les trains, collectez des pièces et voyez jusqu'où vous pouvez aller.", de: "Ein Endless Runner durch U-Bahn-Tunnel. Weiche Zügen aus, sammle Münzen und sieh, wie weit du kommen kannst.", es: "Un corredor sin fin por túneles de metro. Esquiva trenes, recolecta monedas y ve qué tan lejos puedes llegar.", ru: "Бесконечный раннер через туннели метро. Уворачивайтесь от поездов, собирайте монеты и проверьте, как далеко вы сможете зайти.", pt: "Um corredor infinito por túneis de metrô. Desvie de trens, colete moedas e veja até onde você pode chegar." });
 raw.gamesMoreSoon = T("More games coming soon.", { "zh-CN": "更多游戏即将推出。", "zh-TW": "更多遊戲即將推出。", ja: "さらにゲームが近日公開予定。", ko: "더 많은 게임이 곧 출시됩니다.", fr: "Plus de jeux à venir bientôt.", de: "Weitere Spiele folgen bald.", es: "Más juegos próximamente.", ru: "Скоро выйдет больше игр.", pt: "Mais jogos em breve." });
 raw.gamesBackHome = T("← Back to Home", { "zh-CN": "← 返回首页", "zh-TW": "← 返回首頁", ja: "← ホームに戻る", ko: "← 홈으로 돌아가기", fr: "← Retour à l'accueil", de: "← Zurück zur Startseite", es: "← Volver al inicio", ru: "← На главную", pt: "← Voltar ao início" });
+raw.peerChatEyebrow = T("Direct browser messaging", { "zh-CN": "浏览器直连通讯", "zh-TW": "瀏覽器直連通訊", ja: "ブラウザ直接通信", ko: "브라우저 직접 통신" });
+raw.peerTransferEyebrow = T("Device-to-device sharing", { "zh-CN": "设备点对点分享", "zh-TW": "裝置點對點分享", ja: "端末間共有", ko: "기기 간 공유" });
+raw.peerChatTitle = T("Peer Chat", { "zh-CN": "点对点聊天", "zh-TW": "點對點聊天", ja: "ピアチャット", ko: "피어 채팅" });
+raw.peerTransferTitle = T("File Transfer Assistant", { "zh-CN": "文件传输助手", "zh-TW": "檔案傳輸助手", ja: "ファイル転送アシスタント", ko: "파일 전송 도우미" });
+raw.peerChatSubtitle = T("Connect two browsers with a pairing code and exchange messages without creating an account or uploading chat history.", { "zh-CN": "通过配对码连接两个浏览器，无需注册账号，也不会上传聊天记录。", "zh-TW": "透過配對碼連接兩個瀏覽器，無需註冊帳號，也不會上傳聊天記錄。", ja: "ペアリングコードで2つのブラウザを接続し、アカウント作成や履歴のアップロードなしで会話できます。", ko: "페어링 코드로 두 브라우저를 연결해 계정 생성이나 대화 업로드 없이 메시지를 주고받습니다." });
+raw.peerTransferSubtitle = T("Send text, TXT documents, and regular files directly between two computers with progress feedback and local downloads.", { "zh-CN": "在两台电脑之间直接发送文字、TXT 文档和普通文件，并查看进度、在本地下载。", "zh-TW": "在兩台電腦之間直接傳送文字、TXT 文件和一般檔案，並查看進度、在本機下載。", ja: "2台のPC間でテキスト、TXT、通常ファイルを直接送信し、進捗確認とローカル保存ができます。", ko: "두 컴퓨터 사이에서 텍스트, TXT 및 일반 파일을 직접 보내고 진행률을 확인해 로컬로 저장합니다." });
+raw.peerStatusIdle = T("Ready to pair", { "zh-CN": "等待配对", "zh-TW": "等待配對", ja: "ペアリング待ち", ko: "페어링 준비" });
+raw.peerStatusGathering = T("Creating secure route", { "zh-CN": "正在建立安全路径", "zh-TW": "正在建立安全路徑", ja: "安全な経路を作成中", ko: "보안 경로 생성 중" });
+raw.peerStatusWaiting = T("Waiting for answer", { "zh-CN": "等待回答码", "zh-TW": "等待回答碼", ja: "回答コード待ち", ko: "응답 코드 대기 중" });
+raw.peerStatusConnecting = T("Connecting", { "zh-CN": "正在连接", "zh-TW": "正在連線", ja: "接続中", ko: "연결 중" });
+raw.peerStatusConnected = T("Connected", { "zh-CN": "已连接", "zh-TW": "已連線", ja: "接続済み", ko: "연결됨" });
+raw.peerStatusDisconnected = T("Disconnected", { "zh-CN": "连接已断开", "zh-TW": "連線已中斷", ja: "切断されました", ko: "연결 끊김" });
+raw.peerStatusFailed = T("Connection failed", { "zh-CN": "连接失败", "zh-TW": "連線失敗", ja: "接続失敗", ko: "연결 실패" });
+raw.peerOpenMemberChat = T("Open member Chat", { "zh-CN": "打开会员 Chat", "zh-TW": "開啟會員 Chat", ja: "メンバー Chat を開く", ko: "회원 Chat 열기" });
+raw.peerPrivacyNote = T("Messages and files stay in browser memory and travel through the encrypted WebRTC connection. Closing or refreshing the page clears the session.", { "zh-CN": "消息和文件只保留在浏览器内存中，并通过加密的 WebRTC 连接传输；关闭或刷新页面会清除本次会话。", "zh-TW": "訊息和檔案只保留在瀏覽器記憶體中，並透過加密的 WebRTC 連線傳輸；關閉或重新整理頁面會清除此工作階段。", ja: "メッセージとファイルはブラウザメモリ内にのみ保持され、暗号化WebRTC経由で送信されます。ページを閉じるか更新すると消去されます。", ko: "메시지와 파일은 브라우저 메모리에만 남고 암호화된 WebRTC 연결로 전송됩니다. 페이지를 닫거나 새로고침하면 세션이 지워집니다." });
+raw.peerPairingTitle = T("Pair the two devices", { "zh-CN": "连接两台设备", "zh-TW": "連接兩台裝置", ja: "2台の端末をペアリング", ko: "두 기기 페어링" });
+raw.peerPairingHelp = T("Device A creates a code. Device B pastes it and creates an answer. Device A pastes that answer to finish the connection.", { "zh-CN": "设备 A 生成配对码；设备 B 粘贴后生成回答码；设备 A 再粘贴回答码即可完成连接。", "zh-TW": "裝置 A 產生配對碼；裝置 B 貼上後產生回答碼；裝置 A 再貼上回答碼即可完成連線。", ja: "端末Aがコードを作成し、端末Bが貼り付けて回答を作成します。端末Aが回答を貼り付けると接続完了です。", ko: "기기 A가 코드를 만들고 기기 B가 붙여넣어 응답을 만듭니다. 기기 A가 응답을 붙여넣으면 연결됩니다." });
+raw.peerReset = T("Reset connection", { "zh-CN": "重置连接", "zh-TW": "重設連線", ja: "接続をリセット", ko: "연결 초기화" });
+raw.peerYourName = T("Your display name", { "zh-CN": "你的显示名称", "zh-TW": "你的顯示名稱", ja: "表示名", ko: "표시 이름" });
+raw.peerNamePlaceholder = T("Optional name", { "zh-CN": "可选名称", "zh-TW": "選填名稱", ja: "任意の名前", ko: "선택 사항" });
+raw.peerHostStep = T("A · Start or share the answer", { "zh-CN": "A · 发起连接或分享回答码", "zh-TW": "A · 發起連線或分享回答碼", ja: "A · 接続開始または回答共有", ko: "A · 연결 시작 또는 응답 공유" });
+raw.peerCreateCode = T("Create pairing code", { "zh-CN": "生成配对码", "zh-TW": "產生配對碼", ja: "ペアリングコードを作成", ko: "페어링 코드 만들기" });
+raw.peerCreatingCode = T("Creating code…", { "zh-CN": "正在生成…", "zh-TW": "正在產生…", ja: "作成中…", ko: "코드 생성 중…" });
+raw.peerLocalCode = T("Code to share", { "zh-CN": "需要分享的代码", "zh-TW": "需要分享的代碼", ja: "共有するコード", ko: "공유할 코드" });
+raw.peerLocalCodePlaceholder = T("Your pairing or answer code appears here.", { "zh-CN": "配对码或回答码会显示在这里。", "zh-TW": "配對碼或回答碼會顯示在這裡。", ja: "ペアリングまたは回答コードがここに表示されます。", ko: "페어링 또는 응답 코드가 여기에 표시됩니다." });
+raw.peerCopyCode = T("Copy code", { "zh-CN": "复制代码", "zh-TW": "複製代碼", ja: "コードをコピー", ko: "코드 복사" });
+raw.peerRemoteStep = T("B · Paste the code you received", { "zh-CN": "B · 粘贴收到的代码", "zh-TW": "B · 貼上收到的代碼", ja: "B · 受信コードを貼り付け", ko: "B · 받은 코드 붙여넣기" });
+raw.peerRemoteCode = T("Received code", { "zh-CN": "收到的代码", "zh-TW": "收到的代碼", ja: "受信したコード", ko: "받은 코드" });
+raw.peerRemoteCodePlaceholder = T("Paste an offer or answer code here.", { "zh-CN": "在此粘贴配对码或回答码。", "zh-TW": "在此貼上配對碼或回答碼。", ja: "オファーまたは回答コードを貼り付けます。", ko: "제안 또는 응답 코드를 붙여넣으세요." });
+raw.peerUseCode = T("Use pairing code", { "zh-CN": "使用配对码", "zh-TW": "使用配對碼", ja: "コードを使用", ko: "페어링 코드 사용" });
+raw.peerUnsupported = T("This browser does not support WebRTC data connections.", { "zh-CN": "此浏览器不支持 WebRTC 数据连接。", "zh-TW": "此瀏覽器不支援 WebRTC 資料連線。", ja: "このブラウザはWebRTCデータ接続に対応していません。", ko: "이 브라우저는 WebRTC 데이터 연결을 지원하지 않습니다." });
+raw.peerOfferReady = T("Pairing code ready. Send it to the other device, then paste its answer on this device.", { "zh-CN": "配对码已生成。发给另一台设备，然后把对方生成的回答码粘贴回本设备。", "zh-TW": "配對碼已產生。傳給另一台裝置，然後把對方產生的回答碼貼回本裝置。", ja: "コードを相手に送り、相手が作成した回答をこの端末に貼り付けてください。", ko: "코드를 다른 기기에 보내고 그 기기가 만든 응답을 이 기기에 붙여넣으세요." });
+raw.peerAnswerReady = T("Answer code ready. Send it back to the device that created the first code.", { "zh-CN": "回答码已生成，请发回最先生成配对码的设备。", "zh-TW": "回答碼已產生，請傳回最先產生配對碼的裝置。", ja: "回答コードを最初のコードを作成した端末へ送り返してください。", ko: "응답 코드를 첫 코드를 만든 기기로 돌려보내세요." });
+raw.peerAnswerNeedsOffer = T("Create a pairing code on this device before applying an answer code.", { "zh-CN": "请先在本设备生成配对码，再使用回答码。", "zh-TW": "請先在本裝置產生配對碼，再使用回答碼。", ja: "回答を適用する前に、この端末でペアリングコードを作成してください。", ko: "응답 코드를 적용하기 전에 이 기기에서 페어링 코드를 만드세요." });
+raw.peerConnectingNotice = T("Answer accepted. Finishing the direct connection…", { "zh-CN": "回答码已接受，正在完成直连…", "zh-TW": "回答碼已接受，正在完成直連…", ja: "回答を受け付けました。直接接続を完了しています…", ko: "응답이 적용되었습니다. 직접 연결을 완료하는 중…" });
+raw.peerConnectedNotice = T("Direct connection established. Messaging and transfer controls are now available.", { "zh-CN": "点对点连接已建立，现在可以发送消息和文件。", "zh-TW": "點對點連線已建立，現在可以傳送訊息和檔案。", ja: "直接接続が確立されました。メッセージと転送を利用できます。", ko: "직접 연결되었습니다. 이제 메시지와 파일을 보낼 수 있습니다." });
+raw.peerInvalidCode = T("That pairing code is invalid or incomplete.", { "zh-CN": "配对码无效或不完整。", "zh-TW": "配對碼無效或不完整。", ja: "ペアリングコードが無効または不完全です。", ko: "페어링 코드가 잘못되었거나 불완전합니다." });
+raw.peerConnectionError = T("The connection could not be created. Reset and generate fresh pairing codes.", { "zh-CN": "无法建立连接，请重置后重新生成配对码。", "zh-TW": "無法建立連線，請重設後重新產生配對碼。", ja: "接続を作成できませんでした。リセットして新しいコードを作成してください。", ko: "연결할 수 없습니다. 초기화 후 새 페어링 코드를 만드세요." });
+raw.peerCopied = T("Code copied.", { "zh-CN": "代码已复制。", "zh-TW": "代碼已複製。", ja: "コードをコピーしました。", ko: "코드를 복사했습니다." });
+raw.peerCopyFailed = T("Copy was blocked. Select the code and copy it manually.", { "zh-CN": "浏览器阻止了复制，请选中代码后手动复制。", "zh-TW": "瀏覽器阻止了複製，請選取代碼後手動複製。", ja: "コピーがブロックされました。コードを選択して手動でコピーしてください。", ko: "복사가 차단되었습니다. 코드를 선택해 직접 복사하세요." });
+raw.peerYou = T("You", { "zh-CN": "我", "zh-TW": "我", ja: "自分", ko: "나" });
+raw.peerGuest = T("Other device", { "zh-CN": "另一台设备", "zh-TW": "另一台裝置", ja: "相手の端末", ko: "다른 기기" });
+raw.peerMessagesTitle = T("Messages", { "zh-CN": "消息", "zh-TW": "訊息", ja: "メッセージ", ko: "메시지" });
+raw.peerMessageEmpty = T("Connect another device to start a private conversation.", { "zh-CN": "连接另一台设备后即可开始私密对话。", "zh-TW": "連接另一台裝置後即可開始私密對話。", ja: "別の端末を接続して会話を始めましょう。", ko: "다른 기기를 연결해 비공개 대화를 시작하세요." });
+raw.peerMessageLabel = T("Message", { "zh-CN": "消息内容", "zh-TW": "訊息內容", ja: "メッセージ", ko: "메시지" });
+raw.peerMessagePlaceholder = T("Write a message… Ctrl/⌘ + Enter to send", { "zh-CN": "输入消息…按 Ctrl/⌘ + Enter 发送", "zh-TW": "輸入訊息…按 Ctrl/⌘ + Enter 傳送", ja: "メッセージを入力…Ctrl/⌘ + Enterで送信", ko: "메시지 입력…Ctrl/⌘ + Enter로 전송" });
+raw.peerConnectionNeeded = T("Connect another device first.", { "zh-CN": "请先连接另一台设备。", "zh-TW": "請先連接另一台裝置。", ja: "先に別の端末を接続してください。", ko: "먼저 다른 기기를 연결하세요." });
+raw.peerSendMessage = T("Send message", { "zh-CN": "发送消息", "zh-TW": "傳送訊息", ja: "メッセージを送信", ko: "메시지 보내기" });
+raw.peerFilesTitle = T("File transfer", { "zh-CN": "文件传输", "zh-TW": "檔案傳輸", ja: "ファイル転送", ko: "파일 전송" });
+raw.peerFileLimit = T("Up to 50 MiB per file", { "zh-CN": "单文件最大 50 MiB", "zh-TW": "單一檔案最大 50 MiB", ja: "1ファイル最大50 MiB", ko: "파일당 최대 50 MiB" });
+raw.peerChooseFile = T("Choose a TXT or other file", { "zh-CN": "选择 TXT 或其他文件", "zh-TW": "選擇 TXT 或其他檔案", ja: "TXTまたはその他のファイルを選択", ko: "TXT 또는 다른 파일 선택" });
+raw.peerSendFile = T("Send file", { "zh-CN": "发送文件", "zh-TW": "傳送檔案", ja: "ファイルを送信", ko: "파일 보내기" });
+raw.peerFileSending = T("Sending…", { "zh-CN": "正在发送…", "zh-TW": "正在傳送…", ja: "送信中…", ko: "전송 중…" });
+raw.peerFileEmpty = T("Transferred files and download links will appear here.", { "zh-CN": "已传输文件和下载链接会显示在这里。", "zh-TW": "已傳輸檔案和下載連結會顯示在這裡。", ja: "転送ファイルとダウンロードリンクがここに表示されます。", ko: "전송 파일과 다운로드 링크가 여기에 표시됩니다." });
+raw.peerFileTooLarge = T("This file exceeds the 50 MiB limit.", { "zh-CN": "此文件超过 50 MiB 限制。", "zh-TW": "此檔案超過 50 MiB 限制。", ja: "このファイルは50 MiBの上限を超えています。", ko: "이 파일은 50 MiB 제한을 초과합니다." });
+raw.peerFileRejected = T("The file transfer was rejected or incomplete.", { "zh-CN": "文件传输被拒绝或内容不完整。", "zh-TW": "檔案傳輸被拒絕或內容不完整。", ja: "ファイル転送が拒否されたか不完全です。", ko: "파일 전송이 거부되었거나 불완전합니다." });
+raw.peerFileReceived = T("File received. The download link is ready.", { "zh-CN": "文件接收完成，下载链接已就绪。", "zh-TW": "檔案接收完成，下載連結已就緒。", ja: "ファイルを受信しました。ダウンロードできます。", ko: "파일을 받았습니다. 다운로드 링크가 준비되었습니다." });
+raw.peerFileSent = T("File sent successfully.", { "zh-CN": "文件发送成功。", "zh-TW": "檔案傳送成功。", ja: "ファイルを送信しました。", ko: "파일을 보냈습니다." });
+raw.peerFileSendFailed = T("The file could not be sent. Check the connection and try again.", { "zh-CN": "文件发送失败，请检查连接后重试。", "zh-TW": "檔案傳送失敗，請檢查連線後重試。", ja: "ファイルを送信できませんでした。接続を確認して再試行してください。", ko: "파일을 보낼 수 없습니다. 연결을 확인하고 다시 시도하세요." });
+raw.peerFileStatusSending = T("Sending", { "zh-CN": "发送中", "zh-TW": "傳送中", ja: "送信中", ko: "전송 중" });
+raw.peerFileStatusReceiving = T("Receiving", { "zh-CN": "接收中", "zh-TW": "接收中", ja: "受信中", ko: "수신 중" });
+raw.peerFileStatusReady = T("Complete", { "zh-CN": "已完成", "zh-TW": "已完成", ja: "完了", ko: "완료" });
+raw.peerFileStatusFailed = T("Failed", { "zh-CN": "失败", "zh-TW": "失敗", ja: "失敗", ko: "실패" });
+raw.peerDownloadFile = T("Download", { "zh-CN": "下载", "zh-TW": "下載", ja: "ダウンロード", ko: "다운로드" });
+raw.peerDownloadTranscript = T("Download transcript", { "zh-CN": "下载 TXT 记录", "zh-TW": "下載 TXT 紀錄", ja: "TXT記録をダウンロード", ko: "TXT 기록 다운로드" });
 raw.aigcHeroEyebrow = T("Hanazar Games Lab", { "zh-CN": "哈纳扎尔实验室", "zh-TW": "哈納扎爾實驗室", ja: "Hanazar Games Lab", ko: "Hanazar Games Lab", fr: "Laboratoire Hanazar Games", de: "Hanazar Games Lab", es: "Laboratorio Hanazar Games", ru: "Лаборатория Hanazar Games", pt: "Laboratório Hanazar Games" });
 raw.aigcHeroTitle = T("AIGC Experiments", { "zh-CN": "AIGC 实验", "zh-TW": "AIGC 實驗", ja: "AIGC 実験", ko: "AIGC 실험", fr: "Expériences AIGC", de: "AIGC-Experimente", es: "Experimentos AIGC", ru: "AIGC-эксперименты", pt: "Experimentos AIGC" });
 raw.aigcHeroSubtitle = T("A focused archive of AI fully autonomous webgame operations projects, built to compare agent workflows from concept to deployed browser game.", { "zh-CN": "AI 全自主运维 Webgame 项目的集中档案，用于比较不同智能体工作流从概念到浏览器游戏部署的完整过程。", "zh-TW": "AI 全自主運維 Webgame 專案的集中檔案，用於比較不同智能體工作流從概念到瀏覽器遊戲部署的完整過程。", ja: "コンセプトからブラウザゲーム公開まで、異なるエージェントワークフローを比較する AI 完全自律運用 Webgame プロジェクトのアーカイブ。", ko: "콘셉트부터 브라우저 게임 배포까지 서로 다른 에이전트 워크플로를 비교하는 AI 완전 자율 운영 Webgame 프로젝트 아카이브입니다.", fr: "Une archive ciblée de projets Webgame entièrement opérés par IA, conçue pour comparer les workflows d'agents du concept au jeu navigateur déployé.", de: "Ein fokussiertes Archiv voll autonomer AI-Webgame-Projekte, um Agent-Workflows vom Konzept bis zum veröffentlichten Browserspiel zu vergleichen.", es: "Un archivo enfocado de proyectos Webgame operados de forma totalmente autónoma por IA, creado para comparar flujos de agentes desde el concepto hasta el juego desplegado.", ru: "Сфокусированный архив Webgame-проектов с полностью автономной AI-эксплуатацией для сравнения агентных рабочих процессов от идеи до развернутой браузерной игры.", pt: "Um arquivo focado de projetos Webgame operados de forma totalmente autônoma por IA, criado para comparar fluxos de agentes do conceito ao jogo publicado." });

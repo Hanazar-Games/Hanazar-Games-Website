@@ -22,6 +22,7 @@ const requiredFiles = [
   "games/index.html",
   "aigc/index.html",
   "chat/index.html",
+  "transfer/index.html",
   "games/guandan.jpg",
   "games/liars-bar.jpg",
   "games/coreball.jpg",
@@ -53,6 +54,7 @@ for (const file of requiredFiles.filter((file) => file.endsWith(".html"))) {
 const requiredContent = {
   "index.html": [
     "href=\"chat/\"",
+    "href=\"transfer/\"",
     "href=\"#aigc\"",
     "https://hanazar-games.github.io/Guandan-Webgame/",
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
@@ -79,10 +81,16 @@ const requiredContent = {
     "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
   ],
   "chat/index.html": [
-    "Hanazar Chat",
-    chatServiceUrl ? "Service available" : "Deployment pending",
-    "https://github.com/Hanazar-Games/Hanazar-Games-Website/tree/main/chat",
-    ...(chatServiceUrl ? ["Open Chat", `href="${chatServiceUrl}"`] : []),
+    "Peer Chat",
+    "Create pairing code",
+    "Send message",
+    ...(chatServiceUrl ? ["Open member Chat", `href="${chatServiceUrl}"`] : []),
+  ],
+  "transfer/index.html": [
+    "File Transfer Assistant",
+    "Create pairing code",
+    "Send file",
+    "Download transcript",
   ],
 };
 
