@@ -73,6 +73,7 @@ abstract class TestCase extends PHPUnitTestCase
             'RATE_LIMIT_PATH' => $this->runtimeRoot . '/rate-limits',
             'BACKUP_PATH' => $this->runtimeRoot . '/backups',
             'TRUSTED_PROXIES' => '127.0.0.1,::1,10.0.0.0/8',
+            'SHARE_ORIGINS' => 'https://hanazar-games.github.io,https://hanazargames.com',
         ];
     }
 

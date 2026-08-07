@@ -26,6 +26,10 @@ final class DatabaseConfigSecurityTest extends TestCase
         self::assertSame($this->runtimeRoot . '/rate-limits', $this->config->rateLimitPath());
         self::assertSame($this->runtimeRoot . '/backups', $this->config->backupPath());
         self::assertSame(['127.0.0.1', '::1', '10.0.0.0/8'], $this->config->trustedProxies());
+        self::assertSame(
+            ['https://hanazar-games.github.io', 'https://hanazargames.com'],
+            $this->config->shareOrigins(),
+        );
     }
 
     public function testConfigRejectsRelativeOrPublicRuntimePaths(): void
@@ -94,6 +98,30 @@ final class DatabaseConfigSecurityTest extends TestCase
         self::addToAssertionCount(1);
     }
 
+    public function testConfigRejectsUnsafeShareOrigins(): void
+    {
+        foreach (
+            [
+                '*',
+                'http://hanazar-games.github.io',
+                'https://user@hanazargames.com',
+                'https://hanazargames.com/chat',
+                'https://*.hanazargames.com',
+            ] as $origin
+        ) {
+            $values = $this->validConfigValues();
+            $values['SHARE_ORIGINS'] = $origin;
+
+            try {
+                Config::fromArray($values);
+                self::fail('An unsafe share origin must be rejected.');
+            } catch (InvalidArgumentException) {
+            }
+        }
+
+        self::addToAssertionCount(1);
+    }
+
     public function testDatabaseInitializesRequiredPragmasAndSchemaIdempotently(): void
     {
         $pdo = $this->database->connection();
@@ -114,6 +142,7 @@ final class DatabaseConfigSecurityTest extends TestCase
                 'user_presence',
                 'typing_indicators',
                 'audit_logs',
+                'ephemeral_shares',
             ] as $table
         ) {
             self::assertContains($table, $tables);
@@ -139,6 +168,7 @@ final class DatabaseConfigSecurityTest extends TestCase
                 'idx_messages_sender_nonce_unique',
                 'idx_messages_room_id',
                 'idx_user_events_user_id',
+                'idx_ephemeral_shares_expires_at',
             ] as $index
         ) {
             self::assertArrayHasKey($index, $rows);

@@ -109,6 +109,12 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     ip_hash TEXT,
     created_at INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS ephemeral_shares (
+    token_hash TEXT PRIMARY KEY,
+    ciphertext TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_rooms_dm_pair_unique ON rooms(dm_user_low, dm_user_high) WHERE kind = 'dm';
 CREATE INDEX IF NOT EXISTS idx_room_members_active_user ON room_members(user_id, room_id) WHERE left_at IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_room_members_active_owner ON room_members(room_id) WHERE role = 'owner' AND left_at IS NULL;
@@ -116,7 +122,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_room_members_active_pair ON room_members(r
 CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_sender_nonce_unique ON messages(sender_user_id, client_nonce);
 CREATE INDEX IF NOT EXISTS idx_messages_room_id ON messages(room_id, id);
 CREATE INDEX IF NOT EXISTS idx_user_events_user_id ON user_events(user_id, id);
-INSERT INTO app_meta (key, value) VALUES ('schema_version', '1') ON CONFLICT(key) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_ephemeral_shares_expires_at ON ephemeral_shares(expires_at);
+INSERT INTO app_meta (key, value) VALUES ('schema_version', '2') ON CONFLICT(key) DO UPDATE SET value = '2';
 INSERT INTO app_meta (key, value) VALUES ('events_floor_id', '0') ON CONFLICT(key) DO NOTHING;
 SQL);
     }

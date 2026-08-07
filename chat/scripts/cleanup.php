@@ -41,6 +41,7 @@ try {
                 'DELETE FROM typing_indicators WHERE updated_at < :cutoff' => $now - RETENTION['typing_indicators'],
                 'DELETE FROM user_presence WHERE last_seen_at < :cutoff' => $now - RETENTION['user_presence'],
                 'DELETE FROM audit_logs WHERE created_at < :cutoff' => $now - RETENTION['audit_logs'],
+                'DELETE FROM ephemeral_shares WHERE expires_at <= :cutoff' => $now,
             ] as $sql => $cutoff
         ) {
             $statement = $pdo->prepare($sql);

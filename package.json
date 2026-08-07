@@ -1,10 +1,11 @@
 {
   "name": "hanazargames-web",
   "private": true,
-  "version": "2.8.0",
+  "version": "2.9.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "test": "node --no-warnings --experimental-strip-types --test scripts/*.test.mjs",
     "verify:export": "node scripts/verify-static-export.mjs",
     "start": "next start"
   },

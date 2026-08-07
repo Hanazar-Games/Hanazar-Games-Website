@@ -1,0 +1,17 @@
+[Unit]
+Description=Delete expired Hanazar encrypted shares
+After=network.target
+
+[Service]
+Type=oneshot
+User=hanazar-chat
+Group=hanazar-chat
+WorkingDirectory=/srv/hanazar-chat/current
+EnvironmentFile=/srv/hanazar-chat/shared/chat.env
+ExecStart=/usr/bin/php scripts/cleanup.php
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateDevices=true
+ReadWritePaths=/srv/hanazar-chat/shared

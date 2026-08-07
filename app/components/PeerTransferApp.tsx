@@ -12,7 +12,6 @@ import {
 } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 
-type PeerMode = "chat" | "transfer";
 type ConnectionStatus =
   | "idle"
   | "gathering"
@@ -21,11 +20,6 @@ type ConnectionStatus =
   | "connected"
   | "disconnected"
   | "failed";
-
-interface PeerTransferAppProps {
-  mode: PeerMode;
-  memberChatUrl?: string | null;
-}
 
 interface PairingPayload {
   v: 1;
@@ -94,7 +88,10 @@ function createId() {
 }
 
 function cleanName(value: string, fallback: string, maxLength = 80) {
-  const cleaned = value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
+  const cleaned = value
+    .replace(/[\u0000-\u001f\u007f\u061c\u200e-\u200f\u202a-\u202e\u2066-\u2069]/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return cleaned.slice(0, maxLength) || fallback;
 }
 
@@ -190,7 +187,7 @@ function formatBytes(value: number) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferAppProps) {
+export default function PeerTransferApp() {
   const { tr, lang } = useTranslation();
   const fileInputId = useId();
   const peerRef = useRef<RTCPeerConnection | null>(null);
@@ -319,8 +316,7 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
     }
 
     if (
-      mode === "transfer"
-      && payload.kind === "file-start"
+      payload.kind === "file-start"
       && typeof payload.id === "string"
       && typeof payload.name === "string"
       && typeof payload.size === "number"
@@ -359,7 +355,7 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
       return;
     }
 
-    if (mode === "transfer" && payload.kind === "file-end" && typeof payload.id === "string") {
+    if (payload.kind === "file-end" && typeof payload.id === "string") {
       const file = incomingFileRef.current;
       if (!file || file.wireId !== payload.id) return;
       incomingFileRef.current = null;
@@ -376,11 +372,11 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
       return;
     }
 
-    if (mode === "transfer" && payload.kind === "file-reject" && typeof payload.id === "string") {
+    if (payload.kind === "file-reject" && typeof payload.id === "string") {
       updateTransfer(payload.id, { status: "failed" });
       setActivityNotice(trRef.current("peerFileRejected"));
     }
-  }, [appendMessage, appendTransfer, mode, rejectIncomingFile, updateTransfer]);
+  }, [appendMessage, appendTransfer, rejectIncomingFile, updateTransfer]);
 
   const attachChannel = useCallback((channel: RTCDataChannel) => {
     if (channelRef.current && channelRef.current !== channel) channelRef.current.close();
@@ -632,7 +628,7 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
 
   const downloadTranscript = () => {
     const lines = [
-      `Hanazar ${mode === "chat" ? "Peer Chat" : "File Transfer Assistant"}`,
+      "Hanazar File Transfer Assistant",
       new Date().toISOString(),
       "",
       ...messages.map((message) => (
@@ -649,23 +645,23 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
     const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain;charset=utf-8" }));
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `hanazar-${mode}-${new Date().toISOString().slice(0, 10)}.txt`;
+    anchor.download = `hanazar-transfer-${new Date().toISOString().slice(0, 10)}.txt`;
     anchor.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
   };
 
-  const titleKey = mode === "chat" ? "peerChatTitle" : "peerTransferTitle";
+  const titleKey = "peerTransferTitle";
   const hasTranscript = messages.length > 0 || transfers.length > 0;
 
   return (
     <main className="pageShell gamesShell peerShell">
-      <section className={`gamesHero peerHero peerHero-${mode}`}>
+      <section className="gamesHero peerHero peerHero-transfer">
         <Link href="/" className="gamesHeroBack">
           {tr("gamesBackHome")}
         </Link>
         <div className="gamesHeroInner peerHeroInner">
           <span className="gamesHeroEyebrow">
-            {tr(mode === "chat" ? "peerChatEyebrow" : "peerTransferEyebrow")}
+            {tr("peerTransferEyebrow")}
           </span>
           <div className={`peerStatus peerStatus-${status}`} role="status" aria-live="polite">
             <span aria-hidden="true" />
@@ -673,13 +669,8 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
           </div>
           <h1 className="gamesHeroTitle">{tr(titleKey)}</h1>
           <p className="gamesHeroSubtitle">
-            {tr(mode === "chat" ? "peerChatSubtitle" : "peerTransferSubtitle")}
+            {tr("peerTransferSubtitle")}
           </p>
-          {mode === "chat" && memberChatUrl ? (
-            <a className="peerMemberLink" href={memberChatUrl} target="_blank" rel="noopener noreferrer">
-              {tr("peerOpenMemberChat")} <span aria-hidden="true">↗</span>
-            </a>
-          ) : null}
         </div>
       </section>
 
@@ -771,7 +762,7 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
           </p>
         </article>
 
-        <div className={`peerWorkspace${mode === "chat" ? " peerWorkspaceChat" : ""}`}>
+        <div className="peerWorkspace">
           <article className="peerCard peerMessageCard">
             <div className="peerCardHeading">
               <div>
@@ -819,8 +810,7 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
             </form>
           </article>
 
-          {mode === "transfer" ? (
-            <article className="peerCard peerFileCard">
+          <article className="peerCard peerFileCard">
               <div className="peerCardHeading">
                 <div>
                   <span className="peerCardIndex">03</span>
@@ -878,8 +868,7 @@ export default function PeerTransferApp({ mode, memberChatUrl }: PeerTransferApp
                   </div>
                 ))}
               </div>
-            </article>
-          ) : null}
+          </article>
         </div>
 
         <div className="peerFooterActions">

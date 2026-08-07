@@ -81,10 +81,11 @@ const requiredContent = {
     "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
   ],
   "chat/index.html": [
-    "Peer Chat",
-    "Create pairing code",
-    "Send message",
-    ...(chatServiceUrl ? ["Open member Chat", `href="${chatServiceUrl}"`] : []),
+    "Encrypted Expiring Share",
+    "Encrypt and create link",
+    "Expiration",
+    "Send log",
+    ...(chatServiceUrl ? ["AES-256-GCM", "Your browser encrypts before upload"] : []),
   ],
   "transfer/index.html": [
     "File Transfer Assistant",

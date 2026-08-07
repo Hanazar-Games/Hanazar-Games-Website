@@ -4,6 +4,33 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.9.1",
+    date: "2026-08-07",
+    title: "Encrypted Share Hardening and Full-Site QA",
+    items: [
+      "Cleared plaintext composer data and attachment handles immediately after an encrypted share is created.",
+      "Fixed hash-only key changes, repeat attachment selection, stable expiry effects, object-URL cleanup, and malformed payload error classification.",
+      "Stopped per-second countdown announcements from overwhelming screen readers and refined compact mobile share controls.",
+      "Further reduced SFX and ambient BGM output while retaining opt-in BGM, throttled interactions, and hidden-page pause behavior.",
+      "Rechecked GitHub Pages base paths, static assets, encrypted-share deployment guards, themes, translations, and responsive layouts.",
+      "Blocked bidirectional filename spoofing and added quality contracts for encryption integrity, sensitive-state cleanup, accessibility, and audio ceilings.",
+    ],
+  },
+  {
+    version: "2.9.0",
+    date: "2026-08-07",
+    title: "Encrypted Expiring Shares",
+    items: [
+      "Rebuilt the public Chat route as an encrypted temporary delivery box for text and arbitrary attachment types.",
+      "Added browser-side AES-256-GCM encryption, 256-bit random share addresses, fragment-only keys, and ciphertext integrity verification.",
+      "Added adjustable 1–1440 minute expiry, exact read denial, browser memory cleanup, and minute-level server ciphertext deletion.",
+      "Added private share-link creation, copy controls, receive-side countdowns, safe attachment downloads, and clear error recovery.",
+      "Added a browser-local send log that stores no plaintext or attachment content and removes secret links automatically at expiry.",
+      "Added public PHP share endpoints with hashed tokens, strict HTTPS CORS allowlists, isolated rate limits, payload limits, and deployment checks.",
+      "Redesigned the Chat UI for desktop and mobile while preserving the separate device-to-device File Transfer Assistant.",
+    ],
+  },
+  {
     version: "2.8.0",
     date: "2026-08-05",
     title: "Peer Chat, File Transfer Assistant, and Deployment QA",

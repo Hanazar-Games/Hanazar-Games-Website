@@ -50,7 +50,7 @@ function getSfxProfile(style: string) {
 }
 
 function ambientVolume(settings: SettingsState) {
-  return Math.min(0.015, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.015);
+  return Math.min(0.012, (settings.masterVolume / 100) * (settings.bgmVolume / 100) * 0.012);
 }
 
 function getSfxKind(target: Element): SfxKind {
@@ -260,8 +260,8 @@ export default function AudioEngine() {
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
     const volume = Math.min(
-      0.032,
-      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.04 * signature.volume
+      0.024,
+      (current.masterVolume / 100) * (current.sfxVolume / 100) * 0.03 * signature.volume
     );
 
     oscillator.type = profile.wave;

@@ -32,7 +32,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
         }
 
         self::assertStringContainsString('application/json; charset=utf-8', $api);
-        foreach (['GET', 'POST', 'PATCH', 'DELETE'] as $method) {
+        foreach (['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'] as $method) {
             self::assertMatchesRegularExpression('~[\'\"]' . $method . '[\'\"]~', $api);
         }
 
@@ -51,6 +51,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
                 '/presence',
                 '/typing',
                 '/health',
+                '/shares',
             ] as $route
         ) {
             self::assertStringContainsString($route, $api, 'Missing API route contract: ' . $route);
@@ -71,7 +72,21 @@ final class ApiFrontendCleanupContractTest extends TestCase
         self::assertMatchesRegularExpression('~csrf_(?:invalid|mismatch|missing)|invalid_csrf~i', $api);
         self::assertMatchesRegularExpression('~hash_equals\s*\(~', $api);
         self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]api[\'\"]~', $api);
+        self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]share_create[\'\"]~', $api);
+        self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]share_read[\'\"]~', $api);
         self::assertMatchesRegularExpression('~json_last_error|JSON_THROW_ON_ERROR~', $api);
+    }
+
+    public function testPublicShareCorsIsAllowlistedAndCredentialFree(): void
+    {
+        $api = $this->corpus(['app', 'public/api'], ['php']);
+
+        self::assertStringContainsString('SHARE_ORIGINS', $api);
+        self::assertStringContainsString('Access-Control-Allow-Origin', $api);
+        self::assertStringContainsString('Access-Control-Allow-Methods', $api);
+        self::assertStringContainsString('Access-Control-Allow-Headers', $api);
+        self::assertDoesNotMatchRegularExpression('~Access-Control-Allow-Origin[^\n]*\*~i', $api);
+        self::assertDoesNotMatchRegularExpression('~Access-Control-Allow-Credentials~i', $api);
     }
 
     public function testApiUsesSafeAuthenticationAndAuthorizationFailures(): void
@@ -233,6 +248,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
                 'typing_indicators',
                 'user_presence',
                 'audit_logs',
+                'ephemeral_shares',
                 'sessions',
                 'rate-limits',
                 'logs',
@@ -299,7 +315,8 @@ final class ApiFrontendCleanupContractTest extends TestCase
 
         self::assertMatchesRegularExpression('~server_name\s+chat\.hanazargames\.com\s*;~i', $nginx);
         self::assertMatchesRegularExpression('~root\s+[^;]+/public\s*;~i', $nginx);
-        self::assertMatchesRegularExpression('~client_max_body_size\s+1[mM]\s*;~', $nginx);
+        self::assertMatchesRegularExpression('~client_max_body_size\s+12[mM]\s*;~', $nginx);
+        self::assertMatchesRegularExpression('~post_max_size\]\s*=\s*12[mM]~i', $this->readRequired('php-fpm/chat.conf'));
         self::assertMatchesRegularExpression('~location\s+~', $nginx);
         self::assertMatchesRegularExpression('~location[^\{]*php|location\s*=\s*/(?:api/)?index\.php~i', $nginx);
         self::assertMatchesRegularExpression('~deny\s+all\s*;~i', $nginx);

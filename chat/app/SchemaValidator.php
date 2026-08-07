@@ -9,7 +9,7 @@ use RuntimeException;
 
 final class SchemaValidator
 {
-    private const TABLES = ['app_meta', 'users', 'rooms', 'room_members', 'messages', 'user_events', 'user_presence', 'typing_indicators', 'audit_logs'];
+    private const TABLES = ['app_meta', 'users', 'rooms', 'room_members', 'messages', 'user_events', 'user_presence', 'typing_indicators', 'audit_logs', 'ephemeral_shares'];
 
     public function assertKnownDatabase(PDO $pdo): void
     {

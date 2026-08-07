@@ -1436,22 +1436,6 @@ select:focus-visible {
   background: #df7e7e;
 }
 
-.peerMemberLink {
-  min-height: 44px;
-  margin-top: 22px;
-  padding: 10px 18px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  color: #ededed;
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
 .peerContent {
   position: relative;
   z-index: 2;
@@ -1638,11 +1622,6 @@ select:focus-visible {
   gap: 20px;
 }
 
-.peerWorkspaceChat {
-  grid-template-columns: minmax(0, 820px);
-  justify-content: center;
-}
-
 .peerMessageLog {
   min-height: 330px;
   max-height: 520px;
@@ -1811,15 +1790,688 @@ select:focus-visible {
   margin: 0;
 }
 
+/* Encrypted temporary share */
+.shareHero {
+  min-height: 48svh;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(125, 211, 173, 0.11), transparent 35%),
+    radial-gradient(circle at 78% 36%, rgba(106, 178, 231, 0.07), transparent 24%),
+    linear-gradient(180deg, #09100e 0%, #050606 100%);
+}
+
+.shareHeroInner {
+  width: min(100%, 940px);
+}
+
+.shareHero .gamesHeroEyebrow,
+.shareHero .gamesHeroTitle,
+.shareHero .gamesHeroSubtitle {
+  opacity: 1;
+  transform: none;
+  animation: none;
+}
+
+.shareTrustRow {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shareTrustRow span {
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid rgba(169, 217, 194, 0.18);
+  border-radius: 999px;
+  color: #c8ddd2;
+  background: rgba(169, 217, 194, 0.055);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.shareContent {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 1020px);
+  margin: -34px auto 0;
+  padding: 0 24px 112px;
+  display: grid;
+  gap: 20px;
+}
+
+.shareSecurityNote {
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid rgba(169, 217, 194, 0.18);
+  border-radius: 14px;
+  color: #bed2c8;
+  background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
+  font-size: 0.84rem;
+  line-height: 1.65;
+  text-align: center;
+}
+
+.sharePanel {
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+    rgba(11, 13, 12, 0.98);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+}
+
+.sharePanelHeading,
+.shareResultHeading,
+.shareLogTitle {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.sharePanelIndex,
+.shareFieldLabel,
+.shareField > span,
+.shareResultHeading > div > span,
+.shareCountdown span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.sharePanelIndex {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.sharePanel h2,
+.shareResult h3 {
+  margin: 0;
+  font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+  font-weight: 520;
+}
+
+.sharePanelIntro {
+  max-width: 760px;
+  margin: 14px 0 26px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.shareServiceState {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.shareServiceState-ready {
+  border-color: rgba(127, 209, 161, 0.3);
+  color: #9fd8b7;
+  background: rgba(127, 209, 161, 0.07);
+}
+
+.shareServiceState-offline {
+  border-color: rgba(223, 126, 126, 0.28);
+  color: #e5a6a6;
+  background: rgba(223, 126, 126, 0.06);
+}
+
+.shareField {
+  width: 100%;
+  display: grid;
+  gap: 9px;
+}
+
+.shareField textarea,
+.shareCustomExpiration input {
+  width: 100%;
+  min-height: 46px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  outline: none;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.2);
+  font: inherit;
+  line-height: 1.6;
+}
+
+.shareField textarea {
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+
+.shareField small {
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.shareUploadBox {
+  margin-top: 22px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  border: 1px dashed color-mix(in srgb, var(--line-strong) 76%, transparent);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.shareUploadBox p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.shareFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+}
+
+.shareFileButton,
+.shareQuietButton,
+.sharePrimaryButton,
+.sharePresetRow button,
+.shareSelectedFiles button,
+.shareLogCopy,
+.shareDownloadList a {
+  min-height: 42px;
+  padding: 10px 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  color: var(--text);
+  background: var(--panel-soft);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+
+.shareFileButton:hover,
+.shareQuietButton:hover,
+.sharePresetRow button:hover,
+.shareSelectedFiles button:hover,
+.shareLogCopy:hover,
+.shareDownloadList a:hover {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.shareFileInput:focus-visible + .shareFileButton,
+.shareFileButton:focus-visible,
+.shareQuietButton:focus-visible,
+.sharePrimaryButton:focus-visible,
+.sharePresetRow button:focus-visible,
+.shareSelectedFiles button:focus-visible,
+.shareLogCopy:focus-visible,
+.shareDownloadList a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sharePrimaryButton {
+  border-color: #a9d9c2;
+  color: #0b120f;
+  background: #a9d9c2;
+  font-weight: 620;
+}
+
+.sharePrimaryButton:hover:not(:disabled) {
+  border-color: #c6ead9;
+  background: #c6ead9;
+}
+
+.sharePrimaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.shareSelectedFiles,
+.shareDownloadList,
+.shareLogList {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shareSelectedFiles,
+.shareDownloadList {
+  display: grid;
+  gap: 8px;
+}
+
+.shareSelectedFiles li,
+.shareDownloadList li {
+  min-width: 0;
+  padding: 11px 12px 11px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.shareSelectedFiles li > div,
+.shareDownloadList li > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.shareSelectedFiles strong,
+.shareDownloadList strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.86rem;
+}
+
+.shareSelectedFiles span,
+.shareDownloadList span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  overflow-wrap: anywhere;
+}
+
+.shareSelectedFiles button {
+  min-height: 34px;
+  padding: 7px 10px;
+  color: #ddb1b1;
+}
+
+.shareLimitLine {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.shareExpiration {
+  margin: 25px 0 0;
+  padding: 19px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.shareExpiration legend {
+  padding: 0 7px;
+  font-weight: 600;
+}
+
+.shareExpiration > p {
+  margin: 0 0 15px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.sharePresetRow {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sharePresetRow button.active {
+  border-color: #a9d9c2;
+  color: #c9eadb;
+  background: rgba(169, 217, 194, 0.11);
+}
+
+.shareCustomExpiration {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.shareCustomExpiration input {
+  min-height: 42px;
+  padding-block: 8px;
+}
+
+.shareInlineWarning {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(223, 126, 126, 0.24);
+  border-radius: 12px;
+  color: #ddb1b1;
+  background: rgba(223, 126, 126, 0.055);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.shareSubmitRow {
+  min-height: 66px;
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.shareSubmitRow p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.shareSubmitRow .sharePrimaryButton {
+  min-width: 210px;
+}
+
+.shareResult {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid rgba(127, 209, 161, 0.26);
+  border-radius: 17px;
+  background: rgba(127, 209, 161, 0.055);
+}
+
+.shareResultHeading {
+  margin-bottom: 16px;
+}
+
+.shareResultHeading > span {
+  color: #9fd8b7;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+}
+
+.shareResult textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+}
+
+.shareResultActions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.shareLogPanel {
+  box-shadow: none;
+}
+
+.shareLogList {
+  display: grid;
+}
+
+.shareLogList > li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 13px;
+}
+
+.shareLogRail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.shareLogRail span {
+  position: relative;
+  z-index: 1;
+  width: 9px;
+  height: 9px;
+  margin-top: 18px;
+  border: 2px solid #a9d9c2;
+  border-radius: 50%;
+  background: #0b0d0c;
+}
+
+.shareLogRail i {
+  position: absolute;
+  top: 25px;
+  bottom: -25px;
+  width: 1px;
+  background: var(--line);
+}
+
+.shareLogList > li:last-child .shareLogRail i {
+  display: none;
+}
+
+.shareLogBody {
+  min-width: 0;
+  padding: 14px 0 19px;
+  border-bottom: 1px solid var(--line);
+}
+
+.shareLogList > li:last-child .shareLogBody {
+  border-bottom: 0;
+}
+
+.shareLogTitle strong {
+  font-size: 0.88rem;
+  font-weight: 560;
+}
+
+.shareLogTitle span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.shareLogTitle span.active {
+  color: #9fd8b7;
+  background: rgba(127, 209, 161, 0.08);
+}
+
+.shareLogTitle span.expired {
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.shareLogBody p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.shareLogCopy {
+  min-height: 34px;
+  margin-top: 11px;
+  padding: 7px 11px;
+}
+
+.shareEmptyLog,
+.shareStateCard {
+  margin-top: 18px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.14);
+  line-height: 1.6;
+  text-align: center;
+}
+
+.shareCountdown {
+  flex: 0 0 auto;
+  padding: 10px 13px;
+  display: grid;
+  gap: 3px;
+  border: 1px solid rgba(127, 209, 161, 0.25);
+  border-radius: 12px;
+  background: rgba(127, 209, 161, 0.055);
+  text-align: right;
+}
+
+.shareCountdown strong {
+  color: #a9d9c2;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+}
+
+.shareViewedContent {
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.shareViewedBlock {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.shareViewedText {
+  margin: 13px 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.72;
+}
+
+.shareEmptyText {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.shareStateCard {
+  display: grid;
+  gap: 8px;
+}
+
+.shareStateCard strong {
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.shareStateCard-expired,
+.shareStateCard-not_found,
+.shareStateCard-missing_key,
+.shareStateCard-corrupt,
+.shareStateCard-failed {
+  border-color: rgba(223, 126, 126, 0.24);
+  color: #d6b8b8;
+  background: rgba(223, 126, 126, 0.045);
+}
+
+body[data-theme="light"] .sharePanel,
+body[data-theme="light"] .shareSecurityNote {
+  border-color: rgba(0, 0, 0, 0.11);
+  background: rgba(255, 255, 255, 0.97);
+}
+
+body[data-theme="light"] .shareSecurityNote {
+  color: #405c4d;
+}
+
+body[data-theme="light"] .shareField textarea,
+body[data-theme="light"] .shareCustomExpiration input,
+body[data-theme="light"] .shareSelectedFiles li,
+body[data-theme="light"] .shareDownloadList li,
+body[data-theme="light"] .shareViewedBlock,
+body[data-theme="light"] .shareEmptyLog,
+body[data-theme="light"] .shareStateCard {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+body[data-theme="light"] .shareLogRail span {
+  background: #fff;
+}
+
+@media (max-width: 760px) {
+  .sharePresetRow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .shareHero {
+    min-height: 54svh;
+  }
+
+  .shareContent {
+    margin-top: -22px;
+    padding-inline: 0;
+  }
+
+  .shareSecurityNote {
+    margin-inline: 14px;
+  }
+
+  .sharePanel {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .sharePanelHeading,
+  .shareSubmitRow,
+  .shareResultHeading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .shareServiceState,
+  .shareCountdown {
+    width: fit-content;
+    text-align: left;
+  }
+
+  .shareUploadBox,
+  .shareCustomExpiration {
+    grid-template-columns: 1fr;
+  }
+
+  .shareFileButton,
+  .shareSubmitRow .sharePrimaryButton {
+    width: 100%;
+  }
+
+  .shareSelectedFiles li,
+  .shareDownloadList li {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .shareSelectedFiles button,
+  .shareDownloadList a {
+    width: 100%;
+  }
+
+  .shareResultActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 840px) {
   .peerPairingGrid,
   .peerWorkspace {
     grid-template-columns: 1fr;
   }
 
-  .peerWorkspaceChat {
-    display: block;
-  }
 }
 
 @media (max-width: 600px) {

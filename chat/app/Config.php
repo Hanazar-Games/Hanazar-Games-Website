@@ -21,6 +21,7 @@ final readonly class Config
         private string $rateLimitPath,
         private string $backupPath,
         private array $trustedProxies,
+        private array $shareOrigins,
         private int $sessionIdleSeconds,
         private int $sessionAbsoluteSeconds,
     ) {
@@ -69,6 +70,10 @@ final readonly class Config
         }
 
         $proxies = array_values(array_filter(array_map('trim', explode(',', $values['TRUSTED_PROXIES'] ?? ''))));
+        $shareOrigins = [];
+        foreach (array_filter(array_map('trim', explode(',', $values['SHARE_ORIGINS'] ?? ''))) as $origin) {
+            $shareOrigins[] = self::httpsOrigin($origin);
+        }
 
         return new self(
             $values['APP_ENV'],
@@ -82,6 +87,7 @@ final readonly class Config
             $paths['RATE_LIMIT_PATH'],
             $paths['BACKUP_PATH'],
             $proxies,
+            array_values(array_unique($shareOrigins)),
             self::positiveInt($values['SESSION_IDLE_SECONDS'] ?? '1800', 1800),
             self::positiveInt($values['SESSION_ABSOLUTE_SECONDS'] ?? '43200', 43200),
         );
@@ -89,7 +95,7 @@ final readonly class Config
 
     public static function fromEnvironment(): self
     {
-        $keys = ['APP_ENV', 'APP_ORIGIN', 'APP_HOST', 'APP_KEY', 'PUBLIC_ROOT', 'DB_PATH', 'SESSION_PATH', 'LOG_PATH', 'RATE_LIMIT_PATH', 'BACKUP_PATH', 'TRUSTED_PROXIES', 'SESSION_IDLE_SECONDS', 'SESSION_ABSOLUTE_SECONDS'];
+        $keys = ['APP_ENV', 'APP_ORIGIN', 'APP_HOST', 'APP_KEY', 'PUBLIC_ROOT', 'DB_PATH', 'SESSION_PATH', 'LOG_PATH', 'RATE_LIMIT_PATH', 'BACKUP_PATH', 'TRUSTED_PROXIES', 'SHARE_ORIGINS', 'SESSION_IDLE_SECONDS', 'SESSION_ABSOLUTE_SECONDS'];
         $values = [];
         foreach ($keys as $key) {
             $value = getenv($key);
@@ -128,6 +134,34 @@ final readonly class Config
         return $parsed === false ? $fallback : (int) $parsed;
     }
 
+    private static function httpsOrigin(string $value): string
+    {
+        $parts = parse_url($value);
+        if (!is_array($parts)
+            || ($parts['scheme'] ?? '') !== 'https'
+            || !isset($parts['host'])
+            || str_contains((string) $parts['host'], '*')
+            || preg_match('/[\x00-\x20\x7F]/', $value) === 1
+            || isset($parts['user'])
+            || isset($parts['pass'])
+            || isset($parts['query'])
+            || isset($parts['fragment'])
+            || (($parts['path'] ?? '') !== '' && ($parts['path'] ?? '') !== '/')
+            || (isset($parts['port']) && ((int) $parts['port'] < 1 || (int) $parts['port'] > 65535))
+        ) {
+            throw new InvalidArgumentException('SHARE_ORIGINS must contain canonical HTTPS origins.');
+        }
+
+        $host = strtolower((string) $parts['host']);
+        if (filter_var($host, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) === false
+            && filter_var($host, FILTER_VALIDATE_IP) === false
+        ) {
+            throw new InvalidArgumentException('SHARE_ORIGINS contains an invalid host.');
+        }
+        $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
+        return 'https://' . $host . $port;
+    }
+
     public function appEnvironment(): string { return $this->appEnvironment; }
     public function appOrigin(): string { return $this->appOrigin; }
     public function appHost(): string { return $this->appHost; }
@@ -140,6 +174,8 @@ final readonly class Config
     public function backupPath(): string { return $this->backupPath; }
     /** @return list<string> */
     public function trustedProxies(): array { return $this->trustedProxies; }
+    /** @return list<string> */
+    public function shareOrigins(): array { return $this->shareOrigins; }
     public function sessionIdleSeconds(): int { return $this->sessionIdleSeconds; }
     public function sessionAbsoluteSeconds(): int { return $this->sessionAbsoluteSeconds; }
 }

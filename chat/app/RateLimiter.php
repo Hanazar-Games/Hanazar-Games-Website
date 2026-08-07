@@ -11,6 +11,8 @@ final class RateLimiter
     private const POLICIES = [
         'login_ip' => [10, 60],
         'api' => [120, 60],
+        'share_create' => [30, 3600],
+        'share_read' => [240, 60],
     ];
 
     public function __construct(private readonly Config $config) {}

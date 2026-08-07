@@ -1,0 +1,11 @@
+[Unit]
+Description=Delete expired Hanazar encrypted shares every minute
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+AccuracySec=10s
+RandomizedDelaySec=5s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

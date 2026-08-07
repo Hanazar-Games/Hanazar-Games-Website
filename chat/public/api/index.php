@@ -12,21 +12,35 @@ use Hanazar\Chat\SecurityHeaders;
 require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 const MAX_BODY_BYTES = 1048576;
+const MAX_SHARE_BODY_BYTES = 12582912;
 const METHODS = ['GET', 'POST', 'PATCH', 'DELETE'];
+const SHARE_METHODS = ['GET', 'POST', 'OPTIONS'];
 
 try {
     $config = Config::fromEnvironment();
     $identity = ClientIdentity::resolve($_SERVER, $config->trustedProxies());
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    $path = requestPath();
+    $shareRoute = isSharePath($path);
     $requestHost = strtolower(explode(':', $_SERVER['HTTP_HOST'] ?? '')[0]);
     if (!hash_equals($config->appHost(), $requestHost)) {
         throw new HttpException(400, 'invalid_host');
     }
     $requestOrigin = rtrim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''), '/');
-    if ($requestOrigin !== '' && !hash_equals($config->appOrigin(), $requestOrigin)) {
+    if (!$shareRoute && $requestOrigin !== '' && !hash_equals($config->appOrigin(), $requestOrigin)) {
         throw new HttpException(403, 'forbidden');
     }
     foreach (SecurityHeaders::json($identity->isSecure()) as $name => $value) {
         header($name . ': ' . $value);
+    }
+    if ($shareRoute) {
+        applyShareCors($config, $requestOrigin);
+        if ($method === 'OPTIONS') {
+            http_response_code(204);
+            exit;
+        }
+        $publicState = [];
+        dispatchShare(new App($config, $publicState), $identity->ip(), $method, $path);
     }
     session_name('hanazar_chat');
     session_save_path($config->sessionPath());
@@ -39,7 +53,7 @@ try {
     ]);
     session_start();
     $app = new App($config, $_SESSION);
-    dispatch($app, $identity->ip());
+    dispatch($app, $identity->ip(), $method, $path);
 } catch (RateLimitException $exception) {
     header('Retry-After: ' . $exception->retryAfter());
     respondError($exception->status(), $exception->errorCode(), 'Too many requests.');
@@ -51,17 +65,13 @@ try {
     respondError(500, 'internal_error', 'The request could not be completed.');
 }
 
-function dispatch(App $app, string $clientIp): never
+function dispatch(App $app, string $clientIp, string $method, string $path): never
 {
-    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     if (!in_array($method, METHODS, true)) {
         header('Allow: GET, POST, PATCH, DELETE');
         throw new HttpException(405, 'method_not_allowed');
     }
 
-    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
-    $path = preg_replace('~^/api(?:/index\.php)?~', '', $path) ?: '/';
-    $path = '/' . trim($path, '/');
     if (!in_array($path, ['/auth/login', '/health'], true)) {
         $app->rateLimiter->consume('api', hash_hmac('sha256', $clientIp, $app->config->appKey()));
     }
@@ -187,22 +197,76 @@ function dispatch(App $app, string $clientIp): never
     throw new HttpException(404, 'not_found');
 }
 
+function dispatchShare(App $app, string $clientIp, string $method, string $path): never
+{
+    if (!in_array($method, SHARE_METHODS, true)) {
+        header('Allow: GET, POST, OPTIONS');
+        throw new HttpException(405, 'method_not_allowed');
+    }
+
+    $identifier = hash_hmac('sha256', $clientIp, $app->config->appKey());
+    if ($path === '/shares' && $method === 'POST') {
+        $app->rateLimiter->consume('share_create', $identifier);
+        $body = requestBody($method, MAX_SHARE_BODY_BYTES);
+        respond(
+            $app->shares->create(
+                stringField($body, 'ciphertext'),
+                intField($body, 'expires_in_seconds'),
+            ),
+            201,
+        );
+    }
+    if (preg_match('~^/shares/([A-Za-z0-9_-]{43})$~D', $path, $match) === 1 && $method === 'GET') {
+        $app->rateLimiter->consume('share_read', $identifier);
+        respond($app->shares->fetch($match[1]));
+    }
+
+    throw new HttpException(404, 'share_not_found');
+}
+
+function requestPath(): string
+{
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $path = preg_replace('~^/api(?:/index\.php)?~', '', $path) ?: '/';
+    return '/' . trim($path, '/');
+}
+
+function isSharePath(string $path): bool
+{
+    return $path === '/shares' || str_starts_with($path, '/shares/');
+}
+
+function applyShareCors(Config $config, string $origin): void
+{
+    if ($origin === '') {
+        return;
+    }
+    if (!hash_equals($config->appOrigin(), $origin) && !in_array($origin, $config->shareOrigins(), true)) {
+        throw new HttpException(403, 'forbidden');
+    }
+    header('Vary: Origin');
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    header('Access-Control-Max-Age: 600');
+}
+
 /** @return array<string, mixed> */
-function requestBody(string $method): array
+function requestBody(string $method, int $maximumBytes = MAX_BODY_BYTES): array
 {
     if ($method === 'GET') {
         return [];
     }
     $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
-    if ($length > MAX_BODY_BYTES) {
+    if ($length > $maximumBytes) {
         throw new HttpException(413, 'payload_too_large');
     }
     $contentType = strtolower(trim(explode(';', $_SERVER['CONTENT_TYPE'] ?? '')[0]));
     if ($contentType !== 'application/json') {
         throw new HttpException(415, 'unsupported_media_type');
     }
-    $raw = file_get_contents('php://input', false, null, 0, MAX_BODY_BYTES + 1);
-    if (!is_string($raw) || strlen($raw) > MAX_BODY_BYTES) {
+    $raw = file_get_contents('php://input', false, null, 0, $maximumBytes + 1);
+    if (!is_string($raw) || strlen($raw) > $maximumBytes) {
         throw new HttpException(413, 'payload_too_large');
     }
     if ($raw === '') {
@@ -247,6 +311,9 @@ function publicMessage(string $code): string
         'authentication_required', 'session_invalid', 'session_expired' => 'Authentication required.',
         'forbidden', 'room_forbidden', 'message_forbidden' => 'The action is not permitted.',
         'room_not_found', 'message_not_found', 'not_found' => 'The requested resource was not found.',
+        'share_not_found' => 'The encrypted share was not found.',
+        'share_expired' => 'The encrypted share has expired.',
+        'invalid_expiration', 'invalid_ciphertext', 'invalid_request' => 'The share request is invalid.',
         default => 'The request could not be completed.',
     };
 }
