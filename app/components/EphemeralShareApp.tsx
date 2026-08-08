@@ -10,6 +10,7 @@ import {
   cryptoSupported,
   decryptShare,
   encryptShare,
+  safeAttachmentName,
 } from "../lib/ephemeralShareCrypto";
 
 interface ApiEnvelope {
@@ -197,6 +198,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
   const [viewerState, setViewerState] = useState<ViewerState>("idle");
   const [viewed, setViewed] = useState<ViewedShare | null>(null);
   const [viewExpiresAt, setViewExpiresAt] = useState<number | null>(null);
+  const needsClock = Boolean(created || viewExpiresAt !== null || logs.some((entry) => entry.shareUrl));
 
   const revokeViewedFiles = useCallback(() => {
     for (const url of objectUrlsRef.current) URL.revokeObjectURL(url);
@@ -209,9 +211,14 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     const initial = loadLogs(current);
     setLogs(initial);
     persistLogs(initial);
+  }, []);
+
+  useEffect(() => {
+    if (!needsClock) return;
+    setNow(Date.now());
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [needsClock]);
 
   useEffect(() => {
     setLogs((current) => {
@@ -325,6 +332,8 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
   useEffect(() => () => revokeViewedFiles(), [revokeViewedFiles]);
 
   const totalFileBytes = files.reduce((sum, file) => sum + file.size, 0);
+  const expirationMinutes = Number(expiration);
+  const expirationValid = Number.isInteger(expirationMinutes) && expirationMinutes >= 1 && expirationMinutes <= 1440;
   const canCreate = Boolean(
     serviceUrl
     && hasCrypto
@@ -333,7 +342,8 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     && (message.length > 0 || files.length > 0)
     && message.length <= MAX_SHARE_TEXT_LENGTH
     && files.length <= MAX_SHARE_FILES
-    && totalFileBytes <= MAX_SHARE_FILE_BYTES,
+    && totalFileBytes <= MAX_SHARE_FILE_BYTES
+    && expirationValid,
   );
 
   function resetFileInput() {
@@ -357,8 +367,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     event.preventDefault();
     setNotice("");
     setCreated(null);
-    const minutes = Number(expiration);
-    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 1440) {
+    if (!expirationValid) {
       setNotice(tr("shareErrorExpiration"));
       return;
     }
@@ -373,7 +382,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
       const data = await apiRequest(serviceUrl, "shares", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ciphertext: encrypted.ciphertext, expires_in_seconds: minutes * 60 }),
+        body: JSON.stringify({ ciphertext: encrypted.ciphertext, expires_in_seconds: expirationMinutes * 60 }),
       });
       if (
         typeof data.token !== "string"
@@ -557,7 +566,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
                   <ul className="shareSelectedFiles">
                     {files.map((file, index) => (
                       <li key={`${file.name}-${file.lastModified}-${index}`}>
-                        <div><strong>{file.name}</strong><span>{file.type || "application/octet-stream"} · {formatBytes(file.size)}</span></div>
+                        <div><strong>{safeAttachmentName(file.name)}</strong><span>{file.type || "application/octet-stream"} · {formatBytes(file.size)}</span></div>
                         <button
                           type="button"
                           onClick={() => {
@@ -582,6 +591,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
                   <div className="sharePresetRow">
                     {EXPIRATION_PRESETS.map((minutes) => (
                       <button
+                        aria-pressed={expiration === String(minutes)}
                         className={expiration === String(minutes) ? "active" : ""}
                         key={minutes}
                         onClick={() => setExpiration(String(minutes))}
@@ -593,7 +603,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
                   </div>
                   <label className="shareCustomExpiration">
                     <span>{tr("shareCustomMinutes")}</span>
-                    <input min="1" max="1440" onChange={(event) => setExpiration(event.target.value)} step="1" type="number" value={expiration} />
+                    <input aria-invalid={!expirationValid} min="1" max="1440" onChange={(event) => setExpiration(event.target.value)} step="1" type="number" value={expiration} />
                   </label>
                 </fieldset>
 
@@ -608,9 +618,9 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
               </form>
 
               {created ? (
-                <div className="shareResult" aria-live="polite">
+                <div className="shareResult" aria-labelledby="share-result-title" role="region">
                   <div className="shareResultHeading">
-                    <div><span>{tr("shareResultLabel")}</span><h3>{tr("shareResultTitle")}</h3></div>
+                    <div><span>{tr("shareResultLabel")}</span><h3 id="share-result-title">{tr("shareResultTitle")}</h3></div>
                     <span>{formatRemaining(created.expiresAt - now)}</span>
                   </div>
                   <label className="shareField">

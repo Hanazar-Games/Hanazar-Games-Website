@@ -38,7 +38,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function safeName(value: string) {
+export function safeAttachmentName(value: string) {
   return value
     .replace(/[\\/:*?"<>|\u0000-\u001f\u007f\u061c\u200e-\u200f\u202a-\u202e\u2066-\u2069]/gi, "_")
     .replace(/\s+/g, " ")
@@ -89,7 +89,7 @@ async function serialize(text: string, files: File[]) {
     v: 1,
     text,
     files: files.map((file) => ({
-      name: safeName(file.name),
+      name: safeAttachmentName(file.name),
       type: safeType(file.type),
       size: file.size,
       lastModified: Number.isSafeInteger(file.lastModified) && file.lastModified >= 0 ? file.lastModified : 0,
@@ -132,7 +132,7 @@ function parseManifest(value: unknown): ShareManifest {
       throw new Error("invalid_payload");
     }
     return {
-      name: safeName(entry.name),
+      name: safeAttachmentName(entry.name),
       type: safeType(entry.type),
       size: entry.size as number,
       lastModified: entry.lastModified as number,

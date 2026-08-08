@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.9.2",
+    date: "2026-08-08",
+    title: "Encrypted Share Accessibility, Performance, and Security QA",
+    items: [
+      "Stopped idle Chat pages from re-rendering every second while retaining exact active-share and send-log expiry updates.",
+      "Removed countdown and file-progress containers from live regions so screen readers receive completion notices without high-frequency interruptions.",
+      "Added pressed-state semantics and invalid-expiry feedback, and blocked bidirectional attachment-name spoofing before upload and in the composer.",
+      "Prevented disabled controls from producing misleading SFX while preserving low output ceilings, opt-in BGM, visibility pause, and audio cleanup.",
+      "Eager-loaded visible archive image rows, fixed the current dependency advisory, and rechecked static Pages output and responsive routes.",
+      "Regression-tested encrypted text and attachments, local log cleanup, settings, themes, missing routes, and mobile-to-desktop overflow behavior.",
+    ],
+  },
+  {
     version: "2.9.1",
     date: "2026-08-07",
     title: "Encrypted Share Hardening and Full-Site QA",

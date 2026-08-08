@@ -849,7 +849,7 @@ export default function PeerTransferApp() {
                 </button>
               </div>
 
-              <div className="peerTransferList" aria-live="polite">
+              <div className="peerTransferList">
                 {transfers.length === 0 ? (
                   <p className="peerEmptyState">{tr("peerFileEmpty")}</p>
                 ) : transfers.map((file) => (

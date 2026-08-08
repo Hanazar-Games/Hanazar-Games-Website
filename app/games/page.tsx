@@ -54,7 +54,7 @@ export default function GamesPage() {
                 className="gameCardImage"
                 width={640}
                 height={360}
-                loading={index === 0 ? "eager" : "lazy"}
+                loading={index < 3 ? "eager" : "lazy"}
                 sizes="(max-width: 800px) 100vw, 33vw"
               />
             </div>

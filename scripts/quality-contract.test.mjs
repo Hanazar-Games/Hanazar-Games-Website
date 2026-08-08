@@ -56,7 +56,20 @@ test("share UI keeps effects stable and clears sensitive composer state", async 
   assert.match(component, /addEventListener\("hashchange"/);
   assert.match(component, /if \(controller\.signal\.aborted\) return;/);
   assert.match(component, /setViewed\(null\)/);
+  assert.match(component, /const needsClock =/);
+  assert.match(component, /if \(!needsClock\) return;/);
+  assert.match(component, /aria-pressed=\{expiration === String\(minutes\)\}/);
   assert.doesNotMatch(component, /className="shareCountdown" aria-live=/);
+});
+
+test("live regions exclude high-frequency countdown and transfer progress", async () => {
+  const [share, transfer] = await Promise.all([
+    read("app/components/EphemeralShareApp.tsx"),
+    read("app/components/PeerTransferApp.tsx"),
+  ]);
+
+  assert.doesNotMatch(share, /className="shareResult" aria-live=/);
+  assert.doesNotMatch(transfer, /className="peerTransferList" aria-live=/);
 });
 
 test("site audio stays opt-in and below the reduced output ceiling", async () => {
@@ -68,4 +81,20 @@ test("site audio stays opt-in and below the reduced output ceiling", async () =>
   assert.match(settings, /bgmEnabled: false/);
   assert.match(audio, /Math\.min\(0\.012,/);
   assert.match(audio, /Math\.min\(\s*0\.024,/);
+  assert.match(audio, /button:not\(:disabled\)/);
+});
+
+test("above-the-fold archive images load eagerly without preloading competing candidates", async () => {
+  const [games, aigc] = await Promise.all([
+    read("app/games/page.tsx"),
+    read("app/aigc/page.tsx"),
+  ]);
+
+  assert.match(games, /loading=\{index < 3 \? "eager" : "lazy"\}/);
+  assert.match(aigc, /loading=\{index < 2 \? "eager" : "lazy"\}/);
+});
+
+test("subpage hero titles balance narrow-screen line breaks", async () => {
+  const css = await read("app/globals.css");
+  assert.match(css, /\.gamesHeroTitle \{[\s\S]*?text-wrap: balance;/);
 });

@@ -295,7 +295,7 @@ export default function AudioEngine() {
 
   useEffect(() => {
     const interactiveSelector =
-      "button, a, input[type='checkbox'], .colorPreset, .languageItem";
+      "button:not(:disabled), a[href], input[type='checkbox']:not(:disabled), .colorPreset, .languageItem";
 
     const handlePointerDown = async (event: PointerEvent) => {
       const target = event.target;

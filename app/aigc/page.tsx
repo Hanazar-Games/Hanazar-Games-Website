@@ -43,7 +43,7 @@ export default function AigcPage() {
                 className="gameCardImage"
                 width={960}
                 height={540}
-                loading={index === 0 ? "eager" : "lazy"}
+                loading={index < 2 ? "eager" : "lazy"}
                 sizes="(max-width: 800px) 100vw, 33vw"
               />
             </div>
