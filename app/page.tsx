@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "./hooks/useTranslation";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
-import { aigcExperiments, homepageGames } from "./lib/catalog";
+import { aigcExperiments, homepageGames, toolGroups } from "./lib/catalog";
 import { assetPath } from "./lib/paths";
 
 const githubUrl = "https://github.com/hzagaming";
@@ -21,75 +21,6 @@ const heroLinks = [
   { label: "navAbout", href: "#about" },
   { label: "navUpdates", href: "#updates" },
   { label: "navContact", href: "#contact" }
-];
-
-const toolGroups = [
-  {
-    title: "toolsMacTitle",
-    label: "toolsMacLabel",
-    tools: [
-      {
-        title: "toolClipoTitle",
-        description: "toolClipoDesc",
-        tag: "toolTagProductivity",
-        cta: "ctaViewGithub",
-        href: "https://github.com/hzagaming/Clipo",
-        image: "/tools/clipo.jpg"
-      },
-      {
-        title: "toolClassGodTitle",
-        description: "toolClassGodDesc",
-        tag: "toolTagUtility",
-        cta: "ctaViewGithub",
-        href: "https://github.com/hzagaming/ClassGod",
-        image: "/tools/classgod.jpg"
-      }
-    ]
-  },
-  {
-    title: "toolsWebTitle",
-    label: "toolsWebLabel",
-    tools: [
-      {
-        title: "toolAiugcTitle",
-        description: "toolAiugcDesc",
-        tag: "toolTagAiCreation",
-        cta: "ctaViewGithub",
-        href: "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
-        image: "/tools/aiugc-pipeline.jpg"
-      },
-      {
-        title: "toolOcMakerTitle",
-        description: "toolOcMakerDesc",
-        tag: "toolTagCharacter",
-        cta: "toolOpenButton",
-        href: "https://hzagaming.github.io/Original-Character-Maker/",
-        image: "/tools/oc-maker.jpg"
-      },
-      {
-        title: "toolRhythmTitle",
-        description: "toolRhythmDesc",
-        tag: "toolTagMusicAi",
-        cta: "ctaViewGithub",
-        href: "https://github.com/Mirako-Official/AI-Rhythm-Game",
-        image: "/tools/ai-rhythm-game.jpg"
-      }
-    ]
-  },
-  {
-    title: "toolsOtherTitle",
-    label: "toolsOtherLabel",
-    tools: [
-      {
-        title: "productLc300aTitle",
-        description: "productLc300aDesc",
-        tag: "productTagOperatingSystem",
-        cta: "ctaViewGithub",
-        href: "https://github.com/hzagaming/LC300A",
-        image: "/products/lc300a.jpg"
-      }
-    ]
-  }
 ];
 
 const documentModules = [
@@ -158,6 +89,9 @@ const footerColumns = [
       { title: "toolRhythmTitle", href: "https://github.com/Mirako-Official/AI-Rhythm-Game" },
       { title: "toolClipoTitle", href: "https://github.com/hzagaming/Clipo" },
       { title: "toolClassGodTitle", href: "https://github.com/hzagaming/ClassGod" },
+      { title: "toolTransferTitle", href: "https://hzagaming.github.io/HanazarTransfer/" },
+      { title: "toolHeptTitle", href: "https://github.com/hzagaming/Hept" },
+      { title: "toolListenerTitle", href: "https://hzagaming.github.io/LIstener" },
       { title: "productLc300aTitle", href: "https://github.com/hzagaming/LC300A" }
     ]
   },
@@ -368,7 +302,11 @@ export default function HomePage() {
             <div className="toolsGroup" key={group.title}>
               <div
                 className={`toolsGroupHeading ${
-                  groupIndex === 0 ? "revealLeft" : groupIndex === 1 ? "revealFade" : "revealRight"
+                  groupIndex % 3 === 0
+                    ? "revealLeft"
+                    : groupIndex % 3 === 1
+                      ? "revealFade"
+                      : "revealRight"
                 }`}
                 data-reveal
               >
@@ -376,15 +314,17 @@ export default function HomePage() {
                   <span className="toolsGroupLabel">{tr(group.label)}</span>
                   <h3>{tr(group.title)}</h3>
                 </div>
-                <span className="toolsGroupCount">0{group.tools.length}</span>
+                <span className="toolsGroupCount">{String(group.tools.length).padStart(2, "0")}</span>
               </div>
 
               <div className={`toolsGrid${
-                group.tools.length === 1
-                  ? " toolsGridSingle"
-                  : group.tools.length === 2
-                    ? " toolsGridMac"
-                    : ""
+                  group.tools.length === 1
+                    ? " toolsGridSingle"
+                    : group.tools.length === 4
+                      ? " toolsGridBalanced"
+                      : group.tools.length === 2
+                        ? " toolsGridMac"
+                        : ""
               }`}>
                 {group.tools.map((tool, index) => (
                   <article
@@ -410,7 +350,9 @@ export default function HomePage() {
                         height={720}
                         sizes={group.tools.length === 1
                           ? "(max-width: 980px) 100vw, 54vw"
-                          : "(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"}
+                          : group.tools.length % 2 === 0
+                            ? "(max-width: 800px) 100vw, 50vw"
+                            : "(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"}
                       />
                     </div>
                     <div className="gameCardBody">

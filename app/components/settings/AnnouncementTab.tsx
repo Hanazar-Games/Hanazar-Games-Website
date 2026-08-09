@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.10.0",
+    date: "2026-08-09",
+    title: "Weida Go and Cross-platform Tools Expansion",
+    items: [
+      "Added Weida Go to the full Games Hub with original board artwork while keeping the homepage focused on three featured games.",
+      "Added a dedicated iOS Tools section for Hept, the native haptic control, pattern design, reminders, and vibration measurement app.",
+      "Added Listener to Other Tools and Hanazar Transfer to Web Tools with accurate deployment notes and original project artwork.",
+      "Centralized the complete tool catalog, added the new projects to footer discovery, and hardened group counts and reveal sequencing for future sections.",
+      "Expanded GitHub Pages preflight coverage to require every new route, link, section, and image asset in the static export.",
+      "Rechecked responsive card layouts, translations, themes, reduced motion, opt-in BGM, reduced SFX ceilings, and production deployment output.",
+    ],
+  },
+  {
     version: "2.9.2",
     date: "2026-08-08",
     title: "Encrypted Share Accessibility, Performance, and Security QA",

@@ -1,7 +1,7 @@
 {
   "name": "hanazargames-web",
   "private": true,
-  "version": "2.9.2",
+  "version": "2.10.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

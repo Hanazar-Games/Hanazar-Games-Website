@@ -26,7 +26,11 @@ const requiredFiles = [
   "games/guandan.jpg",
   "games/liars-bar.jpg",
   "games/coreball.jpg",
+  "games/go.jpg",
   "products/lc300a.jpg",
+  "tools/hept.jpg",
+  "tools/listener.jpg",
+  "tools/hanazar-transfer.jpg",
   "aigc/gpt-56-sol-ultra.jpg",
 ];
 const forbiddenFiles = [
@@ -62,8 +66,12 @@ const requiredContent = {
     "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
     "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
     "https://github.com/hzagaming/LC300A",
+    "https://github.com/hzagaming/Hept",
+    "https://hzagaming.github.io/LIstener",
+    "https://hzagaming.github.io/HanazarTransfer/",
     "Mac Tools",
     "Web Tools",
+    "iOS Tools",
     "Other Tools",
   ],
   "games/index.html": [
@@ -73,6 +81,8 @@ const requiredContent = {
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     "Coreball",
     "https://hanazar-games.github.io/Core-Ball-Webgame/",
+    "Weida Go",
+    "https://hanazar-games.github.io/Go/",
   ],
   "aigc/index.html": [
     "GPT-5.6-sol-Ultra-AIGC-webgame",

@@ -775,6 +775,10 @@ select:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.toolsGridBalanced {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .toolsGridSingle {
   grid-template-columns: minmax(0, 1fr);
 }

@@ -6,6 +6,16 @@ export interface GameEntry {
   image: string;
 }
 
+export interface ToolEntry extends GameEntry {
+  cta: string;
+}
+
+export interface ToolGroup {
+  title: string;
+  label: string;
+  tools: ToolEntry[];
+}
+
 export const games: GameEntry[] = [
   {
     title: "gameGuandanTitle",
@@ -27,6 +37,13 @@ export const games: GameEntry[] = [
     href: "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     tag: "gameTagPuzzle",
     image: "/aigc/gpt-56-sol-ultra.jpg",
+  },
+  {
+    title: "gameWeidaTitle",
+    description: "gameWeidaDesc",
+    href: "https://hanazar-games.github.io/Go/",
+    tag: "gameTagBoard",
+    image: "/games/go.jpg",
   },
   {
     title: "gameCoreballTitle",
@@ -143,6 +160,105 @@ export const games: GameEntry[] = [
 ];
 
 export const homepageGames = games.slice(0, 3);
+
+export const toolGroups: ToolGroup[] = [
+  {
+    title: "toolsMacTitle",
+    label: "toolsMacLabel",
+    tools: [
+      {
+        title: "toolClipoTitle",
+        description: "toolClipoDesc",
+        tag: "toolTagProductivity",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/Clipo",
+        image: "/tools/clipo.jpg",
+      },
+      {
+        title: "toolClassGodTitle",
+        description: "toolClassGodDesc",
+        tag: "toolTagUtility",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/ClassGod",
+        image: "/tools/classgod.jpg",
+      },
+    ],
+  },
+  {
+    title: "toolsWebTitle",
+    label: "toolsWebLabel",
+    tools: [
+      {
+        title: "toolAiugcTitle",
+        description: "toolAiugcDesc",
+        tag: "toolTagAiCreation",
+        cta: "ctaViewGithub",
+        href: "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
+        image: "/tools/aiugc-pipeline.jpg",
+      },
+      {
+        title: "toolOcMakerTitle",
+        description: "toolOcMakerDesc",
+        tag: "toolTagCharacter",
+        cta: "toolOpenButton",
+        href: "https://hzagaming.github.io/Original-Character-Maker/",
+        image: "/tools/oc-maker.jpg",
+      },
+      {
+        title: "toolRhythmTitle",
+        description: "toolRhythmDesc",
+        tag: "toolTagMusicAi",
+        cta: "ctaViewGithub",
+        href: "https://github.com/Mirako-Official/AI-Rhythm-Game",
+        image: "/tools/ai-rhythm-game.jpg",
+      },
+      {
+        title: "toolTransferTitle",
+        description: "toolTransferDesc",
+        tag: "toolTagLocalTransfer",
+        cta: "ctaViewProject",
+        href: "https://hzagaming.github.io/HanazarTransfer/",
+        image: "/tools/hanazar-transfer.jpg",
+      },
+    ],
+  },
+  {
+    title: "toolsIosTitle",
+    label: "toolsIosLabel",
+    tools: [
+      {
+        title: "toolHeptTitle",
+        description: "toolHeptDesc",
+        tag: "toolTagHaptics",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/Hept",
+        image: "/tools/hept.jpg",
+      },
+    ],
+  },
+  {
+    title: "toolsOtherTitle",
+    label: "toolsOtherLabel",
+    tools: [
+      {
+        title: "productLc300aTitle",
+        description: "productLc300aDesc",
+        tag: "productTagOperatingSystem",
+        cta: "ctaViewGithub",
+        href: "https://github.com/hzagaming/LC300A",
+        image: "/products/lc300a.jpg",
+      },
+      {
+        title: "toolListenerTitle",
+        description: "toolListenerDesc",
+        tag: "toolTagMusicPlayer",
+        cta: "toolOpenButton",
+        href: "https://hzagaming.github.io/LIstener",
+        image: "/tools/listener.jpg",
+      },
+    ],
+  },
+];
 
 export const aigcExperiments: GameEntry[] = [
   {

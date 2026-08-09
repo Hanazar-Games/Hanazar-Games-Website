@@ -98,3 +98,33 @@ test("subpage hero titles balance narrow-screen line breaks", async () => {
   const css = await read("app/globals.css");
   assert.match(css, /\.gamesHeroTitle \{[\s\S]*?text-wrap: balance;/);
 });
+
+test("catalog exposes the Go project and the complete tool taxonomy", async () => {
+  const { games, homepageGames, toolGroups } = await import("../app/lib/catalog.ts");
+
+  assert.deepEqual(homepageGames, games.slice(0, 3));
+  assert.ok(games.some((game) => (
+    game.href === "https://hanazar-games.github.io/Go/" && game.image === "/games/go.jpg"
+  )));
+  assert.equal(homepageGames.some((game) => game.href === "https://hanazar-games.github.io/Go/"), false);
+
+  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 4, 1, 2]);
+  const tools = toolGroups.flatMap((group) => group.tools);
+  for (const expected of [
+    { href: "https://github.com/hzagaming/Hept", image: "/tools/hept.jpg" },
+    { href: "https://hzagaming.github.io/LIstener", image: "/tools/listener.jpg" },
+    { href: "https://hzagaming.github.io/HanazarTransfer/", image: "/tools/hanazar-transfer.jpg" },
+  ]) {
+    assert.ok(tools.some(({ href, image }) => href === expected.href && image === expected.image));
+  }
+});
+
+test("four-card tool groups use a balanced desktop grid", async () => {
+  const [home, css] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(home, /group\.tools\.length === 4\s*\? " toolsGridBalanced"/);
+  assert.match(css, /\.toolsGridBalanced \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+});
