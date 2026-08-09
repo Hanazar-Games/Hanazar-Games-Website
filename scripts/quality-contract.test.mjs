@@ -128,3 +128,29 @@ test("four-card tool groups use a balanced desktop grid", async () => {
   assert.match(home, /group\.tools\.length === 4\s*\? " toolsGridBalanced"/);
   assert.match(css, /\.toolsGridBalanced \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
 });
+
+test("invalid share expiry has visible, associated feedback", async () => {
+  const [share, css] = await Promise.all([
+    read("app/components/EphemeralShareApp.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(share, /aria-describedby=\{!expirationValid \? "share-expiration-error" : undefined\}/);
+  assert.match(share, /id="share-expiration-error"/);
+  assert.match(css, /\.shareFieldError \{/);
+  assert.match(css, /\[aria-invalid="true"\]/);
+});
+
+test("privacy copy distinguishes local state from encrypted uploads", async () => {
+  const i18n = await read("app/lib/i18n.ts");
+
+  assert.doesNotMatch(i18n, /All information on this site is stored locally\./);
+  assert.match(i18n, /Temporary Share uploads only browser-encrypted ciphertext/);
+});
+
+test("Pages verification rejects malformed configured Chat service URLs", async () => {
+  const verifier = await read("scripts/verify-static-export.mjs");
+
+  assert.match(verifier, /url\.username \|\| url\.password \|\| url\.search \|\| url\.hash/);
+  assert.match(verifier, /if \(configuredChatService && !chatServiceUrl\)/);
+});

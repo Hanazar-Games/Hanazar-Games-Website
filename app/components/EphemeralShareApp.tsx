@@ -603,7 +603,21 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
                   </div>
                   <label className="shareCustomExpiration">
                     <span>{tr("shareCustomMinutes")}</span>
-                    <input aria-invalid={!expirationValid} min="1" max="1440" onChange={(event) => setExpiration(event.target.value)} step="1" type="number" value={expiration} />
+                    <input
+                      aria-describedby={!expirationValid ? "share-expiration-error" : undefined}
+                      aria-invalid={!expirationValid}
+                      max="1440"
+                      min="1"
+                      onChange={(event) => setExpiration(event.target.value)}
+                      step="1"
+                      type="number"
+                      value={expiration}
+                    />
+                    {!expirationValid ? (
+                      <span className="shareFieldError" id="share-expiration-error">
+                        {tr("shareErrorExpiration")}
+                      </span>
+                    ) : null}
                   </label>
                 </fieldset>
 

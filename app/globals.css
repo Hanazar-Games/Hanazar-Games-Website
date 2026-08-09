@@ -2159,6 +2159,16 @@ select:focus-visible {
   padding-block: 8px;
 }
 
+.shareCustomExpiration input[aria-invalid="true"] {
+  border-color: rgba(223, 126, 126, 0.58);
+}
+
+.shareFieldError {
+  grid-column: 1 / -1;
+  color: #ddb1b1;
+  line-height: 1.5;
+}
+
 .shareInlineWarning {
   margin: 16px 0 0;
   padding: 12px 14px;

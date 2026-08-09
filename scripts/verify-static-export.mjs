@@ -5,17 +5,22 @@ const repositoryName = process.env.GITHUB_REPOSITORY?.split("/").pop();
 if (!repositoryName) throw new Error("GITHUB_REPOSITORY is required");
 
 function httpsUrl(value) {
-  if (!value) return null;
+  if (!value?.trim()) return null;
   try {
     const url = new URL(value.trim());
-    return url.protocol === "https:" ? url.href : null;
+    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) return null;
+    return new URL(url.pathname.endsWith("/") ? url.pathname : `${url.pathname}/`, url.origin).href;
   } catch {
     return null;
   }
 }
 
 const basePath = `/${repositoryName}`;
-const chatServiceUrl = httpsUrl(process.env.NEXT_PUBLIC_CHAT_SERVICE_URL);
+const configuredChatService = process.env.NEXT_PUBLIC_CHAT_SERVICE_URL?.trim();
+const chatServiceUrl = httpsUrl(configuredChatService);
+if (configuredChatService && !chatServiceUrl) {
+  throw new Error("NEXT_PUBLIC_CHAT_SERVICE_URL must be an absolute HTTPS URL without credentials, query, or fragment");
+}
 const requiredFiles = [
   "index.html",
   "404.html",

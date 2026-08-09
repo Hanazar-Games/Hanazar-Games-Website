@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.10.1",
+    date: "2026-08-09",
+    title: "Deployment Guard and Interaction Integrity QA",
+    items: [
+      "Added visible, screen-reader-associated validation for invalid custom expiry values in Encrypted Temporary Share.",
+      "Corrected privacy copy to distinguish device-local settings and logs from browser-encrypted ciphertext uploads while confirming keys never leave URL fragments.",
+      "Hardened GitHub Pages preflight so malformed Chat service URLs fail clearly instead of silently exporting a disabled feature.",
+      "Reverified Weida Go, Hept, Listener, Hanazar Transfer, LC300A, the three-item homepage Games and AIGC sets, and the complete tool taxonomy.",
+      "Completed real encrypted share, attachment, tamper rejection, WebRTC text and file transfer, settings focus, theme, language, SFX, and BGM interaction checks.",
+      "Passed desktop, tablet, mobile, and narrow responsive QA plus both configured and unconfigured GitHub Pages production exports.",
+    ],
+  },
+  {
     version: "2.10.0",
     date: "2026-08-09",
     title: "Weida Go and Cross-platform Tools Expansion",
