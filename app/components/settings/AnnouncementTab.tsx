@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.10.2",
+    date: "2026-08-10",
+    title: "Responsive Catalog and Transfer Recovery QA",
+    items: [
+      "Fixed tablet Games and AIGC grids so 801–980 px layouts use two balanced columns with matching responsive image hints.",
+      "Made interrupted WebRTC sends and receives fail visibly instead of remaining stuck in progress, while releasing buffered incoming file data.",
+      "Hardened browser-local encrypted-share logs against invalid dates, reversed timestamps, and impossible lifetimes.",
+      "Reverified Weida Go, Hept, Listener, Hanazar Transfer, LC300A, homepage catalog limits, tool taxonomy, project links, and artwork.",
+      "Completed real encrypted text and attachment exchange, ciphertext tamper rejection, large-transfer interruption, focus, language, SFX, and BGM checks.",
+      "Passed desktop, tablet, mobile, and narrow responsive QA plus configured and unconfigured GitHub Pages production verification.",
+    ],
+  },
+  {
     version: "2.10.1",
     date: "2026-08-09",
     title: "Deployment Guard and Interaction Integrity QA",

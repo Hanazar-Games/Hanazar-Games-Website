@@ -55,7 +55,7 @@ export default function GamesPage() {
                 width={640}
                 height={360}
                 loading={index < 3 ? "eager" : "lazy"}
-                sizes="(max-width: 800px) 100vw, 33vw"
+                sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
               />
             </div>
             <div className="gameCardBody">

@@ -44,7 +44,7 @@ export default function AigcPage() {
                 width={960}
                 height={540}
                 loading={index < 2 ? "eager" : "lazy"}
-                sizes="(max-width: 800px) 100vw, 33vw"
+                sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
               />
             </div>
             <div className="gameCardBody">

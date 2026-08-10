@@ -154,3 +154,37 @@ test("Pages verification rejects malformed configured Chat service URLs", async 
   assert.match(verifier, /url\.username \|\| url\.password \|\| url\.search \|\| url\.hash/);
   assert.match(verifier, /if \(configuredChatService && !chatServiceUrl\)/);
 });
+
+test("tablet card grids and responsive image hints stay aligned", async () => {
+  const [css, games, aigc] = await Promise.all([
+    read("app/globals.css"),
+    read("app/games/page.tsx"),
+    read("app/aigc/page.tsx"),
+  ]);
+
+  const baseGrid = css.indexOf(".gamesGrid {\n  display: grid");
+  const tabletGrid = css.lastIndexOf("@media (min-width: 801px) and (max-width: 980px)");
+  assert.ok(tabletGrid > baseGrid, "tablet grid override must follow the base grid");
+  assert.match(css.slice(tabletGrid), /\.gamesGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(games, /sizes="\(max-width: 800px\) 100vw, \(max-width: 980px\) 50vw, 33vw"/);
+  assert.match(aigc, /sizes="\(max-width: 800px\) 100vw, \(max-width: 980px\) 50vw, 33vw"/);
+});
+
+test("disconnecting a peer fails pending transfers and releases incoming chunks", async () => {
+  const transfer = await read("app/components/PeerTransferApp.tsx");
+
+  assert.match(transfer, /const failActiveTransfers = useCallback/);
+  assert.match(transfer, /status === "sending" \|\| item\.status === "receiving"/);
+  assert.match(transfer, /incomingFileRef\.current\.chunks = \[\]/);
+  assert.match(transfer, /channel\.onerror = \(\) => \{[\s\S]*?failActiveTransfers\(\)/);
+  assert.match(transfer, /channel\.onclose = \(\) => \{[\s\S]*?failActiveTransfers\(\)/);
+});
+
+test("local share logs reject invalid dates and impossible lifetimes", async () => {
+  const share = await read("app/components/EphemeralShareApp.tsx");
+
+  assert.match(share, /const MAX_DATE_MS = 8\.64e15/);
+  assert.match(share, /!Number\.isSafeInteger\(createdAt\)/);
+  assert.match(share, /expiresAt <= createdAt/);
+  assert.match(share, /expiresAt - createdAt > MAX_SHARE_LIFETIME_MS/);
+});

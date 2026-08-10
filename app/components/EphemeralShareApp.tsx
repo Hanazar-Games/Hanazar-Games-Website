@@ -56,6 +56,8 @@ type ViewerState = "idle" | "loading" | "ready" | "expired" | "not_found" | "mis
 const STORAGE_KEY = "hanazar.ephemeral-share-log.v1";
 const EXPIRATION_PRESETS = [5, 15, 30, 60, 180, 1440];
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+const MAX_DATE_MS = 8.64e15;
+const MAX_SHARE_LIFETIME_MS = 24 * 60 * 60 * 1000;
 
 class ShareRequestError extends Error {
   constructor(public readonly code: string, public readonly status: number) {
@@ -94,11 +96,17 @@ function parseLogEntry(value: unknown, now: number): ShareLogEntry | null {
   const { id, createdAt, expiresAt, fileCount, totalBytes } = value;
   if (
     typeof id !== "string"
+    || id.length === 0
     || id.length > 100
     || typeof createdAt !== "number"
-    || !Number.isFinite(createdAt)
+    || !Number.isSafeInteger(createdAt)
+    || createdAt < 0
+    || createdAt > MAX_DATE_MS
     || typeof expiresAt !== "number"
-    || !Number.isFinite(expiresAt)
+    || !Number.isSafeInteger(expiresAt)
+    || expiresAt <= createdAt
+    || expiresAt > MAX_DATE_MS
+    || expiresAt - createdAt > MAX_SHARE_LIFETIME_MS
     || typeof fileCount !== "number"
     || !Number.isSafeInteger(fileCount)
     || fileCount < 0

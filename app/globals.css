@@ -2594,6 +2594,12 @@ body[data-theme="light"] .shareLogRail span {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+@media (min-width: 801px) and (max-width: 980px) {
+  .gamesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .gameCard {
   position: relative;
   min-height: 340px;

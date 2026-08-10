@@ -164,7 +164,10 @@ function waitForChannelBuffer(channel: RTCDataChannel) {
   if (channel.readyState !== "open") return Promise.reject(new Error("channel closed"));
   if (channel.bufferedAmount <= BUFFER_HIGH_WATER) return Promise.resolve();
   return new Promise<void>((resolve, reject) => {
+    let settled = false;
     const finish = (error?: Error) => {
+      if (settled) return;
+      settled = true;
       window.clearTimeout(timeout);
       channel.removeEventListener("bufferedamountlow", handleLow);
       channel.removeEventListener("close", handleClose);
@@ -245,6 +248,24 @@ export default function PeerTransferApp() {
     const next = transfersRef.current.map((item) => item.id === id ? { ...item, ...patch } : item);
     transfersRef.current = next;
     setTransfers(next);
+  }, []);
+
+  const failActiveTransfers = useCallback(() => {
+    const current = transfersRef.current;
+    const next = current.map((item) => (
+      item.status === "sending" || item.status === "receiving"
+        ? { ...item, status: "failed" as const }
+        : item
+    ));
+    if (next.some((item, index) => item !== current[index])) {
+      transfersRef.current = next;
+      setTransfers(next);
+    }
+    if (incomingFileRef.current) {
+      incomingFileRef.current.chunks = [];
+      incomingFileRef.current = null;
+    }
+    setIsSendingFile(false);
   }, []);
 
   const sendWire = useCallback((payload: Record<string, unknown>) => {
@@ -395,14 +416,19 @@ export default function PeerTransferApp() {
       }
     };
     channel.onerror = () => {
-      if (channelRef.current === channel) setStatus("failed");
+      if (channelRef.current !== channel) return;
+      failActiveTransfers();
+      setStatus("failed");
     };
     channel.onclose = () => {
-      if (channelRef.current === channel) setStatus("disconnected");
+      if (channelRef.current !== channel) return;
+      failActiveTransfers();
+      setStatus("disconnected");
     };
-  }, [handleIncomingData]);
+  }, [failActiveTransfers, handleIncomingData]);
 
   const closePeer = useCallback(() => {
+    failActiveTransfers();
     const channel = channelRef.current;
     channelRef.current = null;
     if (channel) {
@@ -419,13 +445,8 @@ export default function PeerTransferApp() {
       peer.ondatachannel = null;
       peer.close();
     }
-    if (incomingFileRef.current) {
-      incomingFileRef.current.chunks = [];
-      incomingFileRef.current = null;
-    }
-    setIsSendingFile(false);
     setPeerName("");
-  }, []);
+  }, [failActiveTransfers]);
 
   const createPeer = useCallback(() => {
     if (typeof RTCPeerConnection === "undefined") throw new Error("unsupported");
@@ -439,14 +460,18 @@ export default function PeerTransferApp() {
     peer.ondatachannel = (event) => attachChannel(event.channel);
     peer.onconnectionstatechange = () => {
       if (peerRef.current !== peer) return;
-      if (peer.connectionState === "failed") setStatus("failed");
-      else if (peer.connectionState === "disconnected") setStatus("disconnected");
-      else if (peer.connectionState === "connected" && channelRef.current?.readyState === "open") {
+      if (peer.connectionState === "failed") {
+        failActiveTransfers();
+        setStatus("failed");
+      } else if (peer.connectionState === "disconnected") {
+        failActiveTransfers();
+        setStatus("disconnected");
+      } else if (peer.connectionState === "connected" && channelRef.current?.readyState === "open") {
         setStatus("connected");
       }
     };
     return peer;
-  }, [attachChannel]);
+  }, [attachChannel, failActiveTransfers]);
 
   useEffect(() => {
     setSupported(typeof RTCPeerConnection !== "undefined");
