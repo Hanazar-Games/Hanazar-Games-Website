@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.10.3",
+    date: "2026-08-11",
+    title: "Encrypted Share Timestamp Integrity QA",
+    items: [
+      "Rejected out-of-range Unix timestamps from the encrypted-share service before they can create invalid dates or unbounded countdowns.",
+      "Validated create-response timestamp ordering and the 24-hour maximum lifetime before saving a secret link to the browser-local log.",
+      "Reverified encrypted text and attachments, ciphertext tamper rejection, malformed service responses, and local-log privacy behavior.",
+      "Rechecked Weida Go, Hept, Listener, Hanazar Transfer, LC300A, Core Ball, Guandan, Liar's Bar, and GPT-5.6-sol-Ultra endpoints and artwork.",
+      "Passed desktop and responsive boundary QA across all routes, nine settings categories, SFX/BGM states, and 48 MiB WebRTC interruption recovery.",
+      "Revalidated the production build and configured and unconfigured GitHub Pages exports with the synchronized release announcement.",
+    ],
+  },
+  {
     version: "2.10.2",
     date: "2026-08-10",
     title: "Responsive Catalog and Transfer Recovery QA",

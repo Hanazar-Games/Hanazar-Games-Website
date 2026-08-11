@@ -188,3 +188,14 @@ test("local share logs reject invalid dates and impossible lifetimes", async () 
   assert.match(share, /expiresAt <= createdAt/);
   assert.match(share, /expiresAt - createdAt > MAX_SHARE_LIFETIME_MS/);
 });
+
+test("share API timestamps stay within the Date range and maximum lifetime", async () => {
+  const share = await read("app/components/EphemeralShareApp.tsx");
+
+  assert.match(share, /const MAX_UNIX_SECONDS = Math\.floor\(MAX_DATE_MS \/ 1000\)/);
+  assert.match(share, /function unixSecondsToMilliseconds\(value: unknown\)/);
+  assert.match(share, /value > MAX_UNIX_SECONDS/);
+  assert.match(share, /const expiresAt = unixSecondsToMilliseconds\(data\.expires_at\)/);
+  assert.match(share, /const createdAt = unixSecondsToMilliseconds\(data\.created_at\)/);
+  assert.match(share, /expiresAt - createdAt > MAX_SHARE_LIFETIME_MS/);
+});

@@ -57,6 +57,7 @@ const STORAGE_KEY = "hanazar.ephemeral-share-log.v1";
 const EXPIRATION_PRESETS = [5, 15, 30, 60, 180, 1440];
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 const MAX_DATE_MS = 8.64e15;
+const MAX_UNIX_SECONDS = Math.floor(MAX_DATE_MS / 1000);
 const MAX_SHARE_LIFETIME_MS = 24 * 60 * 60 * 1000;
 
 class ShareRequestError extends Error {
@@ -89,6 +90,18 @@ function createLocalId() {
   return cryptoSupported() && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function unixSecondsToMilliseconds(value: unknown) {
+  if (
+    typeof value !== "number"
+    || !Number.isSafeInteger(value)
+    || value < 0
+    || value > MAX_UNIX_SECONDS
+  ) {
+    return null;
+  }
+  return value * 1000;
 }
 
 function parseLogEntry(value: unknown, now: number): ShareLogEntry | null {
@@ -286,14 +299,10 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     void (async () => {
       try {
         const data = await apiRequest(serviceUrl, `shares/${token}`, { method: "GET" }, controller.signal);
-        if (
-          typeof data.ciphertext !== "string"
-          || typeof data.expires_at !== "number"
-          || !Number.isSafeInteger(data.expires_at)
-        ) {
+        const expiresAt = unixSecondsToMilliseconds(data.expires_at);
+        if (typeof data.ciphertext !== "string" || expiresAt === null) {
           throw new ShareRequestError("invalid_response", 0);
         }
-        const expiresAt = data.expires_at * 1000;
         if (expiresAt <= Date.now()) {
           setViewerState("expired");
           return;
@@ -392,13 +401,15 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ciphertext: encrypted.ciphertext, expires_in_seconds: expirationMinutes * 60 }),
       });
+      const createdAt = unixSecondsToMilliseconds(data.created_at);
+      const expiresAt = unixSecondsToMilliseconds(data.expires_at);
       if (
         typeof data.token !== "string"
         || !TOKEN_PATTERN.test(data.token)
-        || typeof data.created_at !== "number"
-        || typeof data.expires_at !== "number"
-        || !Number.isSafeInteger(data.created_at)
-        || !Number.isSafeInteger(data.expires_at)
+        || createdAt === null
+        || expiresAt === null
+        || expiresAt <= createdAt
+        || expiresAt - createdAt > MAX_SHARE_LIFETIME_MS
       ) {
         throw new ShareRequestError("invalid_response", 0);
       }
@@ -408,7 +419,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
       url.hash = "";
       url.searchParams.set("share", data.token);
       url.hash = `key=${encrypted.key}`;
-      const result = { shareUrl: url.href, createdAt: data.created_at * 1000, expiresAt: data.expires_at * 1000 };
+      const result = { shareUrl: url.href, createdAt, expiresAt };
       setCreated(result);
       const entry: ShareLogEntry = {
         id: createLocalId(),
