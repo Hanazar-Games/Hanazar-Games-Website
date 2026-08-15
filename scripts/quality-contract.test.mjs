@@ -199,3 +199,19 @@ test("share API timestamps stay within the Date range and maximum lifetime", asy
   assert.match(share, /const createdAt = unixSecondsToMilliseconds\(data\.created_at\)/);
   assert.match(share, /expiresAt - createdAt > MAX_SHARE_LIFETIME_MS/);
 });
+
+test("share viewer bounds remote expiry and releases its clock at expiry", async () => {
+  const share = await read("app/components/EphemeralShareApp.tsx");
+
+  assert.match(share, /const MAX_CLOCK_SKEW_MS = 5 \* 60 \* 1000/);
+  assert.match(share, /expiresAt - requestedAt > MAX_SHARE_LIFETIME_MS \+ MAX_CLOCK_SKEW_MS/);
+  assert.match(share, /setViewExpiresAt\(null\);\s*setViewerState\("expired"\)/);
+});
+
+test("attachment validation follows the current selected file set", async () => {
+  const share = await read("app/components/EphemeralShareApp.tsx");
+
+  assert.match(share, /function fileValidationNotice\(selected: File\[\]\)/);
+  assert.match(share, /const next = files\.filter/);
+  assert.match(share, /setNotice\(fileValidationNotice\(next\)\)/);
+});

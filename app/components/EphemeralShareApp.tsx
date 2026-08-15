@@ -59,6 +59,7 @@ const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 const MAX_DATE_MS = 8.64e15;
 const MAX_UNIX_SECONDS = Math.floor(MAX_DATE_MS / 1000);
 const MAX_SHARE_LIFETIME_MS = 24 * 60 * 60 * 1000;
+const MAX_CLOCK_SKEW_MS = 5 * 60 * 1000;
 
 class ShareRequestError extends Error {
   constructor(public readonly code: string, public readonly status: number) {
@@ -298,9 +299,14 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     setViewerState("loading");
     void (async () => {
       try {
+        const requestedAt = Date.now();
         const data = await apiRequest(serviceUrl, `shares/${token}`, { method: "GET" }, controller.signal);
         const expiresAt = unixSecondsToMilliseconds(data.expires_at);
-        if (typeof data.ciphertext !== "string" || expiresAt === null) {
+        if (
+          typeof data.ciphertext !== "string"
+          || expiresAt === null
+          || expiresAt - requestedAt > MAX_SHARE_LIFETIME_MS + MAX_CLOCK_SKEW_MS
+        ) {
           throw new ShareRequestError("invalid_response", 0);
         }
         if (expiresAt <= Date.now()) {
@@ -335,6 +341,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     if (viewExpiresAt !== null && viewExpiresAt <= now && viewerState === "ready") {
       revokeViewedFiles();
       setViewed(null);
+      setViewExpiresAt(null);
       setViewerState("expired");
     }
   }, [now, revokeViewedFiles, viewExpiresAt, viewerState]);
@@ -367,17 +374,25 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  function fileValidationNotice(selected: File[]) {
+    if (selected.length > MAX_SHARE_FILES) return tr("shareErrorTooManyFiles");
+    return selected.reduce((sum, file) => sum + file.size, 0) > MAX_SHARE_FILE_BYTES
+      ? tr("shareErrorFilesTooLarge")
+      : "";
+  }
+
   function selectFiles(selected: FileList | null) {
     const next = selected ? Array.from(selected).slice(0, MAX_SHARE_FILES + 1) : [];
     setFiles(next);
     resetFileInput();
-    setNotice(
-      next.length > MAX_SHARE_FILES
-        ? tr("shareErrorTooManyFiles")
-        : next.reduce((sum, file) => sum + file.size, 0) > MAX_SHARE_FILE_BYTES
-          ? tr("shareErrorFilesTooLarge")
-          : "",
-    );
+    setNotice(fileValidationNotice(next));
+  }
+
+  function removeFile(index: number) {
+    const next = files.filter((_, itemIndex) => itemIndex !== index);
+    setFiles(next);
+    setNotice(fileValidationNotice(next));
+    resetFileInput();
   }
 
   async function create(event: FormEvent<HTMLFormElement>) {
@@ -588,10 +603,7 @@ export default function EphemeralShareApp({ serviceUrl }: { serviceUrl: string |
                         <div><strong>{safeAttachmentName(file.name)}</strong><span>{file.type || "application/octet-stream"} · {formatBytes(file.size)}</span></div>
                         <button
                           type="button"
-                          onClick={() => {
-                            setFiles((current) => current.filter((_, itemIndex) => itemIndex !== index));
-                            resetFileInput();
-                          }}
+                          onClick={() => removeFile(index)}
                         >
                           {tr("shareRemove")}
                         </button>

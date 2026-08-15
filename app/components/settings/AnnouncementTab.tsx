@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.10.4",
+    date: "2026-08-15",
+    title: "Encrypted Share Expiry and Attachment Validation QA",
+    items: [
+      "Rejected encrypted-share viewer responses whose expiry exceeds the 24-hour service limit, with a bounded allowance for clock skew.",
+      "Released the active viewer countdown and revoked decrypted attachment URLs immediately when a share expires.",
+      "Refreshed attachment validation after every removal so recovered file selections no longer retain stale error messages.",
+      "Reverified encrypted text and attachments, ciphertext tamper rejection, browser-local logs, and 48 MiB WebRTC interruption recovery.",
+      "Rechecked all primary routes at desktop, tablet, mobile, and 320 px widths with no overflow, broken images, hidden content, or runtime errors.",
+      "Revalidated all settings categories, 20 languages, reduced SFX, opt-in BGM states, dependency integrity, and GitHub Pages exports.",
+    ],
+  },
+  {
     version: "2.10.3",
     date: "2026-08-11",
     title: "Encrypted Share Timestamp Integrity QA",
