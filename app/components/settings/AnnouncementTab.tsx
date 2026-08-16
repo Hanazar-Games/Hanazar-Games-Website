@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.11.0",
+    date: "2026-08-16",
+    title: "Skin Publishing Service Center",
+    items: [
+      "Added the 代发皮肤服务中心 entry to the homepage and primary section navigation.",
+      "Created a dedicated service documentation route with six structured, content-ready sections.",
+      "Added Service Overview, Publishing Process, QA, Frequently Asked Questions, Material Submission, and After-sales and Feedback sections without placeholder copy.",
+      "Extended GitHub Pages export validation to cover the new route, homepage entry, and complete document structure.",
+    ],
+  },
+  {
     version: "2.10.4",
     date: "2026-08-15",
     title: "Encrypted Share Expiry and Attachment Validation QA",

@@ -28,6 +28,7 @@ const requiredFiles = [
   "aigc/index.html",
   "chat/index.html",
   "transfer/index.html",
+  "skin-service/index.html",
   "games/guandan.jpg",
   "games/liars-bar.jpg",
   "games/coreball.jpg",
@@ -62,6 +63,8 @@ for (const file of requiredFiles.filter((file) => file.endsWith(".html"))) {
 
 const requiredContent = {
   "index.html": [
+    "href=\"skin-service/\"",
+    "代发皮肤服务中心",
     "href=\"chat/\"",
     "href=\"transfer/\"",
     "href=\"#aigc\"",
@@ -107,6 +110,15 @@ const requiredContent = {
     "Create pairing code",
     "Send file",
     "Download transcript",
+  ],
+  "skin-service/index.html": [
+    "代发皮肤服务中心",
+    "Service Overview",
+    "Publishing Process",
+    "QA",
+    "Frequently Asked Questions",
+    "Material Submission",
+    "After-sales and Feedback",
   ],
 };
 

@@ -18,6 +18,7 @@ const heroLinks = [
   { label: "navChat", href: chatUrl },
   { label: "navTransfer", href: transferUrl },
   { label: "navTools", href: "#tools" },
+  { label: "navSkinService", href: "#skin-service" },
   { label: "navAbout", href: "#about" },
   { label: "navUpdates", href: "#updates" },
   { label: "navContact", href: "#contact" }
@@ -378,9 +379,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="contentSection skinServiceSection" id="skin-service">
+        <div className="sectionHeading reveal revealFade" data-reveal>
+          <span className="sectionIndex">04</span>
+          <h2>{tr("skinServiceTitle")}</h2>
+        </div>
+
+        <a className="skinServiceFeature reveal revealFade" href="skin-service/" data-reveal>
+          <span className="skinServiceFeatureLabel">{tr("skinServiceEyebrow")}</span>
+          <h3>{tr("skinServiceTitle")}</h3>
+          <span className="skinServiceFeatureCta">
+            {tr("skinServiceOpen")} <span aria-hidden="true">→</span>
+          </span>
+        </a>
+      </section>
+
       <section className="contentSection aboutSection" id="about">
         <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">04</span>
+          <span className="sectionIndex">05</span>
           <h2>{tr("sectionAbout")}</h2>
         </div>
 
@@ -393,7 +409,7 @@ export default function HomePage() {
 
       <section className="contentSection documentsSection" id="documents">
         <div className="sectionHeading reveal revealRight" data-reveal>
-          <span className="sectionIndex">05</span>
+          <span className="sectionIndex">06</span>
           <h2>{tr("sectionDocuments")}</h2>
         </div>
 
@@ -416,7 +432,7 @@ export default function HomePage() {
 
       <section className="contentSection updatesSection" id="updates">
         <div className="sectionHeading reveal revealLeft" data-reveal>
-          <span className="sectionIndex">06</span>
+          <span className="sectionIndex">07</span>
           <h2>{tr("sectionUpdates")}</h2>
         </div>
 
@@ -439,7 +455,7 @@ export default function HomePage() {
 
       <section className="contentSection contactSection" id="contact">
         <div className="sectionHeading reveal revealRight" data-reveal>
-          <span className="sectionIndex">07</span>
+          <span className="sectionIndex">08</span>
           <h2>{tr("sectionContact")}</h2>
         </div>
 
