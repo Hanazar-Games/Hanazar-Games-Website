@@ -2,36 +2,33 @@
 
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useTranslation } from "../hooks/useTranslation";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 
 const sections = [
-  { id: "overview", title: "skinServiceOverview" },
-  { id: "process", title: "skinServiceProcess" },
-  { id: "qa", title: "skinServiceQa" },
-  { id: "faq", title: "skinServiceFaq" },
-  { id: "materials", title: "skinServiceMaterials" },
-  { id: "support", title: "skinServiceSupport" },
+  { id: "overview", title: "服务概览" },
+  { id: "process", title: "代发流程" },
+  { id: "qa", title: "问答区域" },
+  { id: "faq", title: "代发常见问题" },
+  { id: "materials", title: "资料提交" },
+  { id: "support", title: "售后与反馈" },
 ];
 
 export default function SkinServicePage() {
-  const { tr } = useTranslation();
-
   useRevealOnScroll();
 
   return (
-    <main className="pageShell gamesShell skinServiceShell">
+    <main className="pageShell gamesShell skinServiceShell" lang="zh-CN">
       <section className="gamesHero skinServiceHero">
         <Link href="/" className="gamesHeroBack">
-          {tr("skinServiceBackHome")}
+          返回主页
         </Link>
         <div className="gamesHeroInner">
-          <span className="gamesHeroEyebrow">{tr("skinServiceEyebrow")}</span>
-          <h1 className="gamesHeroTitle">{tr("skinServiceTitle")}</h1>
+          <span className="gamesHeroEyebrow">服务文档</span>
+          <h1 className="gamesHeroTitle">代发皮肤服务中心</h1>
         </div>
       </section>
 
-      <nav className="skinServiceIndex" aria-label={tr("skinServiceIndexLabel")}>
+      <nav className="skinServiceIndex" aria-label="文档分区">
         {sections.map((section, index) => (
           <a
             key={section.id}
@@ -41,7 +38,7 @@ export default function SkinServicePage() {
             style={{ "--reveal-delay": `${(index % 3) * 0.06}s` } as CSSProperties}
           >
             <span>{String(index + 1).padStart(2, "0")}</span>
-            {tr(section.title)}
+            {section.title}
           </a>
         ))}
       </nav>
@@ -55,7 +52,7 @@ export default function SkinServicePage() {
             data-reveal
           >
             <span>{String(index + 1).padStart(2, "0")}</span>
-            <h2>{tr(section.title)}</h2>
+            <h2>{section.title}</h2>
           </section>
         ))}
       </div>

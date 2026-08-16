@@ -205,6 +205,14 @@ export const toolGroups: ToolGroup[] = [
         image: "/tools/oc-maker.jpg",
       },
       {
+        title: "toolListenerTitle",
+        description: "toolListenerDesc",
+        tag: "toolTagMusicPlayer",
+        cta: "toolOpenButton",
+        href: "https://hzagaming.github.io/LIstener",
+        image: "/tools/listener.jpg",
+      },
+      {
         title: "toolRhythmTitle",
         description: "toolRhythmDesc",
         tag: "toolTagMusicAi",
@@ -230,8 +238,8 @@ export const toolGroups: ToolGroup[] = [
         title: "toolHeptTitle",
         description: "toolHeptDesc",
         tag: "toolTagHaptics",
-        cta: "ctaViewGithub",
-        href: "https://github.com/hzagaming/Hept",
+        cta: "ctaViewReleases",
+        href: "https://github.com/hzagaming/Hept/releases",
         image: "/tools/hept.jpg",
       },
     ],
@@ -248,17 +256,14 @@ export const toolGroups: ToolGroup[] = [
         href: "https://github.com/hzagaming/LC300A",
         image: "/products/lc300a.jpg",
       },
-      {
-        title: "toolListenerTitle",
-        description: "toolListenerDesc",
-        tag: "toolTagMusicPlayer",
-        cta: "toolOpenButton",
-        href: "https://hzagaming.github.io/LIstener",
-        image: "/tools/listener.jpg",
-      },
     ],
   },
 ];
+
+export const homepageToolGroups: ToolGroup[] = toolGroups.map((group) => ({
+  ...group,
+  tools: group.tools.slice(0, 3),
+}));
 
 export const aigcExperiments: GameEntry[] = [
   {

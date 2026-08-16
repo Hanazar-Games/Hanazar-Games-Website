@@ -100,7 +100,7 @@ test("subpage hero titles balance narrow-screen line breaks", async () => {
 });
 
 test("catalog exposes the Go project and the complete tool taxonomy", async () => {
-  const { games, homepageGames, toolGroups } = await import("../app/lib/catalog.ts");
+  const { games, homepageGames, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
 
   assert.deepEqual(homepageGames, games.slice(0, 3));
   assert.ok(games.some((game) => (
@@ -108,10 +108,13 @@ test("catalog exposes the Go project and the complete tool taxonomy", async () =
   )));
   assert.equal(homepageGames.some((game) => game.href === "https://hanazar-games.github.io/Go/"), false);
 
-  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 4, 1, 2]);
+  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 5, 1, 1]);
+  assert.ok(homepageToolGroups.every((group) => group.tools.length <= 3));
+  assert.ok(homepageToolGroups[1].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"));
+  assert.equal(toolGroups[3].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"), false);
   const tools = toolGroups.flatMap((group) => group.tools);
   for (const expected of [
-    { href: "https://github.com/hzagaming/Hept", image: "/tools/hept.jpg" },
+    { href: "https://github.com/hzagaming/Hept/releases", image: "/tools/hept.jpg" },
     { href: "https://hzagaming.github.io/LIstener", image: "/tools/listener.jpg" },
     { href: "https://hzagaming.github.io/HanazarTransfer/", image: "/tools/hanazar-transfer.jpg" },
   ]) {
@@ -119,14 +122,28 @@ test("catalog exposes the Go project and the complete tool taxonomy", async () =
   }
 });
 
-test("four-card tool groups use a balanced desktop grid", async () => {
+test("homepage tools cap each group at three cards and link to the archive", async () => {
   const [home, css] = await Promise.all([
     read("app/page.tsx"),
     read("app/globals.css"),
   ]);
 
-  assert.match(home, /group\.tools\.length === 4\s*\? " toolsGridBalanced"/);
-  assert.match(css, /\.toolsGridBalanced \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(home, /homepageToolGroups\.map/);
+  assert.match(home, /href="tools\/"/);
+  assert.match(css, /\.toolsGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
+});
+
+test("skin service stays Chinese-only with a route-scoped light theme", async () => {
+  const [page, css] = await Promise.all([
+    read("app/skin-service/page.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(page, /lang="zh-CN"/);
+  assert.match(page, /服务概览/);
+  assert.match(page, /问答区域/);
+  assert.doesNotMatch(page, /Service Documentation|Back to home|Publishing Process|Frequently Asked Questions/);
+  assert.match(css, /body:has\(\.skinServiceShell\) \{[\s\S]*?color-scheme: light;/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

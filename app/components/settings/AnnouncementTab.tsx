@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.12.0",
+    date: "2026-08-16",
+    title: "Tools Archive and Service Center Localization",
+    items: [
+      "Added a complete Tools Archive while keeping homepage tool groups focused on three featured cards.",
+      "Moved Listener into Web Tools, linked directly to its website, and identified it as a multi-source music crawler.",
+      "Updated Hept links to open the GitHub Releases page for direct access to published builds.",
+      "Converted the skin publishing service page to Chinese-only content and a route-scoped light interface.",
+      "Expanded automated and GitHub Pages checks for the new route, tool taxonomy, links, layout, and localization rules.",
+    ],
+  },
+  {
     version: "2.11.0",
     date: "2026-08-16",
     title: "Skin Publishing Service Center",

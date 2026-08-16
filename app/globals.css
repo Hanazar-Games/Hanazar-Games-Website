@@ -782,10 +782,6 @@ select:focus-visible {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.toolsGridBalanced {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 .toolsGridSingle {
   grid-template-columns: minmax(0, 1fr);
 }
@@ -818,6 +814,10 @@ select:focus-visible {
   font-size: 0.84rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.sectionHeadingLink {
+  margin-left: auto;
 }
 
 .skinServiceFeature {
@@ -2797,12 +2797,81 @@ body[data-theme="light"] .shareLogRail span {
   border-color: rgba(255, 255, 255, 0.24);
 }
 
+/* Tools Archive */
+.toolsArchiveHero {
+  min-height: 54svh;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(180, 215, 255, 0.09), transparent 34%),
+    linear-gradient(180deg, #090b0e 0%, #050505 100%);
+}
+
+.toolsArchiveGroups {
+  padding: 72px 0 48px;
+  display: grid;
+  gap: 72px;
+}
+
+.toolsArchiveGroups .toolsGroupHeading h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
 /* Skin Service Documentation */
 .skinServiceHero {
   min-height: 54svh;
   background:
     radial-gradient(circle at 50% 24%, rgba(165, 193, 255, 0.1), transparent 36%),
     linear-gradient(180deg, #0a0b0e 0%, #050505 100%);
+}
+
+body:has(.skinServiceShell) {
+  color-scheme: light;
+  --bg: #f6f6f6;
+  --panel: rgba(255, 255, 255, 0.92);
+  --panel-strong: rgba(255, 255, 255, 0.98);
+  --panel-soft: rgba(0, 0, 0, 0.04);
+  --text: #1a1a1a;
+  --muted: #666;
+  --line: rgba(0, 0, 0, 0.1);
+  --line-strong: rgba(0, 0, 0, 0.18);
+  --accent: #333;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 50% 10%, rgba(0, 0, 0, 0.035), transparent 30%),
+    linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+}
+
+body:has(.skinServiceShell) .skinServiceHero {
+  background:
+    radial-gradient(circle at 50% 26%, rgba(71, 106, 163, 0.1), transparent 36%),
+    linear-gradient(180deg, #f8fafc 0%, #eef1f5 100%);
+}
+
+body:has(.skinServiceShell) .gamesHeroTitle,
+body:has(.skinServiceShell) .gamesHeroEyebrow {
+  color: #1a1a1a;
+  text-shadow: none;
+}
+
+body:has(.skinServiceShell) .gamesHeroBack {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+  color: #333;
+}
+
+body:has(.skinServiceShell) .settingsFloatingButton {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  color: #1a1a1a;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.12);
+}
+
+body:has(.skinServiceShell) .skinServiceIndex,
+body:has(.skinServiceShell) .skinServiceDocumentSection {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .skinServiceIndex {

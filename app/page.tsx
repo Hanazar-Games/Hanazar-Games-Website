@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "./hooks/useTranslation";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
-import { aigcExperiments, homepageGames, toolGroups } from "./lib/catalog";
+import { aigcExperiments, homepageGames, homepageToolGroups } from "./lib/catalog";
 import { assetPath } from "./lib/paths";
 
 const githubUrl = "https://github.com/hzagaming";
@@ -91,7 +91,7 @@ const footerColumns = [
       { title: "toolClipoTitle", href: "https://github.com/hzagaming/Clipo" },
       { title: "toolClassGodTitle", href: "https://github.com/hzagaming/ClassGod" },
       { title: "toolTransferTitle", href: "https://hzagaming.github.io/HanazarTransfer/" },
-      { title: "toolHeptTitle", href: "https://github.com/hzagaming/Hept" },
+      { title: "toolHeptTitle", href: "https://github.com/hzagaming/Hept/releases" },
       { title: "toolListenerTitle", href: "https://hzagaming.github.io/LIstener" },
       { title: "productLc300aTitle", href: "https://github.com/hzagaming/LC300A" }
     ]
@@ -123,6 +123,7 @@ const footerColumns = [
       { title: "footerSocialGithub", href: githubUrl },
       { title: "gamesHeroTitle", href: "games/" },
       { title: "navAigc", href: "aigc/" },
+      { title: "sectionTools", href: "tools/" },
       { title: "navChat", href: chatUrl },
       { title: "navTransfer", href: transferUrl },
       { title: "navContact", href: "mailto:hanazar@mirako.co" }
@@ -296,10 +297,13 @@ export default function HomePage() {
         <div className="sectionHeading reveal revealFade" data-reveal>
           <span className="sectionIndex">03</span>
           <h2>{tr("sectionTools")}</h2>
+          <a className="sectionTextLink sectionHeadingLink" href="tools/">
+            {tr("toolsBrowseAll")} <span aria-hidden="true">→</span>
+          </a>
         </div>
 
         <div className="toolsGroups">
-          {toolGroups.map((group, groupIndex) => (
+          {homepageToolGroups.map((group, groupIndex) => (
             <div className="toolsGroup" key={group.title}>
               <div
                 className={`toolsGroupHeading ${
@@ -321,9 +325,7 @@ export default function HomePage() {
               <div className={`toolsGrid${
                   group.tools.length === 1
                     ? " toolsGridSingle"
-                    : group.tools.length === 4
-                      ? " toolsGridBalanced"
-                      : group.tools.length === 2
+                    : group.tools.length === 2
                         ? " toolsGridMac"
                         : ""
               }`}>
