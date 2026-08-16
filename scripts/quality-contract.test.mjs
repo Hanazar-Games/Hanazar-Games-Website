@@ -134,16 +134,39 @@ test("homepage tools cap each group at three cards and link to the archive", asy
 });
 
 test("skin service stays Chinese-only with a route-scoped light theme", async () => {
-  const [page, css] = await Promise.all([
+  const [page, center, css] = await Promise.all([
     read("app/skin-service/page.tsx"),
+    read("app/components/SkinServiceCenter.tsx"),
     read("app/globals.css"),
   ]);
 
-  assert.match(page, /lang="zh-CN"/);
-  assert.match(page, /服务概览/);
-  assert.match(page, /问答区域/);
-  assert.doesNotMatch(page, /Service Documentation|Back to home|Publishing Process|Frequently Asked Questions/);
+  assert.match(center, /lang="zh-CN"/);
+  assert.match(center, /我们的社群/);
+  assert.match(center, /代发皮肤常见问题/);
+  assert.doesNotMatch(page + center, /Service Documentation|Back to home|Publishing Process|Frequently Asked Questions/);
   assert.match(css, /body:has\(\.skinServiceShell\) \{[\s\S]*?color-scheme: light;/);
+});
+
+test("skin service exposes searchable communities and a protected public feedback wall", async () => {
+  const [page, center] = await Promise.all([
+    read("app/skin-service/page.tsx"),
+    read("app/components/SkinServiceCenter.tsx"),
+  ]);
+
+  assert.match(page, /NEXT_PUBLIC_CHAT_SERVICE_URL/);
+  for (const value of ["939095145", "853878672", "953014293", "1105843703", "https://discord.gg/XtTbKCSKa"]) {
+    assert.match(center, new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  for (const title of ["我们的社群", "代发皮肤常见问题", "匿名反馈墙", "审核通知", "支持与捐赠"]) {
+    assert.match(center, new RegExp(title));
+  }
+  assert.match(center, /type="search"/);
+  assert.match(center, /api\/feedbacks/);
+  assert.match(center, /method:\s*editingId\s*\?\s*"PATCH"\s*:\s*"POST"/);
+  assert.match(center, /5\s*\*\s*60\s*\*\s*1000/);
+  assert.match(center, /localStorage/);
+  assert.match(center, /name="website"/);
+  assert.doesNotMatch(center, /dangerouslySetInnerHTML|innerHTML/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

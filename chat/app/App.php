@@ -14,6 +14,7 @@ final readonly class App
     public MessageService $messages;
     public PresenceService $presence;
     public ShareService $shares;
+    public FeedbackService $feedback;
     public RateLimiter $rateLimiter;
     public SessionManager $sessions;
     public Csrf $csrf;
@@ -31,6 +32,7 @@ final readonly class App
         $this->messages = new MessageService($this->database, $this->permissions, $this->events);
         $this->presence = new PresenceService($this->database, $this->events);
         $this->shares = new ShareService($this->database);
+        $this->feedback = new FeedbackService($this->database);
         $this->rateLimiter = new RateLimiter($config);
         $this->sessions = new SessionManager($config, $sessionState);
         $this->csrf = new Csrf($this->sessions);

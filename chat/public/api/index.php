@@ -13,34 +13,35 @@ require dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 const MAX_BODY_BYTES = 1048576;
 const MAX_SHARE_BODY_BYTES = 12582912;
+const MAX_FEEDBACK_BODY_BYTES = 4096;
 const METHODS = ['GET', 'POST', 'PATCH', 'DELETE'];
-const SHARE_METHODS = ['GET', 'POST', 'OPTIONS'];
+const PUBLIC_METHODS = ['GET', 'POST', 'PATCH', 'OPTIONS'];
 
 try {
     $config = Config::fromEnvironment();
     $identity = ClientIdentity::resolve($_SERVER, $config->trustedProxies());
     $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
     $path = requestPath();
-    $shareRoute = isSharePath($path);
+    $publicRoute = isPublicPath($path);
     $requestHost = strtolower(explode(':', $_SERVER['HTTP_HOST'] ?? '')[0]);
     if (!hash_equals($config->appHost(), $requestHost)) {
         throw new HttpException(400, 'invalid_host');
     }
     $requestOrigin = rtrim((string) ($_SERVER['HTTP_ORIGIN'] ?? ''), '/');
-    if (!$shareRoute && $requestOrigin !== '' && !hash_equals($config->appOrigin(), $requestOrigin)) {
+    if (!$publicRoute && $requestOrigin !== '' && !hash_equals($config->appOrigin(), $requestOrigin)) {
         throw new HttpException(403, 'forbidden');
     }
     foreach (SecurityHeaders::json($identity->isSecure()) as $name => $value) {
         header($name . ': ' . $value);
     }
-    if ($shareRoute) {
-        applyShareCors($config, $requestOrigin);
+    if ($publicRoute) {
+        applyPublicCors($config, $requestOrigin);
         if ($method === 'OPTIONS') {
             http_response_code(204);
             exit;
         }
         $publicState = [];
-        dispatchShare(new App($config, $publicState), $identity->ip(), $method, $path);
+        dispatchPublic(new App($config, $publicState), $identity->ip(), $method, $path);
     }
     session_name('hanazar_chat');
     session_save_path($config->sessionPath());
@@ -197,10 +198,10 @@ function dispatch(App $app, string $clientIp, string $method, string $path): nev
     throw new HttpException(404, 'not_found');
 }
 
-function dispatchShare(App $app, string $clientIp, string $method, string $path): never
+function dispatchPublic(App $app, string $clientIp, string $method, string $path): never
 {
-    if (!in_array($method, SHARE_METHODS, true)) {
-        header('Allow: GET, POST, OPTIONS');
+    if (!in_array($method, PUBLIC_METHODS, true)) {
+        header('Allow: GET, POST, PATCH, OPTIONS');
         throw new HttpException(405, 'method_not_allowed');
     }
 
@@ -221,7 +222,38 @@ function dispatchShare(App $app, string $clientIp, string $method, string $path)
         respond($app->shares->fetch($match[1]));
     }
 
-    throw new HttpException(404, 'share_not_found');
+    if ($path === '/feedbacks' && $method === 'GET') {
+        $app->rateLimiter->consume('feedback_read', $identifier);
+        $now = time();
+        respond([
+            'items' => $app->feedback->list(intQuery('limit') ?? 50, $now),
+            'server_time' => $now,
+        ]);
+    }
+    if ($path === '/feedbacks' && $method === 'POST') {
+        $app->rateLimiter->consume('feedback_submit', $identifier);
+        $body = requestBody($method, MAX_FEEDBACK_BODY_BYTES);
+        $website = $body['website'] ?? '';
+        if (!is_string($website) || trim($website) !== '') {
+            throw new HttpException(422, 'invalid_feedback');
+        }
+        respond($app->feedback->create(stringField($body, 'content')), 201);
+    }
+    if (preg_match('~^/feedbacks/([1-9]\d{0,18})$~D', $path, $match) === 1 && $method === 'PATCH') {
+        $app->rateLimiter->consume('feedback_edit', $identifier);
+        $body = requestBody($method, MAX_FEEDBACK_BODY_BYTES);
+        $website = $body['website'] ?? '';
+        if (!is_string($website) || trim($website) !== '') {
+            throw new HttpException(422, 'invalid_feedback');
+        }
+        respond($app->feedback->edit(
+            (int) $match[1],
+            stringField($body, 'edit_token'),
+            stringField($body, 'content'),
+        ));
+    }
+
+    throw new HttpException(404, str_starts_with($path, '/feedbacks') ? 'feedback_not_found' : 'share_not_found');
 }
 
 function requestPath(): string
@@ -231,12 +263,15 @@ function requestPath(): string
     return '/' . trim($path, '/');
 }
 
-function isSharePath(string $path): bool
+function isPublicPath(string $path): bool
 {
-    return $path === '/shares' || str_starts_with($path, '/shares/');
+    return $path === '/shares'
+        || str_starts_with($path, '/shares/')
+        || $path === '/feedbacks'
+        || str_starts_with($path, '/feedbacks/');
 }
 
-function applyShareCors(Config $config, string $origin): void
+function applyPublicCors(Config $config, string $origin): void
 {
     if ($origin === '') {
         return;
@@ -246,7 +281,7 @@ function applyShareCors(Config $config, string $origin): void
     }
     header('Vary: Origin');
     header('Access-Control-Allow-Origin: ' . $origin);
-    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Methods: GET, POST, PATCH, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
     header('Access-Control-Max-Age: 600');
 }
@@ -314,6 +349,10 @@ function publicMessage(string $code): string
         'share_not_found' => 'The encrypted share was not found.',
         'share_expired' => 'The encrypted share has expired.',
         'invalid_expiration', 'invalid_ciphertext', 'invalid_request' => 'The share request is invalid.',
+        'feedback_not_found' => 'The feedback entry was not found.',
+        'edit_window_closed' => 'The feedback edit window has closed.',
+        'duplicate_feedback' => 'Duplicate feedback was rejected.',
+        'invalid_feedback' => 'The feedback content is invalid.',
         default => 'The request could not be completed.',
     };
 }

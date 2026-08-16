@@ -52,6 +52,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
                 '/typing',
                 '/health',
                 '/shares',
+                '/feedbacks',
             ] as $route
         ) {
             self::assertStringContainsString($route, $api, 'Missing API route contract: ' . $route);
@@ -74,6 +75,9 @@ final class ApiFrontendCleanupContractTest extends TestCase
         self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]api[\'\"]~', $api);
         self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]share_create[\'\"]~', $api);
         self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]share_read[\'\"]~', $api);
+        self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]feedback_submit[\'\"]~', $api);
+        self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]feedback_edit[\'\"]~', $api);
+        self::assertMatchesRegularExpression('~consume\s*\(\s*[\'\"]feedback_read[\'\"]~', $api);
         self::assertMatchesRegularExpression('~json_last_error|JSON_THROW_ON_ERROR~', $api);
     }
 
@@ -85,6 +89,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
         self::assertStringContainsString('Access-Control-Allow-Origin', $api);
         self::assertStringContainsString('Access-Control-Allow-Methods', $api);
         self::assertStringContainsString('Access-Control-Allow-Headers', $api);
+        self::assertMatchesRegularExpression('~Access-Control-Allow-Methods[^\n]*PATCH~', $api);
         self::assertDoesNotMatchRegularExpression('~Access-Control-Allow-Origin[^\n]*\*~i', $api);
         self::assertDoesNotMatchRegularExpression('~Access-Control-Allow-Credentials~i', $api);
     }
@@ -249,6 +254,7 @@ final class ApiFrontendCleanupContractTest extends TestCase
                 'user_presence',
                 'audit_logs',
                 'ephemeral_shares',
+                'public_feedback',
                 'sessions',
                 'rate-limits',
                 'logs',
@@ -317,6 +323,16 @@ final class ApiFrontendCleanupContractTest extends TestCase
         self::assertMatchesRegularExpression('~root\s+[^;]+/public\s*;~i', $nginx);
         self::assertMatchesRegularExpression('~client_max_body_size\s+12[mM]\s*;~', $nginx);
         self::assertMatchesRegularExpression('~post_max_size\]\s*=\s*12[mM]~i', $this->readRequired('php-fpm/chat.conf'));
+        self::assertMatchesRegularExpression('~limit_req_zone\s+\$binary_remote_addr~i', $nginx);
+        self::assertMatchesRegularExpression('~limit_conn_zone\s+\$binary_remote_addr~i', $nginx);
+        self::assertMatchesRegularExpression('~limit_req_status\s+429\s*;~i', $nginx);
+        self::assertMatchesRegularExpression('~limit_conn_status\s+429\s*;~i', $nginx);
+        self::assertMatchesRegularExpression('~server_tokens\s+off\s*;~i', $nginx);
+        self::assertMatchesRegularExpression('~client_header_timeout\s+\d+s\s*;~i', $nginx);
+        self::assertMatchesRegularExpression('~client_body_timeout\s+\d+s\s*;~i', $nginx);
+        self::assertMatchesRegularExpression('~request_terminate_timeout\s*=\s*\d+s~i', $this->readRequired('php-fpm/chat.conf'));
+        self::assertMatchesRegularExpression('~max_execution_time\]\s*=\s*\d+~i', $this->readRequired('php-fpm/chat.conf'));
+        self::assertMatchesRegularExpression('~expose_php\]\s*=\s*Off~i', $this->readRequired('php-fpm/chat.conf'));
         self::assertMatchesRegularExpression('~location\s+~', $nginx);
         self::assertMatchesRegularExpression('~location[^\{]*php|location\s*=\s*/(?:api/)?index\.php~i', $nginx);
         self::assertMatchesRegularExpression('~deny\s+all\s*;~i', $nginx);

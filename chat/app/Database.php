@@ -115,6 +115,16 @@ CREATE TABLE IF NOT EXISTS ephemeral_shares (
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
 );
+CREATE TABLE IF NOT EXISTS public_feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    content TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    edit_token_hash TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'visible' CHECK (status IN ('visible', 'hidden')),
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    publish_at INTEGER NOT NULL
+);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_rooms_dm_pair_unique ON rooms(dm_user_low, dm_user_high) WHERE kind = 'dm';
 CREATE INDEX IF NOT EXISTS idx_room_members_active_user ON room_members(user_id, room_id) WHERE left_at IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_room_members_active_owner ON room_members(room_id) WHERE role = 'owner' AND left_at IS NULL;
@@ -123,7 +133,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_messages_sender_nonce_unique ON messages(s
 CREATE INDEX IF NOT EXISTS idx_messages_room_id ON messages(room_id, id);
 CREATE INDEX IF NOT EXISTS idx_user_events_user_id ON user_events(user_id, id);
 CREATE INDEX IF NOT EXISTS idx_ephemeral_shares_expires_at ON ephemeral_shares(expires_at);
-INSERT INTO app_meta (key, value) VALUES ('schema_version', '2') ON CONFLICT(key) DO UPDATE SET value = '2';
+CREATE INDEX IF NOT EXISTS idx_public_feedback_publish ON public_feedback(status, publish_at, id);
+CREATE INDEX IF NOT EXISTS idx_public_feedback_duplicate ON public_feedback(content_hash, created_at);
+INSERT INTO app_meta (key, value) VALUES ('schema_version', '3') ON CONFLICT(key) DO UPDATE SET value = '3';
 INSERT INTO app_meta (key, value) VALUES ('events_floor_id', '0') ON CONFLICT(key) DO NOTHING;
 SQL);
     }

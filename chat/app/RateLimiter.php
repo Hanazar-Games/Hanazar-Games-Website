@@ -13,6 +13,9 @@ final class RateLimiter
         'api' => [120, 60],
         'share_create' => [30, 3600],
         'share_read' => [240, 60],
+        'feedback_submit' => [3, 3600],
+        'feedback_edit' => [12, 3600],
+        'feedback_read' => [120, 60],
     ];
 
     public function __construct(private readonly Config $config) {}

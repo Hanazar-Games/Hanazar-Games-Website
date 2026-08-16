@@ -21,6 +21,7 @@ const RETENTION = [
     'typing_indicators' => 60,
     'user_presence' => 2592000,
     'audit_logs' => 7776000,
+    'public_feedback' => 15552000,
     'sessions' => 86400,
     'rate-limits' => 86400,
     'logs' => 2592000,
@@ -42,6 +43,7 @@ try {
                 'DELETE FROM user_presence WHERE last_seen_at < :cutoff' => $now - RETENTION['user_presence'],
                 'DELETE FROM audit_logs WHERE created_at < :cutoff' => $now - RETENTION['audit_logs'],
                 'DELETE FROM ephemeral_shares WHERE expires_at <= :cutoff' => $now,
+                'DELETE FROM public_feedback WHERE created_at < :cutoff' => $now - RETENTION['public_feedback'],
             ] as $sql => $cutoff
         ) {
             $statement = $pdo->prepare($sql);

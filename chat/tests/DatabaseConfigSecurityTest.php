@@ -143,6 +143,7 @@ final class DatabaseConfigSecurityTest extends TestCase
                 'typing_indicators',
                 'audit_logs',
                 'ephemeral_shares',
+                'public_feedback',
             ] as $table
         ) {
             self::assertContains($table, $tables);
@@ -169,6 +170,8 @@ final class DatabaseConfigSecurityTest extends TestCase
                 'idx_messages_room_id',
                 'idx_user_events_user_id',
                 'idx_ephemeral_shares_expires_at',
+                'idx_public_feedback_publish',
+                'idx_public_feedback_duplicate',
             ] as $index
         ) {
             self::assertArrayHasKey($index, $rows);
