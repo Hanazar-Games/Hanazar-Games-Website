@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.13.0",
+    date: "2026-08-17",
+    title: "Secure Feedback Wall and Full-Site QA",
+    items: [
+      "Expanded the 代发皮肤服务中心 with verified community entries, searchable help articles, a public feedback wall, review notices, and support placeholders.",
+      "Added anonymous feedback creation, five-minute same-browser editing, delayed publication, strict response validation, request cancellation, and safe local edit-token recovery.",
+      "Hardened feedback delivery with hashed edit tokens, prepared SQLite statements, content and duplicate defenses, CORS allowlists, application rate limits, and Nginx connection limits.",
+      "Kept the service center and its settings dialog consistently light, removed two dead tool links and their unused assets, and retained a three-card Web Tools row.",
+      "Recovered Safari interrupted audio contexts while preserving opt-in ambient BGM, throttled SFX, reduced output ceilings, hidden-page pause, and audio-node cleanup.",
+      "Rechecked every route at desktop, tablet, mobile, and 320 px widths and revalidated the configured and unconfigured GitHub Pages exports.",
+    ],
+  },
+  {
     version: "2.12.0",
     date: "2026-08-16",
     title: "Tools Archive and Service Center Localization",

@@ -64,7 +64,8 @@ body[data-theme="light"] .heroSection::after {
   background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.5));
 }
 
-body[data-theme="light"] .settingsModal {
+body[data-theme="light"] .settingsModal,
+body:has(.skinServiceShell) .settingsModal {
   background: rgba(245, 245, 245, 0.98);
   color: #1a1a1a;
 }
@@ -77,33 +78,40 @@ body[data-theme="light"] .settingsFloatingButton {
   box-shadow: 0 16px 42px rgba(0, 0, 0, 0.16);
 }
 
-body[data-theme="light"] .settingsTabBtn {
+body[data-theme="light"] .settingsTabBtn,
+body:has(.skinServiceShell) .settingsTabBtn {
   color: #444;
 }
 
-body[data-theme="light"] .settingsTabBtn.active {
+body[data-theme="light"] .settingsTabBtn.active,
+body:has(.skinServiceShell) .settingsTabBtn.active {
   background: rgba(0,0,0,0.06);
   color: #111;
 }
 
-body[data-theme="light"] .settingsTabPanel {
+body[data-theme="light"] .settingsTabPanel,
+body:has(.skinServiceShell) .settingsTabPanel {
   color: #1a1a1a;
 }
 
 body[data-theme="light"] .settingsInput,
-body[data-theme="light"] .settingsTextarea {
+body[data-theme="light"] .settingsTextarea,
+body:has(.skinServiceShell) .settingsInput,
+body:has(.skinServiceShell) .settingsTextarea {
   background: rgba(0,0,0,0.04);
   border-color: rgba(0,0,0,0.12);
   color: #1a1a1a;
 }
 
-body[data-theme="light"] .seg-btn {
+body[data-theme="light"] .seg-btn,
+body:has(.skinServiceShell) .seg-btn {
   background: rgba(0,0,0,0.04);
   border-color: rgba(0,0,0,0.1);
   color: #444;
 }
 
-body[data-theme="light"] .seg-btn.active {
+body[data-theme="light"] .seg-btn.active,
+body:has(.skinServiceShell) .seg-btn.active {
   background: rgba(0,0,0,0.12);
   color: #111;
 }
@@ -227,11 +235,14 @@ body[data-theme="light"] .settingsCloseBtn:hover {
 }
 
 body[data-theme="light"] .changelogItems,
-body[data-theme="light"] .aboutDesc {
+body[data-theme="light"] .aboutDesc,
+body:has(.skinServiceShell) .changelogItems,
+body:has(.skinServiceShell) .aboutDesc {
   color: #555;
 }
 
-body[data-theme="light"] .changelogEntryLatest {
+body[data-theme="light"] .changelogEntryLatest,
+body:has(.skinServiceShell) .changelogEntryLatest {
   border-color: rgba(0, 0, 0, 0.14);
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.035), rgba(0, 0, 0, 0.012)),
@@ -239,28 +250,36 @@ body[data-theme="light"] .changelogEntryLatest {
 }
 
 body[data-theme="light"] .settingsBtn,
-body[data-theme="light"] .settingsCloseBtn {
+body[data-theme="light"] .settingsCloseBtn,
+body:has(.skinServiceShell) .settingsBtn,
+body:has(.skinServiceShell) .settingsCloseBtn {
   background: rgba(0, 0, 0, 0.035);
   border-color: rgba(0, 0, 0, 0.12);
   color: #333;
 }
 
 body[data-theme="light"] .settingsBtn:hover,
-body[data-theme="light"] .settingsCloseBtn:hover {
+body[data-theme="light"] .settingsCloseBtn:hover,
+body:has(.skinServiceShell) .settingsBtn:hover,
+body:has(.skinServiceShell) .settingsCloseBtn:hover {
   background: rgba(0, 0, 0, 0.08);
 }
 
-body[data-theme="light"] .settingsBtn.danger {
+body[data-theme="light"] .settingsBtn.danger,
+body:has(.skinServiceShell) .settingsBtn.danger {
   border-color: rgba(177, 48, 59, 0.35);
   color: #a52632;
 }
 
 body[data-theme="light"] .rangeSlider,
-body[data-theme="light"] .switch .slider {
+body[data-theme="light"] .switch .slider,
+body:has(.skinServiceShell) .rangeSlider,
+body:has(.skinServiceShell) .switch .slider {
   background: rgba(0, 0, 0, 0.12);
 }
 
-body[data-theme="light"] .switch input:checked + .slider {
+body[data-theme="light"] .switch input:checked + .slider,
+body:has(.skinServiceShell) .switch input:checked + .slider {
   background: rgba(0, 0, 0, 0.42);
 }
 
@@ -292,21 +311,25 @@ body[data-theme="light"] .aboutPanel p {
   color: #555;
 }
 
-body[data-theme="light"] .colorPreset {
+body[data-theme="light"] .colorPreset,
+body:has(.skinServiceShell) .colorPreset {
   border-color: rgba(0, 0, 0, 0.12);
   background: rgba(0, 0, 0, 0.025);
 }
 
-body[data-theme="light"] .colorPreset.active {
+body[data-theme="light"] .colorPreset.active,
+body:has(.skinServiceShell) .colorPreset.active {
   border-color: rgba(0, 0, 0, 0.34);
   background: rgba(0, 0, 0, 0.08);
 }
 
-body[data-theme="light"] .rangeSlider::-webkit-slider-thumb {
+body[data-theme="light"] .rangeSlider::-webkit-slider-thumb,
+body:has(.skinServiceShell) .rangeSlider::-webkit-slider-thumb {
   border: 1px solid rgba(0, 0, 0, 0.24);
 }
 
-body[data-theme="light"] .rangeSlider::-moz-range-thumb {
+body[data-theme="light"] .rangeSlider::-moz-range-thumb,
+body:has(.skinServiceShell) .rangeSlider::-moz-range-thumb {
   border: 1px solid rgba(0, 0, 0, 0.24);
 }
 

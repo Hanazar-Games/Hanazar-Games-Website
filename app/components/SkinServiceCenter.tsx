@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface FeedbackItem {
   id: number;
@@ -128,6 +128,7 @@ function parsePending(value: unknown, now: number): PendingFeedback | null {
     || !Number.isSafeInteger(id)
     || id < 1
     || typeof content !== "string"
+    || Array.from(content).length < 4
     || Array.from(content).length > 500
     || typeof editToken !== "string"
     || !TOKEN_PATTERN.test(editToken)
@@ -182,7 +183,7 @@ async function feedbackRequest(serviceUrl: string, suffix: string, init: Request
   } catch {
     throw new FeedbackRequestError("invalid_response");
   }
-  if (!envelope || envelope.ok !== true) {
+  if (!response.ok || !envelope || envelope.ok !== true) {
     throw new FeedbackRequestError(typeof envelope?.error?.code === "string" ? envelope.error.code : "request_failed");
   }
   return envelope.data;
@@ -224,23 +225,31 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   const [submitting, setSubmitting] = useState(false);
   const [feedbackNotice, setFeedbackNotice] = useState("");
   const [now, setNow] = useState(Date.now());
+  const wallRequestRef = useRef<AbortController | null>(null);
 
-  const refreshWall = useCallback(async (signal?: AbortSignal) => {
+  const refreshWall = useCallback(async () => {
+    wallRequestRef.current?.abort();
     if (!serviceUrl) {
       setWallState("unavailable");
       return;
     }
+    const controller = new AbortController();
+    wallRequestRef.current = controller;
     try {
-      const data = await feedbackRequest(serviceUrl, "?limit=50", { method: "GET" }, signal);
+      const data = await feedbackRequest(serviceUrl, "?limit=50", { method: "GET" }, controller.signal);
       const items = isRecord(data) && Array.isArray(data.items)
         ? data.items.map(parseFeedback).filter((item): item is FeedbackItem => item !== null)
         : null;
       if (!items) throw new FeedbackRequestError("invalid_response");
+      if (wallRequestRef.current !== controller) return;
       setWall(items);
       setWallState("ready");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
+      if (wallRequestRef.current !== controller) return;
       setWallState("failed");
+    } finally {
+      if (wallRequestRef.current === controller) wallRequestRef.current = null;
     }
   }, [serviceUrl]);
 
@@ -256,15 +265,15 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   }, []);
 
   useEffect(() => {
-    const controller = new AbortController();
-    void refreshWall(controller.signal);
+    void refreshWall();
     const refreshWhenVisible = () => {
       if (!document.hidden) void refreshWall();
     };
     const timer = window.setInterval(refreshWhenVisible, 30_000);
     document.addEventListener("visibilitychange", refreshWhenVisible);
     return () => {
-      controller.abort();
+      wallRequestRef.current?.abort();
+      wallRequestRef.current = null;
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", refreshWhenVisible);
     };
@@ -341,34 +350,34 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           ...(editingId && pending ? { edit_token: pending.editToken } : {}),
         }),
       });
-      if (!isRecord(data)) throw new FeedbackRequestError("invalid_response");
-
       if (editingId && pending) {
-        const updated = { ...pending, content: normalized };
+        const updatedFeedback = parseFeedback(data);
+        if (!updatedFeedback || updatedFeedback.id !== editingId) {
+          throw new FeedbackRequestError("invalid_response");
+        }
+        const updated = { ...pending, content: updatedFeedback.content };
         setPending(updated);
         persistPending(updated);
         setFeedbackNotice("反馈已更新，公开倒计时不变。");
       } else {
-        const id = data.id;
+        if (!isRecord(data)) throw new FeedbackRequestError("invalid_response");
+        const createdFeedback = parseFeedback(data);
         const editToken = data.edit_token;
-        const createdAt = data.created_at;
-        const publishAt = data.publish_at;
         if (
-          typeof id !== "number"
-          || !Number.isSafeInteger(id)
-          || id < 1
+          !createdFeedback
           || typeof editToken !== "string"
           || !TOKEN_PATTERN.test(editToken)
-          || typeof createdAt !== "number"
-          || !Number.isSafeInteger(createdAt)
-          || typeof publishAt !== "number"
-          || !Number.isSafeInteger(publishAt)
-          || publishAt <= createdAt
         ) throw new FeedbackRequestError("invalid_response");
-        const duration = Math.min(EDIT_WINDOW_MS, Math.max(1_000, (publishAt - createdAt) * 1000));
-        const created: PendingFeedback = { id, content: normalized, editToken, expiresAt: Date.now() + duration };
+        const duration = (createdFeedback.publishAt - createdFeedback.createdAt) * 1000;
+        if (duration < 1_000 || duration > EDIT_WINDOW_MS) throw new FeedbackRequestError("invalid_response");
+        const created: PendingFeedback = {
+          id: createdFeedback.id,
+          content: createdFeedback.content,
+          editToken,
+          expiresAt: Date.now() + duration,
+        };
         setPending(created);
-        setEditingId(id);
+        setEditingId(createdFeedback.id);
         persistPending(created);
         setFeedbackNotice("反馈已保存。本机可在五分钟内修改，倒计时结束后将公开。");
       }

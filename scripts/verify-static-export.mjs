@@ -44,6 +44,8 @@ const forbiddenFiles = [
   "HanazarIntroAnimation.mp4",
   "hanazar-emblem.svg",
   "aigc/gpt-55-extrahigh.jpg",
+  "tools/aiugc-pipeline.jpg",
+  "tools/ai-rhythm-game.jpg",
 ];
 
 for (const file of requiredFiles) {
@@ -152,8 +154,14 @@ const forbiddenContent = {
   "index.html": [
     "https://hanazar-games.github.io/Tic-Tac-Toe/",
     "https://chat.hanazargames.com/",
+    "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
+    "https://github.com/Mirako-Official/AI-Rhythm-Game",
   ],
   "aigc/index.html": ["https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project"],
+  "tools/index.html": [
+    "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
+    "https://github.com/Mirako-Official/AI-Rhythm-Game",
+  ],
 };
 
 for (const [file, values] of Object.entries(forbiddenContent)) {

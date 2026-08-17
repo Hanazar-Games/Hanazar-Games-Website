@@ -84,6 +84,13 @@ test("site audio stays opt-in and below the reduced output ceiling", async () =>
   assert.match(audio, /button:not\(:disabled\)/);
 });
 
+test("audio recovery handles nonstandard interrupted contexts", async () => {
+  const audio = await read("app/components/AudioEngine.tsx");
+
+  assert.match(audio, /ctx\.state !== "running" && ctx\.state !== "closed"/);
+  assert.doesNotMatch(audio, /ctx\.state === "suspended"\) await ctx\.resume/);
+});
+
 test("above-the-fold archive images load eagerly without preloading competing candidates", async () => {
   const [games, aigc] = await Promise.all([
     read("app/games/page.tsx"),
@@ -108,11 +115,12 @@ test("catalog exposes the Go project and the complete tool taxonomy", async () =
   )));
   assert.equal(homepageGames.some((game) => game.href === "https://hanazar-games.github.io/Go/"), false);
 
-  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 5, 1, 1]);
+  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 3, 1, 1]);
   assert.ok(homepageToolGroups.every((group) => group.tools.length <= 3));
   assert.ok(homepageToolGroups[1].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"));
   assert.equal(toolGroups[3].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"), false);
   const tools = toolGroups.flatMap((group) => group.tools);
+  assert.equal(tools.some(({ href }) => href.includes("Mirako-Official")), false);
   for (const expected of [
     { href: "https://github.com/hzagaming/Hept/releases", image: "/tools/hept.jpg" },
     { href: "https://hzagaming.github.io/LIstener", image: "/tools/listener.jpg" },
@@ -145,6 +153,7 @@ test("skin service stays Chinese-only with a route-scoped light theme", async ()
   assert.match(center, /代发皮肤常见问题/);
   assert.doesNotMatch(page + center, /Service Documentation|Back to home|Publishing Process|Frequently Asked Questions/);
   assert.match(css, /body:has\(\.skinServiceShell\) \{[\s\S]*?color-scheme: light;/);
+  assert.match(css, /body:has\(\.skinServiceShell\) \.settingsModal/);
 });
 
 test("skin service exposes searchable communities and a protected public feedback wall", async () => {
@@ -167,6 +176,17 @@ test("skin service exposes searchable communities and a protected public feedbac
   assert.match(center, /localStorage/);
   assert.match(center, /name="website"/);
   assert.doesNotMatch(center, /dangerouslySetInnerHTML|innerHTML/);
+});
+
+test("skin feedback recovery validates drafts and cancels superseded wall requests", async () => {
+  const center = await read("app/components/SkinServiceCenter.tsx");
+
+  assert.match(center, /Array\.from\(content\)\.length < 4/);
+  assert.match(center, /useRef<AbortController \| null>/);
+  assert.match(center, /wallRequestRef\.current\?\.abort\(\)/);
+  assert.match(center, /wallRequestRef\.current !== controller/);
+  assert.match(center, /createdAt > MAX_UNIX_SECONDS/);
+  assert.match(center, /publishAt > MAX_UNIX_SECONDS/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

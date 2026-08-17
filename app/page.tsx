@@ -85,9 +85,7 @@ const footerColumns = [
   {
     title: "footerColumnTools",
     links: [
-      { title: "toolAiugcTitle", href: "https://github.com/Mirako-Official/New-Aiugc-Pipeline" },
       { title: "toolOcMakerTitle", href: "https://hzagaming.github.io/Original-Character-Maker/" },
-      { title: "toolRhythmTitle", href: "https://github.com/Mirako-Official/AI-Rhythm-Game" },
       { title: "toolClipoTitle", href: "https://github.com/hzagaming/Clipo" },
       { title: "toolClassGodTitle", href: "https://github.com/hzagaming/ClassGod" },
       { title: "toolTransferTitle", href: "https://hzagaming.github.io/HanazarTransfer/" },

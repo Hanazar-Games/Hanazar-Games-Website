@@ -189,14 +189,6 @@ export const toolGroups: ToolGroup[] = [
     label: "toolsWebLabel",
     tools: [
       {
-        title: "toolAiugcTitle",
-        description: "toolAiugcDesc",
-        tag: "toolTagAiCreation",
-        cta: "ctaViewGithub",
-        href: "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
-        image: "/tools/aiugc-pipeline.jpg",
-      },
-      {
         title: "toolOcMakerTitle",
         description: "toolOcMakerDesc",
         tag: "toolTagCharacter",
@@ -211,14 +203,6 @@ export const toolGroups: ToolGroup[] = [
         cta: "toolOpenButton",
         href: "https://hzagaming.github.io/LIstener",
         image: "/tools/listener.jpg",
-      },
-      {
-        title: "toolRhythmTitle",
-        description: "toolRhythmDesc",
-        tag: "toolTagMusicAi",
-        cta: "ctaViewGithub",
-        href: "https://github.com/Mirako-Official/AI-Rhythm-Game",
-        image: "/tools/ai-rhythm-game.jpg",
       },
       {
         title: "toolTransferTitle",

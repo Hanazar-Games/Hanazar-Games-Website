@@ -233,7 +233,7 @@ export default function AudioEngine() {
     const ctx = getContext();
     if (!ctx) return;
     try {
-      if (ctx.state === "suspended") await ctx.resume();
+      if (ctx.state !== "running" && ctx.state !== "closed") await ctx.resume();
     } catch {
       publishBgmState("waiting");
       return;
