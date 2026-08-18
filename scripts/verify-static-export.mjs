@@ -39,6 +39,10 @@ const requiredFiles = [
   "tools/listener.jpg",
   "tools/hanazar-transfer.jpg",
   "aigc/gpt-56-sol-ultra.jpg",
+  "skin-service/groups/group-2.jpg",
+  "skin-service/groups/group-4.jpg",
+  "skin-service/groups/group-7.jpg",
+  "skin-service/groups/group-9.jpg",
 ];
 const forbiddenFiles = [
   "HanazarIntroAnimation.mp4",
@@ -80,19 +84,19 @@ const requiredContent = {
     "https://github.com/hzagaming/LC300A",
     "https://github.com/hzagaming/Hept/releases",
     "https://hzagaming.github.io/LIstener",
-    "Mac Tools",
-    "Web Tools",
-    "iOS Tools",
-    "Other Tools",
+    "Mac 工具",
+    "网页工具",
+    "iOS 工具",
+    "其他工具",
   ],
   "games/index.html": [
     "https://hanazar-games.github.io/Guandan-Webgame/",
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "GPT-5.6-sol-Ultra-AIGC-webgame",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
-    "Coreball",
+    "见缝插针",
     "https://hanazar-games.github.io/Core-Ball-Webgame/",
-    "Weida Go",
+    "围达网 · 围棋",
     "https://hanazar-games.github.io/Go/",
   ],
   "aigc/index.html": [
@@ -102,24 +106,29 @@ const requiredContent = {
     "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
   ],
   "chat/index.html": [
-    "Encrypted Expiring Share",
-    "Encrypt and create link",
-    "Expiration",
-    "Send log",
-    ...(chatServiceUrl ? ["AES-256-GCM", "Your browser encrypts before upload"] : []),
+    "加密临时投递箱",
+    "加密并生成链接",
+    "有效时间",
+    "发送记录",
+    ...(chatServiceUrl ? ["AES-256-GCM", "内容会先在浏览器内加密再上传"] : []),
   ],
   "transfer/index.html": [
-    "File Transfer Assistant",
-    "Create pairing code",
-    "Send file",
-    "Download transcript",
+    "文件传输助手",
+    "生成配对码",
+    "发送文件",
+    "下载 TXT 记录",
   ],
   "skin-service/index.html": [
     "代发皮肤服务中心",
     "服务文档",
     "全局搜索",
     "我们的社群",
+    "使用微信扫描二维码加入",
     "代发皮肤常见问题",
+    "服务入门",
+    "材料准备",
+    "审核与处理",
+    "隐私安全",
     "匿名反馈墙",
     "审核通知",
     "支持与捐赠",
@@ -131,11 +140,11 @@ const requiredContent = {
     "本机可修改五分钟",
   ],
   "tools/index.html": [
-    "Tools Archive",
-    "Mac Tools",
-    "Web Tools",
-    "iOS Tools",
-    "Other Tools",
+    "工具总览",
+    "Mac 工具",
+    "网页工具",
+    "iOS 工具",
+    "其他工具",
     "https://hzagaming.github.io/LIstener",
     "https://github.com/hzagaming/Hept/releases",
     "https://hzagaming.github.io/HanazarTransfer/",
@@ -147,6 +156,17 @@ for (const [file, values] of Object.entries(requiredContent)) {
   const html = readFileSync(join("out", file), "utf8");
   for (const value of values) {
     if (!html.includes(value)) throw new Error(`Missing ${value} in ${file}`);
+  }
+}
+
+const skinServiceHtml = readFileSync(join("out", "skin-service/index.html"), "utf8");
+for (const group of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]) {
+  const path = `skin-service/groups/${group}`;
+  if (!skinServiceHtml.includes(`src="${basePath}/${path}"`)) {
+    throw new Error(`Missing base path for ${path}`);
+  }
+  if (skinServiceHtml.includes(`src="/${path}"`)) {
+    throw new Error(`Root-relative skin service image: ${path}`);
   }
 }
 

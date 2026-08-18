@@ -122,6 +122,34 @@ final class DatabaseConfigSecurityTest extends TestCase
         self::addToAssertionCount(1);
     }
 
+    public function testConfigRejectsMalformedTrustedProxyRanges(): void
+    {
+        foreach (
+            [
+                'proxy.internal',
+                '10.0.0.0/',
+                '10.0.0.0/-1',
+                '0.0.0.0/0',
+                '10.0.0.0/33',
+                '10.0.0.0/8/1',
+                '2001:db8::/129',
+                '::/0',
+                "127.0.0.1\n10.0.0.0/8",
+            ] as $proxy
+        ) {
+            $values = $this->validConfigValues();
+            $values['TRUSTED_PROXIES'] = $proxy;
+
+            try {
+                Config::fromArray($values);
+                self::fail('A malformed trusted proxy range must be rejected.');
+            } catch (InvalidArgumentException) {
+            }
+        }
+
+        self::addToAssertionCount(1);
+    }
+
     public function testDatabaseInitializesRequiredPragmasAndSchemaIdempotently(): void
     {
         $pdo = $this->database->connection();
@@ -283,6 +311,21 @@ final class DatabaseConfigSecurityTest extends TestCase
         );
 
         self::assertSame('127.0.0.1', $identity->ip());
+        self::assertFalse($identity->isSecure());
+    }
+
+    public function testClientIdentityDefensivelyIgnoresMalformedProxyRanges(): void
+    {
+        $identity = ClientIdentity::resolve(
+            [
+                'REMOTE_ADDR' => '203.0.113.8',
+                'HTTP_X_FORWARDED_FOR' => '198.51.100.9',
+                'HTTP_X_FORWARDED_PROTO' => 'https',
+            ],
+            ['203.0.113.0/-1', '203.0.113.0/0', '203.0.113.0/33', 'not-an-ip'],
+        );
+
+        self::assertSame('203.0.113.8', $identity->ip());
         self::assertFalse($identity->isSecure());
     }
 }

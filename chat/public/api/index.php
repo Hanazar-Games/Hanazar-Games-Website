@@ -225,10 +225,11 @@ function dispatchPublic(App $app, string $clientIp, string $method, string $path
     if ($path === '/feedbacks' && $method === 'GET') {
         $app->rateLimiter->consume('feedback_read', $identifier);
         $now = time();
-        respond([
-            'items' => $app->feedback->list(intQuery('limit') ?? 50, $now),
-            'server_time' => $now,
-        ]);
+        respond($app->feedback->page(
+            positiveIntQuery('limit') ?? 20,
+            positiveIntQuery('before_id'),
+            $now,
+        ) + ['server_time' => $now]);
     }
     if ($path === '/feedbacks' && $method === 'POST') {
         $app->rateLimiter->consume('feedback_submit', $identifier);
@@ -386,6 +387,15 @@ function intQuery(string $key): ?int
         throw new HttpException(422, 'invalid_request');
     }
     return (int) $value;
+}
+
+function positiveIntQuery(string $key): ?int
+{
+    $value = intQuery($key);
+    if ($value !== null && $value < 1) {
+        throw new HttpException(422, 'invalid_request');
+    }
+    return $value;
 }
 
 function requiredIntQuery(string $key): int

@@ -69,7 +69,10 @@ final readonly class Config
             }
         }
 
-        $proxies = array_values(array_filter(array_map('trim', explode(',', $values['TRUSTED_PROXIES'] ?? ''))));
+        $proxies = [];
+        foreach (array_filter(array_map('trim', explode(',', $values['TRUSTED_PROXIES'] ?? ''))) as $proxy) {
+            $proxies[] = self::trustedProxy($proxy);
+        }
         $shareOrigins = [];
         foreach (array_filter(array_map('trim', explode(',', $values['SHARE_ORIGINS'] ?? ''))) as $origin) {
             $shareOrigins[] = self::httpsOrigin($origin);
@@ -160,6 +163,33 @@ final readonly class Config
         }
         $port = isset($parts['port']) ? ':' . (int) $parts['port'] : '';
         return 'https://' . $host . $port;
+    }
+
+    private static function trustedProxy(string $value): string
+    {
+        if (preg_match('/[\x00-\x20\x7F]/', $value) === 1 || substr_count($value, '/') > 1) {
+            throw new InvalidArgumentException('TRUSTED_PROXIES contains an invalid IP range.');
+        }
+        [$network, $bits] = array_pad(explode('/', $value, 2), 2, null);
+        $packed = @inet_pton($network);
+        if ($packed === false) {
+            throw new InvalidArgumentException('TRUSTED_PROXIES contains an invalid IP range.');
+        }
+        if ($bits === null) {
+            if (hash_equals(str_repeat("\0", strlen($packed)), $packed)) {
+                throw new InvalidArgumentException('TRUSTED_PROXIES must not trust an unspecified address.');
+            }
+            return $network;
+        }
+        if ($bits === '' || preg_match('/^[0-9]{1,3}$/D', $bits) !== 1) {
+            throw new InvalidArgumentException('TRUSTED_PROXIES contains an invalid CIDR prefix.');
+        }
+        $prefix = (int) $bits;
+        if ($prefix < 1 || $prefix > strlen($packed) * 8) {
+            throw new InvalidArgumentException('TRUSTED_PROXIES contains an invalid CIDR prefix.');
+        }
+
+        return $network . '/' . $prefix;
     }
 
     public function appEnvironment(): string { return $this->appEnvironment; }

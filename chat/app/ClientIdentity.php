@@ -41,17 +41,32 @@ final readonly class ClientIdentity
     /** @param list<string> $ranges */
     private static function matchesAny(string $ip, array $ranges): bool
     {
+        $packedIp = @inet_pton($ip);
+        if ($packedIp === false) {
+            return false;
+        }
         foreach ($ranges as $range) {
-            [$network, $bits] = array_pad(explode('/', $range, 2), 2, null);
-            if ($bits === null && hash_equals($network, $ip)) {
-                return true;
+            if (substr_count($range, '/') > 1) {
+                continue;
             }
-            $packedIp = @inet_pton($ip);
+            [$network, $bits] = array_pad(explode('/', $range, 2), 2, null);
             $packedNetwork = @inet_pton($network);
-            if ($packedIp === false || $packedNetwork === false || strlen($packedIp) !== strlen($packedNetwork)) {
+            if ($packedNetwork === false || strlen($packedIp) !== strlen($packedNetwork)) {
+                continue;
+            }
+            if ($bits === null) {
+                if (hash_equals($packedNetwork, $packedIp)) {
+                    return true;
+                }
+                continue;
+            }
+            if (preg_match('/^[0-9]{1,3}$/D', $bits) !== 1) {
                 continue;
             }
             $prefix = (int) $bits;
+            if ($prefix < 1 || $prefix > strlen($packedIp) * 8) {
+                continue;
+            }
             $bytes = intdiv($prefix, 8);
             $remainder = $prefix % 8;
             if (substr($packedIp, 0, $bytes) !== substr($packedNetwork, 0, $bytes)) {

@@ -31,9 +31,24 @@ final class RateLimiter
         }
         try {
             $raw = stream_get_contents($handle);
-            $state = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
-            $startedAt = is_array($state) ? (int) ($state['started_at'] ?? $now) : $now;
-            $count = is_array($state) ? (int) ($state['count'] ?? 0) : 0;
+            if (!is_string($raw)) {
+                throw new RuntimeException('Rate limit state is unavailable.');
+            }
+            $state = $raw === '' ? null : json_decode($raw, true);
+            if ($raw !== '' && (
+                !is_array($state)
+                || !isset($state['started_at'], $state['count'])
+                || !is_int($state['started_at'])
+                || !is_int($state['count'])
+                || $state['started_at'] < 0
+                || $state['count'] < 0
+                || $state['started_at'] > $now + $window
+                || $state['count'] > $limit
+            )) {
+                throw new RuntimeException('Rate limit state is invalid.');
+            }
+            $startedAt = is_array($state) ? $state['started_at'] : $now;
+            $count = is_array($state) ? $state['count'] : 0;
             if ($startedAt + $window <= $now) {
                 $startedAt = $now;
                 $count = 0;
@@ -41,10 +56,14 @@ final class RateLimiter
             if ($count >= $limit) {
                 throw new RateLimitException(max(1, $startedAt + $window - $now));
             }
-            rewind($handle);
-            ftruncate($handle, 0);
-            fwrite($handle, json_encode(['started_at' => $startedAt, 'count' => $count + 1], JSON_THROW_ON_ERROR));
-            fflush($handle);
+            $encoded = json_encode(['started_at' => $startedAt, 'count' => $count + 1], JSON_THROW_ON_ERROR);
+            if (!rewind($handle) || !ftruncate($handle, 0)) {
+                throw new RuntimeException('Rate limit state cannot be updated.');
+            }
+            $written = fwrite($handle, $encoded);
+            if ($written !== strlen($encoded) || !fflush($handle)) {
+                throw new RuntimeException('Rate limit state cannot be updated.');
+            }
             @chmod($path, 0600);
         } finally {
             flock($handle, LOCK_UN);

@@ -141,25 +141,74 @@ test("homepage tools cap each group at three cards and link to the archive", asy
   assert.match(css, /\.toolsGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
 });
 
-test("skin service stays Chinese-only with a route-scoped light theme", async () => {
-  const [page, center, css] = await Promise.all([
-    read("app/skin-service/page.tsx"),
+test("skin service shares system-aware settings with a scoped three-language selector", async () => {
+  const [center, copy, settings, panel, languageTab, css] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/components/SettingsContext.tsx"),
+    read("app/components/SettingsPanel.tsx"),
+    read("app/components/settings/LanguageTab.tsx"),
     read("app/globals.css"),
   ]);
 
-  assert.match(center, /lang="zh-CN"/);
-  assert.match(center, /我们的社群/);
-  assert.match(center, /代发皮肤常见问题/);
-  assert.doesNotMatch(page + center, /Service Documentation|Back to home|Publishing Process|Frequently Asked Questions/);
-  assert.match(css, /body:has\(\.skinServiceShell\) \{[\s\S]*?color-scheme: light;/);
-  assert.match(css, /body:has\(\.skinServiceShell\) \.settingsModal/);
+  assert.match(settings, /theme: "auto"/);
+  assert.match(settings, /language: "zh-CN"/);
+  assert.match(copy, /skinServiceLanguages = \["zh-CN", "ja", "en"\]/);
+  assert.match(center, /useSettingsContext/);
+  assert.match(center, /skinServiceLanguage\(settings\.language\)/);
+  assert.match(panel, /skinServiceLanguages/);
+  assert.match(languageTab, /allowedCodes/);
+  assert.doesNotMatch(css, /body:has\(\.skinServiceShell\)[^{]*\{[\s\S]*?color-scheme: light;/);
+  assert.match(css, /body\[data-theme="light"\] \.skinServiceShell/);
+});
+
+test("skin service uses localized copy and original section icons without numeric markers", async () => {
+  const [center, copy, css] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/globals.css"),
+  ]);
+
+  for (const value of ["我们的社群", "Our Communities", "コミュニティ"]) {
+    assert.match(copy, new RegExp(value));
+  }
+  assert.match(center, /function SectionIcon/);
+  assert.match(center, /skinServiceSectionIcon/);
+  assert.match(center, /data-tone=/);
+  assert.doesNotMatch(center, /<span>0[1-5]<\/span>/);
+  assert.match(css, /\.skinServiceSectionIcon/);
+});
+
+test("skin service publishes group QR artwork and a first-visit community prompt", async () => {
+  const [center, copy, css, verifier] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/globals.css"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+
+  for (const path of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]) {
+    assert.match(center, new RegExp(path));
+    assert.match(verifier, new RegExp(`skin-service/groups/${path}`));
+  }
+  assert.match(center, /COMMUNITY_PROMPT_STORAGE_KEY/);
+  assert.match(center, /localStorage\.getItem\(COMMUNITY_PROMPT_STORAGE_KEY\)/);
+  assert.match(center, /role="dialog"/);
+  assert.match(center, /document\.getElementById\("communities"\)/);
+  assert.match(center, /assetPath\(community\.image\)/);
+  assert.match(center, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
+  for (const value of ["一起加入社群玩 MC", "Join the community for MC", "コミュニティで MC を遊ぼう"]) {
+    assert.match(copy, new RegExp(value));
+  }
+  assert.match(css, /\.skinCommunityPromptOverlay/);
+  assert.match(css, /\.skinCommunityQrImage/);
 });
 
 test("skin service exposes searchable communities and a protected public feedback wall", async () => {
-  const [page, center] = await Promise.all([
+  const [page, center, copy] = await Promise.all([
     read("app/skin-service/page.tsx"),
     read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
   ]);
 
   assert.match(page, /NEXT_PUBLIC_CHAT_SERVICE_URL/);
@@ -167,7 +216,7 @@ test("skin service exposes searchable communities and a protected public feedbac
     assert.match(center, new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
   for (const title of ["我们的社群", "代发皮肤常见问题", "匿名反馈墙", "审核通知", "支持与捐赠"]) {
-    assert.match(center, new RegExp(title));
+    assert.match(copy, new RegExp(title));
   }
   assert.match(center, /type="search"/);
   assert.match(center, /api\/feedbacks/);
@@ -187,6 +236,30 @@ test("skin feedback recovery validates drafts and cancels superseded wall reques
   assert.match(center, /wallRequestRef\.current !== controller/);
   assert.match(center, /createdAt > MAX_UNIX_SECONDS/);
   assert.match(center, /publishAt > MAX_UNIX_SECONDS/);
+});
+
+test("skin documentation is categorized and the public wall supports cursor pagination", async () => {
+  const [center, copy, feedback, api, config, identity, limiter] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("chat/app/FeedbackService.php"),
+    read("chat/public/api/index.php"),
+    read("chat/app/Config.php"),
+    read("chat/app/ClientIdentity.php"),
+    read("chat/app/RateLimiter.php"),
+  ]);
+
+  for (const category of ["服务入门", "材料准备", "审核与处理", "隐私安全"]) {
+    assert.match(copy, new RegExp(category));
+  }
+  assert.match(center, /activeArticleCategory/);
+  assert.match(copy, /加载更多反馈/);
+  assert.match(center, /next_cursor/);
+  assert.match(feedback, /beforeId/);
+  assert.match(api, /before_id/);
+  assert.match(config, /trustedProxy/);
+  assert.match(identity, /prefix < 1|prefix > strlen\(\$packedIp\) \* 8/);
+  assert.match(limiter, /Rate limit state is invalid/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

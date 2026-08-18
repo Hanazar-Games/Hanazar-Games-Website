@@ -4,7 +4,7 @@ PHP 8.2 and SQLite service for private member Chat, public end-to-end encrypted 
 
 The public frontend encrypts text and arbitrary attachment types with AES-256-GCM before upload. `POST /api/shares` stores only ciphertext and expiry metadata; `GET /api/shares/{token}` returns the ciphertext while valid. The 256-bit encryption key remains after `#key=` in the public URL and is never included in an HTTP request. The database stores only SHA-256 hashes of the 256-bit random share tokens.
 
-The anonymous feedback API exposes `GET /api/feedbacks`, `POST /api/feedbacks`, and `PATCH /api/feedbacks/{id}`. New entries stay private for five minutes. The creating browser receives a random edit token, while SQLite stores only its SHA-256 hash; the original publication deadline is never extended by editing. Content is length checked, rendered as text by the website, deduplicated for 24 hours, and protected by application and Nginx rate limits.
+The anonymous feedback API exposes cursor-paginated `GET /api/feedbacks?limit=20&before_id=...`, `POST /api/feedbacks`, and `PATCH /api/feedbacks/{id}`. New entries stay private for five minutes. The creating browser receives a random edit token, while SQLite stores only its SHA-256 hash; the original publication deadline is never extended by editing. Content is length checked, rendered as text by the website, deduplicated for 24 hours, and protected by application and Nginx rate limits.
 
 ## Deploy
 

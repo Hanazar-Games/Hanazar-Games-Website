@@ -36,12 +36,12 @@ export const sfxStyles = [
 ] as const;
 
 const defaultSettings: SettingsState = {
-  theme: "dark",
+  theme: "auto",
   font: "sans",
   customFont: "",
   colorPreset: "graphite",
   contrast: 100,
-  language: "en",
+  language: "zh-CN",
   masterVolume: 75,
   sfxEnabled: true,
   sfxVolume: 28,

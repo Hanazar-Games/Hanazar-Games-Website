@@ -13,6 +13,7 @@ use Hanazar\Chat\HttpException;
 use Hanazar\Chat\RateLimiter;
 use Hanazar\Chat\RateLimitException;
 use Hanazar\Chat\SessionManager;
+use RuntimeException;
 
 final class AuthSessionCsrfRateLimitTest extends TestCase
 {
@@ -283,6 +284,29 @@ final class AuthSessionCsrfRateLimitTest extends TestCase
 
         $this->expectException(RateLimitException::class);
         $this->rateLimiter->consume('api', $identifier, self::NOW);
+    }
+
+    public function testCorruptRateLimitStateFailsClosed(): void
+    {
+        $identifier = 'corrupt-rate-limit-state';
+        $path = $this->config->rateLimitPath() . '/' . hash('sha256', 'login_ip:' . $identifier) . '.json';
+        self::assertNotFalse(file_put_contents($path, '{"started_at":"invalid","count":-1}'));
+
+        $this->expectException(RuntimeException::class);
+        $this->rateLimiter->consume('login_ip', $identifier, self::NOW);
+    }
+
+    public function testImpossibleFutureRateLimitStateFailsClosed(): void
+    {
+        $identifier = 'future-rate-limit-state';
+        $path = $this->config->rateLimitPath() . '/' . hash('sha256', 'login_ip:' . $identifier) . '.json';
+        self::assertNotFalse(file_put_contents($path, json_encode([
+            'started_at' => PHP_INT_MAX,
+            'count' => 0,
+        ], JSON_THROW_ON_ERROR)));
+
+        $this->expectException(RuntimeException::class);
+        $this->rateLimiter->consume('login_ip', $identifier, self::NOW);
     }
 
     /** @return array{0: Auth, 1: SessionManager, 2: Csrf} */

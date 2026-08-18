@@ -107,20 +107,29 @@ final readonly class FeedbackService
         });
     }
 
-    /** @return list<array{id: int, content: string, created_at: int, updated_at: int, publish_at: int}> */
-    public function list(int $limit = 50, ?int $now = null): array
+    /** @return array{items: list<array{id: int, content: string, created_at: int, updated_at: int, publish_at: int}>, next_cursor: ?int} */
+    public function page(int $limit = 20, ?int $beforeId = null, ?int $now = null): array
     {
         $now ??= time();
+        if ($beforeId !== null && $beforeId < 1) {
+            throw new HttpException(422, 'invalid_request');
+        }
+        $limit = max(1, min(50, $limit));
+        $cursorClause = $beforeId === null ? '' : 'AND id < :before_id ';
         $statement = $this->database->connection()->prepare(
             'SELECT id, content, created_at, updated_at, publish_at FROM public_feedback '
-            . 'WHERE status = :status AND publish_at <= :now ORDER BY id DESC LIMIT :limit',
+            . 'WHERE status = :status AND publish_at <= :now ' . $cursorClause
+            . 'ORDER BY id DESC LIMIT :limit',
         );
         $statement->bindValue(':status', 'visible');
         $statement->bindValue(':now', $now, PDO::PARAM_INT);
-        $statement->bindValue(':limit', max(1, min(50, $limit)), PDO::PARAM_INT);
+        if ($beforeId !== null) {
+            $statement->bindValue(':before_id', $beforeId, PDO::PARAM_INT);
+        }
+        $statement->bindValue(':limit', $limit + 1, PDO::PARAM_INT);
         $statement->execute();
 
-        return array_map(
+        $items = array_map(
             static fn (array $row): array => [
                 'id' => (int) $row['id'],
                 'content' => (string) $row['content'],
@@ -130,6 +139,15 @@ final readonly class FeedbackService
             ],
             $statement->fetchAll(),
         );
+        $hasMore = count($items) > $limit;
+        if ($hasMore) {
+            array_pop($items);
+        }
+
+        return [
+            'items' => $items,
+            'next_cursor' => $hasMore ? $items[array_key_last($items)]['id'] : null,
+        ];
     }
 
     /** @return array{string, string} */

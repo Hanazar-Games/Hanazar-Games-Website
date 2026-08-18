@@ -1,4 +1,4 @@
-export const defaultLang = "en";
+export const defaultLang = "zh-CN";
 
 export type LangCode =
   | "zh-CN" | "zh-TW" | "en" | "ja" | "ko"

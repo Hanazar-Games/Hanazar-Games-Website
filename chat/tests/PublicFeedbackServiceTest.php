@@ -24,8 +24,8 @@ final class PublicFeedbackServiceTest extends TestCase
 
         self::assertMatchesRegularExpression('~^[A-Za-z0-9_-]{43}$~', $created['edit_token']);
         self::assertSame(self::NOW + 300, $created['publish_at']);
-        self::assertSame([], $this->feedback->list(50, self::NOW + 299));
-        self::assertSame('希望增加更多皮肤提交说明。', $this->feedback->list(50, self::NOW + 300)[0]['content']);
+        self::assertSame([], $this->feedback->page(50, null, self::NOW + 299)['items']);
+        self::assertSame('希望增加更多皮肤提交说明。', $this->feedback->page(50, null, self::NOW + 300)['items'][0]['content']);
 
         $row = $this->database->connection()->query(
             'SELECT edit_token_hash, content_hash FROM public_feedback',
@@ -79,7 +79,7 @@ final class PublicFeedbackServiceTest extends TestCase
 
         $content = "测试反馈'); DROP TABLE users; -- 仍应作为普通文本保存。";
         $this->feedback->create($content, self::NOW);
-        self::assertSame($content, $this->feedback->list(50, self::NOW + 300)[0]['content']);
+        self::assertSame($content, $this->feedback->page(50, null, self::NOW + 300)['items'][0]['content']);
         self::assertSame(0, (int) $this->database->connection()->query('SELECT COUNT(*) FROM users')->fetchColumn());
 
         try {
@@ -89,5 +89,25 @@ final class PublicFeedbackServiceTest extends TestCase
             self::assertSame(409, $exception->status());
             self::assertSame('duplicate_feedback', $exception->errorCode());
         }
+    }
+
+    public function testPublicWallUsesStableCursorPaginationWithoutDuplicates(): void
+    {
+        for ($index = 1; $index <= 5; ++$index) {
+            $this->feedback->create('分页反馈内容编号 ' . $index, self::NOW + $index);
+        }
+
+        $first = $this->feedback->page(2, null, self::NOW + 400);
+        self::assertCount(2, $first['items']);
+        self::assertSame([5, 4], array_column($first['items'], 'id'));
+        self::assertSame(4, $first['next_cursor']);
+
+        $second = $this->feedback->page(2, $first['next_cursor'], self::NOW + 400);
+        self::assertSame([3, 2], array_column($second['items'], 'id'));
+        self::assertSame(2, $second['next_cursor']);
+
+        $last = $this->feedback->page(2, $second['next_cursor'], self::NOW + 400);
+        self::assertSame([1], array_column($last['items'], 'id'));
+        self::assertNull($last['next_cursor']);
     }
 }

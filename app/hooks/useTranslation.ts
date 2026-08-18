@@ -6,7 +6,7 @@ import { getTranslation } from "../lib/i18n";
 
 export function useTranslation() {
   const { settings } = useSettingsContext();
-  const lang = settings.language ?? "en";
+  const lang = settings.language ?? "zh-CN";
 
   const tr = useCallback((key: string) => getTranslation(lang as any, key), [lang]);
 

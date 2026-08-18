@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.14.0",
+    date: "2026-08-18",
+    title: "Community QR Access and First-Visit Welcome",
+    items: [
+      "Added the provided QR artwork for WeChat Groups 2, 4, 7, and 9 alongside the existing QQ and Discord community entries.",
+      "Added an accessible first-visit community welcome with View and Not Now actions, keyboard focus containment, Escape support, and direct navigation to the community section.",
+      "Refined the service center with shared system theme behavior, Chinese, Japanese, and English copy, richer section colors, responsive QR layouts, and reduced-motion support.",
+      "Expanded automated and GitHub Pages validation to cover every community image, deployment path, and the new first-visit experience.",
+      "Rechecked UI, UX, SFX, BGM, feedback safety, responsive layouts, and static deployment behavior across the site.",
+    ],
+  },
+  {
     version: "2.13.0",
     date: "2026-08-17",
     title: "Secure Feedback Wall and Full-Site QA",

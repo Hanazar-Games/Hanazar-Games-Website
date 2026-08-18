@@ -9,9 +9,18 @@ const languages = Object.entries(langNames).map(([code, name]) => ({
   name,
 }));
 
-export default function LanguageTab() {
+const nativeNames: Partial<Record<LangCode, string>> = {
+  "zh-CN": "简体中文",
+  ja: "日本語",
+  en: "English",
+};
+
+export default function LanguageTab({ allowedCodes }: { allowedCodes?: readonly LangCode[] }) {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
+  const visibleLanguages = allowedCodes
+    ? allowedCodes.map((code) => ({ code, name: nativeNames[code] ?? langNames[code] }))
+    : languages;
 
   return (
     <div className="settingsTabContent">
@@ -21,7 +30,7 @@ export default function LanguageTab() {
           {tr("stLangDesc")}
         </p>
         <div className="languageList">
-          {languages.map((lang) => (
+          {visibleLanguages.map((lang) => (
             <button
               key={lang.code}
               type="button"
