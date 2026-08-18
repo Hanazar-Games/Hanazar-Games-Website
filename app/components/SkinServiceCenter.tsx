@@ -6,6 +6,7 @@ import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
 import {
+  skinServiceLanguages,
   skinServiceLanguage,
   skinText,
   type SkinServiceLanguage,
@@ -43,38 +44,39 @@ const WALL_PAGE_SIZE = 20;
 const MAX_UNIX_SECONDS = Math.floor(8.64e15 / 1000);
 const STORAGE_KEY = "hanazar.skin-feedback-edit.v1";
 const COMMUNITY_PROMPT_STORAGE_KEY = "hanazar.skin-service-community-prompt.v1";
+const SKIN_LANGUAGE_STORAGE_KEY = "hanazar.skin-service-language.v1";
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 const sectionDefinitions: Array<{
   id: string;
   icon: SectionIconName;
-  tone: string;
   title: SkinTextKey;
   summary: SkinTextKey;
 }> = [
-  { id: "communities", icon: "communities", tone: "violet", title: "communitiesTitle", summary: "communitiesSummary" },
-  { id: "questions", icon: "questions", tone: "cyan", title: "questionsTitle", summary: "questionsSummary" },
-  { id: "feedback", icon: "feedback", tone: "coral", title: "feedbackTitle", summary: "feedbackSummary" },
-  { id: "review-notices", icon: "notices", tone: "amber", title: "noticesTitle", summary: "noticesSummary" },
-  { id: "support", icon: "support", tone: "emerald", title: "supportTitle", summary: "supportSummary" },
+  { id: "communities", icon: "communities", title: "communitiesTitle", summary: "communitiesSummary" },
+  { id: "questions", icon: "questions", title: "questionsTitle", summary: "questionsSummary" },
+  { id: "feedback", icon: "feedback", title: "feedbackTitle", summary: "feedbackSummary" },
+  { id: "review-notices", icon: "notices", title: "noticesTitle", summary: "noticesSummary" },
+  { id: "support", icon: "support", title: "supportTitle", summary: "supportSummary" },
 ];
 
 const communityDefinitions: Array<{
+  id: string;
   name: SkinTextKey;
   kind: SkinTextKey;
   image?: string;
   value?: string;
   href?: string;
 }> = [
-  { name: "group2", kind: "wechat", image: "/skin-service/groups/group-2.jpg" },
-  { name: "group3", kind: "qqGroup", value: "939095145" },
-  { name: "group4", kind: "wechat", image: "/skin-service/groups/group-4.jpg" },
-  { name: "group5", kind: "voiceCommunity", href: "https://discord.gg/XtTbKCSKa" },
-  { name: "group6", kind: "qqGroup", value: "853878672" },
-  { name: "group7", kind: "wechat", image: "/skin-service/groups/group-7.jpg" },
-  { name: "group8", kind: "qqGroup", value: "953014293" },
-  { name: "group9", kind: "wechat", image: "/skin-service/groups/group-9.jpg" },
-  { name: "group10", kind: "qqGroup", value: "1105843703" },
+  { id: "group-2", name: "group2", kind: "wechat", image: "/skin-service/groups/group-2.jpg" },
+  { id: "group-3", name: "group3", kind: "qqGroup", value: "939095145" },
+  { id: "group-4", name: "group4", kind: "wechat", image: "/skin-service/groups/group-4.jpg" },
+  { id: "group-5", name: "group5", kind: "voiceCommunity", href: "https://discord.gg/XtTbKCSKa" },
+  { id: "group-6", name: "group6", kind: "qqGroup", value: "853878672" },
+  { id: "group-7", name: "group7", kind: "wechat", image: "/skin-service/groups/group-7.jpg" },
+  { id: "group-8", name: "group8", kind: "qqGroup", value: "953014293" },
+  { id: "group-9", name: "group9", kind: "wechat", image: "/skin-service/groups/group-9.jpg" },
+  { id: "group-10", name: "group10", kind: "qqGroup", value: "1105843703" },
 ];
 
 const articleCategoryDefinitions: Array<{ id: ArticleCategory; title: SkinTextKey }> = [
@@ -279,9 +281,16 @@ function scrollBehavior(reduceAnimations: boolean): ScrollBehavior {
     : "smooth";
 }
 
+function storedSkinLanguage(value: string | null): SkinServiceLanguage {
+  return skinServiceLanguages.includes(value as SkinServiceLanguage)
+    ? value as SkinServiceLanguage
+    : "zh-CN";
+}
+
 export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string | null }) {
-  const { settings, update } = useSettingsContext();
-  const language = skinServiceLanguage(settings.language);
+  const { settings, loaded, update } = useSettingsContext();
+  const [skinLanguageInitialized, setSkinLanguageInitialized] = useState(false);
+  const language = skinLanguageInitialized ? skinServiceLanguage(settings.language) : "zh-CN";
   const [query, setQuery] = useState("");
   const [activeArticleCategory, setActiveArticleCategory] = useState<ArticleCategory>("all");
   const [communityPromptOpen, setCommunityPromptOpen] = useState(false);
@@ -303,6 +312,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   const communityPromptDialogRef = useRef<HTMLDivElement | null>(null);
   const communityPromptViewRef = useRef<HTMLButtonElement | null>(null);
   const communityPromptPreviousFocusRef = useRef<HTMLElement | null>(null);
+  const pageMainRef = useRef<HTMLElement | null>(null);
   const sections = sectionDefinitions.map((section) => ({
     ...section,
     title: skinText(language, section.title),
@@ -343,8 +353,29 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   }, [reduceAnimations]);
 
   useEffect(() => {
-    if (settings.language !== language) update("language", language);
-  }, [language, settings.language, update]);
+    if (!loaded || skinLanguageInitialized) return;
+    let preferred: SkinServiceLanguage = "zh-CN";
+    try {
+      preferred = storedSkinLanguage(localStorage.getItem(SKIN_LANGUAGE_STORAGE_KEY));
+    } catch {
+      // Chinese remains the page default when storage is unavailable.
+    }
+    if (settings.language !== preferred) update("language", preferred);
+    setSkinLanguageInitialized(true);
+  }, [loaded, settings.language, skinLanguageInitialized, update]);
+
+  useEffect(() => {
+    if (!skinLanguageInitialized) return;
+    if (settings.language !== language) {
+      update("language", language);
+      return;
+    }
+    try {
+      localStorage.setItem(SKIN_LANGUAGE_STORAGE_KEY, language);
+    } catch {
+      // The language still works for the current page session.
+    }
+  }, [language, settings.language, skinLanguageInitialized, update]);
 
   useEffect(() => {
     try {
@@ -359,11 +390,17 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   useEffect(() => {
     if (!communityPromptOpen) return;
     const body = document.body;
+    const main = pageMainRef.current;
     const previousOverflow = body.style.overflow;
+    const previousAriaHidden = main?.getAttribute("aria-hidden") ?? null;
+    const previousInert = main?.hasAttribute("inert") ?? false;
     communityPromptPreviousFocusRef.current = document.activeElement instanceof HTMLElement
       ? document.activeElement
       : null;
     body.style.overflow = "hidden";
+    body.setAttribute("data-community-prompt-open", "true");
+    main?.setAttribute("aria-hidden", "true");
+    main?.setAttribute("inert", "");
     const frame = window.requestAnimationFrame(() => communityPromptViewRef.current?.focus());
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -391,6 +428,12 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
       window.cancelAnimationFrame(frame);
       document.removeEventListener("keydown", handleKeyDown);
       body.style.overflow = previousOverflow;
+      body.removeAttribute("data-community-prompt-open");
+      if (main) {
+        if (previousAriaHidden === null) main.removeAttribute("aria-hidden");
+        else main.setAttribute("aria-hidden", previousAriaHidden);
+        if (!previousInert) main.removeAttribute("inert");
+      }
       if (communityPromptPreviousFocusRef.current?.isConnected) {
         communityPromptPreviousFocusRef.current.focus({ preventScroll: true });
       }
@@ -487,7 +530,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
       ...communities.map((community) => ({
         title: `${community.name} · ${community.kind}`,
         text: community.value ?? (community.image ? skinText(language, "qrAvailable") : community.kind),
-        href: "#communities",
+        href: `#community-${community.id}`,
       })),
       ...articles.map((article) => ({
         title: article.title,
@@ -513,33 +556,39 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   };
 
   const renderCommunityCard = (community: typeof communities[number]) => (
-    <article className={`skinCommunityCard${community.image ? " skinCommunityCardQr" : ""}`} key={community.name}>
-      <div><span>{community.kind}</span><h4>{community.name}</h4></div>
-      {community.image && (
-        <>
-          <div className="skinCommunityQr">
-            <Image
-              className="skinCommunityQrImage"
-              src={assetPath(community.image)}
-              alt={skinText(language, "qrImageAlt", { group: community.name })}
-              width={1050}
-              height={1566}
-              sizes="(max-width: 480px) calc(100vw - 90px), (max-width: 800px) calc(50vw - 54px), 270px"
-            />
-          </div>
-          <small className="skinCommunityQrHint">{skinText(language, "scanQrHint")}</small>
-        </>
-      )}
-      {community.value && (
-        <>
-          <code>{community.value}</code>
-          <button type="button" onClick={() => void copyGroup(community.value!)}>{skinText(language, "copyGroup")}</button>
-        </>
-      )}
-      {community.href && (
-        <a href={community.href} target="_blank" rel="noopener noreferrer">{skinText(language, "openGroup5")}</a>
-      )}
-    </article>
+    <details
+      id={`community-${community.id}`}
+      className={`skinCommunityCard${community.image ? " skinCommunityCardQr" : ""}`}
+      key={community.id}
+    >
+      <summary><span>{community.kind}</span><strong>{community.name}</strong></summary>
+      <div className="skinCommunityCardContent">
+        {community.image && (
+          <>
+            <div className="skinCommunityQr">
+              <Image
+                className="skinCommunityQrImage"
+                src={assetPath(community.image)}
+                alt={skinText(language, "qrImageAlt", { group: community.name })}
+                width={1050}
+                height={1566}
+                sizes="(max-width: 480px) calc(100vw - 90px), (max-width: 800px) calc(50vw - 54px), 270px"
+              />
+            </div>
+            <small className="skinCommunityQrHint">{skinText(language, "scanQrHint")}</small>
+          </>
+        )}
+        {community.value && (
+          <>
+            <code>{community.value}</code>
+            <button type="button" onClick={() => void copyGroup(community.value!)}>{skinText(language, "copyGroup")}</button>
+          </>
+        )}
+        {community.href && (
+          <a href={community.href} target="_blank" rel="noopener noreferrer">{skinText(language, "openGroup5")}</a>
+        )}
+      </div>
+    </details>
   );
 
   const submitFeedback = async (event: FormEvent<HTMLFormElement>) => {
@@ -624,7 +673,6 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
         <div className="skinCommunityPromptOverlay">
           <div
             className="skinCommunityPrompt"
-            data-tone="violet"
             ref={communityPromptDialogRef}
             role="dialog"
             aria-modal="true"
@@ -646,7 +694,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           </div>
         </div>
       )}
-      <main className="pageShell gamesShell skinServiceShell" lang={language}>
+      <main className="pageShell gamesShell skinServiceShell" lang={language} ref={pageMainRef}>
       <section className="gamesHero skinServiceHero">
         <Link href="/" className="gamesHeroBack">{skinText(language, "backHome")}</Link>
         <div className="gamesHeroInner">
@@ -682,7 +730,10 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
                   setQuery("");
                   setActiveArticleCategory("all");
                   window.requestAnimationFrame(() => {
-                    document.getElementById(result.href.slice(1))?.scrollIntoView({ behavior: scrollBehavior(reduceAnimations) });
+                    const target = document.getElementById(result.href.slice(1));
+                    if (target instanceof HTMLDetailsElement) target.open = true;
+                    target?.scrollIntoView({ behavior: scrollBehavior(reduceAnimations), block: "start" });
+                    if (target instanceof HTMLDetailsElement) target.querySelector("summary")?.focus({ preventScroll: true });
                     window.history.replaceState(null, "", result.href);
                   });
                 }}
@@ -697,7 +748,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
 
       <nav className="skinServiceIndex" aria-label={skinText(language, "sectionsAria")}>
         {sections.map((section) => (
-          <a key={section.id} className="skinServiceIndexLink" href={`#${section.id}`} data-tone={section.tone}>
+          <a key={section.id} className="skinServiceIndexLink" href={`#${section.id}`}>
             <span className="skinServiceIndexIcon" aria-hidden="true"><SectionIcon name={section.icon} /></span>
             <span><strong>{section.title}</strong><small>{section.summary}</small></span>
           </a>
@@ -705,7 +756,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
       </nav>
 
       <div className="skinServiceDocument">
-        <section className="skinServiceDocumentSection" id="communities" data-tone="violet" tabIndex={-1}>
+        <section className="skinServiceDocumentSection" id="communities" tabIndex={-1}>
           <SectionHeader
             icon="communities"
             title={skinText(language, "communitiesTitle")}
@@ -726,7 +777,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           <p className="skinServiceLiveNotice" aria-live="polite">{communityNotice}</p>
         </section>
 
-        <section className="skinServiceDocumentSection" id="questions" data-tone="cyan">
+        <section className="skinServiceDocumentSection" id="questions">
           <SectionHeader
             icon="questions"
             title={skinText(language, "questionsTitle")}
@@ -757,7 +808,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           </div>
         </section>
 
-        <section className="skinServiceDocumentSection" id="feedback" data-tone="coral">
+        <section className="skinServiceDocumentSection" id="feedback">
           <SectionHeader
             icon="feedback"
             title={skinText(language, "feedbackTitle")}
@@ -837,7 +888,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           </div>
         </section>
 
-        <section className="skinServiceDocumentSection" id="review-notices" data-tone="amber">
+        <section className="skinServiceDocumentSection" id="review-notices">
           <SectionHeader
             icon="notices"
             title={skinText(language, "noticesTitle")}
@@ -849,7 +900,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           </div>
         </section>
 
-        <section className="skinServiceDocumentSection" id="support" data-tone="emerald">
+        <section className="skinServiceDocumentSection" id="support">
           <SectionHeader
             icon="support"
             title={skinText(language, "supportTitle")}

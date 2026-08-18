@@ -153,16 +153,20 @@ test("skin service shares system-aware settings with a scoped three-language sel
 
   assert.match(settings, /theme: "auto"/);
   assert.match(settings, /language: "zh-CN"/);
+  assert.match(settings, /loaded,/);
   assert.match(copy, /skinServiceLanguages = \["zh-CN", "ja", "en"\]/);
   assert.match(center, /useSettingsContext/);
   assert.match(center, /skinServiceLanguage\(settings\.language\)/);
+  assert.match(center, /SKIN_LANGUAGE_STORAGE_KEY/);
+  assert.match(center, /localStorage\.getItem\(SKIN_LANGUAGE_STORAGE_KEY\)/);
+  assert.match(center, /"zh-CN"/);
   assert.match(panel, /skinServiceLanguages/);
   assert.match(languageTab, /allowedCodes/);
   assert.doesNotMatch(css, /body:has\(\.skinServiceShell\)[^{]*\{[\s\S]*?color-scheme: light;/);
   assert.match(css, /body\[data-theme="light"\] \.skinServiceShell/);
 });
 
-test("skin service uses localized copy and original section icons without numeric markers", async () => {
+test("skin service uses localized copy, collapsible communities, and one accent tone", async () => {
   const [center, copy, css] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
@@ -174,9 +178,26 @@ test("skin service uses localized copy and original section icons without numeri
   }
   assert.match(center, /function SectionIcon/);
   assert.match(center, /skinServiceSectionIcon/);
-  assert.match(center, /data-tone=/);
+  assert.match(center, /<details/);
+  assert.match(center, /<summary/);
+  assert.doesNotMatch(center, /<summary>[^\n]*<h[1-6]/);
+  assert.doesNotMatch(center, /data-tone=/);
   assert.doesNotMatch(center, /<span>0[1-5]<\/span>/);
   assert.match(css, /\.skinServiceSectionIcon/);
+  assert.match(css, /\.skinServiceShell \{[\s\S]*?--skin-tone:/);
+  assert.doesNotMatch(css, /\.skinServiceShell \[data-tone="cyan"\]/);
+});
+
+test("community prompt prevents stacked dialogs and hides background content", async () => {
+  const [center, launcher] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/components/SettingsLauncher.tsx"),
+  ]);
+
+  assert.match(center, /pageMainRef/);
+  assert.match(center, /setAttribute\("inert", ""\)/);
+  assert.match(center, /setAttribute\("aria-hidden", "true"\)/);
+  assert.match(launcher, /\[role=['"]dialog['"]\]\[aria-modal=['"]true['"]\]/);
 });
 
 test("skin service publishes group QR artwork and a first-visit community prompt", async () => {

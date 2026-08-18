@@ -24,7 +24,10 @@ export default function SettingsLauncher() {
   const { settings, update } = useSettingsContext();
   const { tr } = useTranslation();
 
-  const openSettings = useCallback(() => setOpen(true), []);
+  const openSettings = useCallback(() => {
+    if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+    setOpen(true);
+  }, []);
   const closeSettings = useCallback(() => setOpen(false), []);
   const showShortcutStatus = useCallback((message: string) => {
     if (statusTimerRef.current !== null) window.clearTimeout(statusTimerRef.current);
@@ -56,7 +59,7 @@ export default function SettingsLauncher() {
 
       if (modifier && key === ",") {
         event.preventDefault();
-        setOpen(true);
+        openSettings();
         return;
       }
 
@@ -86,7 +89,7 @@ export default function SettingsLauncher() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [settings.masterVolume, settings.theme, showShortcutStatus, tr, update]);
+  }, [openSettings, settings.masterVolume, settings.theme, showShortcutStatus, tr, update]);
 
   return (
     <>

@@ -132,6 +132,7 @@ function normalizeSettings(input: unknown, base: SettingsState = defaultSettings
 
 interface SettingsContextValue {
   settings: SettingsState;
+  loaded: boolean;
   update: <K extends keyof SettingsState>(key: K, value: SettingsState[K]) => void;
   reset: () => void;
   clearCache: () => void;
@@ -204,7 +205,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   }, [settings]);
 
   return (
-    <SettingsContext.Provider value={{ settings, update, reset, clearCache, exportJson, importJson }}>
+    <SettingsContext.Provider value={{ settings, loaded, update, reset, clearCache, exportJson, importJson }}>
       {children}
     </SettingsContext.Provider>
   );

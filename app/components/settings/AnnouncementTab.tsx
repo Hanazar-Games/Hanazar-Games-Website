@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.15.0",
+    date: "2026-08-19",
+    title: "Focused Skin Service UI and Full-Site QA",
+    items: [
+      "Made Simplified Chinese the first-use default for the skin service while preserving the user's later Chinese, Japanese, or English choice.",
+      "Collapsed all nine community entries into compact accessible groups and made search open and focus the matching entry automatically.",
+      "Unified the complete service center under one indigo accent system in both system-aware light and dark themes.",
+      "Prevented the first-visit community prompt and Settings from opening as stacked dialogs, with correct background isolation and focus restoration.",
+      "Rechecked every route at desktop, tablet, mobile, and 320 px widths alongside images, accessibility references, responsive overflow, SFX, opt-in BGM, and GitHub Pages export behavior.",
+    ],
+  },
+  {
     version: "2.14.0",
     date: "2026-08-18",
     title: "Community QR Access and First-Visit Welcome",
