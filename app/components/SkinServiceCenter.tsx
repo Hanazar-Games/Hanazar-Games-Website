@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
+import packageInfo from "../../package.json";
 import {
   skinServiceLanguages,
   skinServiceLanguage,
@@ -38,6 +40,8 @@ type WallState = "loading" | "ready" | "unavailable" | "failed";
 type ArticleCategoryId = "introduction" | "preparation" | "review" | "privacy";
 type ArticleCategory = "all" | ArticleCategoryId;
 type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "support";
+type CommunityPlatform = "wechat" | "qq" | "discord";
+export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "support";
 
 const EDIT_WINDOW_MS = 5 * 60 * 1000;
 const WALL_PAGE_SIZE = 20;
@@ -48,35 +52,37 @@ const SKIN_LANGUAGE_STORAGE_KEY = "hanazar.skin-service-language.v1";
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 const sectionDefinitions: Array<{
-  id: string;
+  id: SkinServiceSection;
   icon: SectionIconName;
   title: SkinTextKey;
   summary: SkinTextKey;
+  description: SkinTextKey;
 }> = [
-  { id: "communities", icon: "communities", title: "communitiesTitle", summary: "communitiesSummary" },
-  { id: "questions", icon: "questions", title: "questionsTitle", summary: "questionsSummary" },
-  { id: "feedback", icon: "feedback", title: "feedbackTitle", summary: "feedbackSummary" },
-  { id: "review-notices", icon: "notices", title: "noticesTitle", summary: "noticesSummary" },
-  { id: "support", icon: "support", title: "supportTitle", summary: "supportSummary" },
+  { id: "communities", icon: "communities", title: "communitiesTitle", summary: "communitiesSummary", description: "communitiesDescription" },
+  { id: "questions", icon: "questions", title: "questionsTitle", summary: "questionsSummary", description: "questionsDescription" },
+  { id: "feedback", icon: "feedback", title: "feedbackTitle", summary: "feedbackSummary", description: "feedbackDescription" },
+  { id: "review-notices", icon: "notices", title: "noticesTitle", summary: "noticesSummary", description: "noticesDescription" },
+  { id: "support", icon: "support", title: "supportTitle", summary: "supportSummary", description: "supportDescription" },
 ];
 
 const communityDefinitions: Array<{
   id: string;
   name: SkinTextKey;
   kind: SkinTextKey;
+  platform: CommunityPlatform;
   image?: string;
   value?: string;
   href?: string;
 }> = [
-  { id: "group-2", name: "group2", kind: "wechat", image: "/skin-service/groups/group-2.jpg" },
-  { id: "group-3", name: "group3", kind: "qqGroup", value: "939095145" },
-  { id: "group-4", name: "group4", kind: "wechat", image: "/skin-service/groups/group-4.jpg" },
-  { id: "group-5", name: "group5", kind: "voiceCommunity", href: "https://discord.gg/XtTbKCSKa" },
-  { id: "group-6", name: "group6", kind: "qqGroup", value: "853878672" },
-  { id: "group-7", name: "group7", kind: "wechat", image: "/skin-service/groups/group-7.jpg" },
-  { id: "group-8", name: "group8", kind: "qqGroup", value: "953014293" },
-  { id: "group-9", name: "group9", kind: "wechat", image: "/skin-service/groups/group-9.jpg" },
-  { id: "group-10", name: "group10", kind: "qqGroup", value: "1105843703" },
+  { id: "group-2", name: "group2", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-2.jpg" },
+  { id: "group-3", name: "group3", kind: "qqGroup", platform: "qq", value: "939095145" },
+  { id: "group-4", name: "group4", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-4.jpg" },
+  { id: "group-5", name: "group5", kind: "discord", platform: "discord", href: "https://discord.gg/XtTbKCSKa" },
+  { id: "group-6", name: "group6", kind: "qqGroup", platform: "qq", value: "853878672" },
+  { id: "group-7", name: "group7", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-7.jpg" },
+  { id: "group-8", name: "group8", kind: "qqGroup", platform: "qq", value: "953014293" },
+  { id: "group-9", name: "group9", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-9.jpg" },
+  { id: "group-10", name: "group10", kind: "qqGroup", platform: "qq", value: "1105843703" },
 ];
 
 const articleCategoryDefinitions: Array<{ id: ArticleCategory; title: SkinTextKey }> = [
@@ -287,13 +293,21 @@ function storedSkinLanguage(value: string | null): SkinServiceLanguage {
     : "zh-CN";
 }
 
-export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string | null }) {
+export default function SkinServiceCenter({
+  serviceUrl,
+  activeSection,
+}: {
+  serviceUrl: string | null;
+  activeSection?: SkinServiceSection;
+}) {
+  const router = useRouter();
   const { settings, loaded, update } = useSettingsContext();
   const [skinLanguageInitialized, setSkinLanguageInitialized] = useState(false);
   const language = skinLanguageInitialized ? skinServiceLanguage(settings.language) : "zh-CN";
   const [query, setQuery] = useState("");
   const [activeArticleCategory, setActiveArticleCategory] = useState<ArticleCategory>("all");
   const [communityPromptOpen, setCommunityPromptOpen] = useState(false);
+  const [enlargedCommunityId, setEnlargedCommunityId] = useState<string | null>(null);
   const [communityNotice, setCommunityNotice] = useState("");
   const [wall, setWall] = useState<FeedbackItem[]>([]);
   const [wallState, setWallState] = useState<WallState>(serviceUrl ? "loading" : "unavailable");
@@ -312,12 +326,17 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
   const communityPromptDialogRef = useRef<HTMLDivElement | null>(null);
   const communityPromptViewRef = useRef<HTMLButtonElement | null>(null);
   const communityPromptPreviousFocusRef = useRef<HTMLElement | null>(null);
+  const communityImageDialogRef = useRef<HTMLDivElement | null>(null);
+  const communityImageCloseRef = useRef<HTMLButtonElement | null>(null);
+  const communityImagePreviousFocusRef = useRef<HTMLElement | null>(null);
   const pageMainRef = useRef<HTMLElement | null>(null);
   const sections = sectionDefinitions.map((section) => ({
     ...section,
     title: skinText(language, section.title),
     summary: skinText(language, section.summary),
+    description: skinText(language, section.description),
   }));
+  const activeSectionDetails = sections.find((section) => section.id === activeSection);
   const communities = communityDefinitions.map((community) => ({
     ...community,
     name: skinText(language, community.name),
@@ -332,8 +351,12 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
     title: skinText(language, article.title),
     content: skinText(language, article.content),
   }));
-  const wechatCommunities = communities.filter((community) => community.image);
-  const otherCommunities = communities.filter((community) => !community.image);
+  const wechatCommunities = communities.filter((community) => community.platform === "wechat");
+  const qqCommunities = communities.filter((community) => community.platform === "qq");
+  const discordCommunities = communities.filter((community) => community.platform === "discord");
+  const enlargedCommunity = communities.find((community) => (
+    community.id === enlargedCommunityId && community.image
+  ));
   const reduceAnimations = settings.reduceAnimations || !settings.animationsEnabled;
 
   const dismissCommunityPrompt = useCallback((showCommunities: boolean) => {
@@ -344,13 +367,8 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
     }
     setCommunityPromptOpen(false);
     if (!showCommunities) return;
-    window.setTimeout(() => {
-      const communitiesSection = document.getElementById("communities");
-      communitiesSection?.scrollIntoView({ behavior: scrollBehavior(reduceAnimations), block: "start" });
-      communitiesSection?.focus({ preventScroll: true });
-      window.history.replaceState(null, "", "#communities");
-    }, 0);
-  }, [reduceAnimations]);
+    router.push("/skin-service/communities");
+  }, [router]);
 
   useEffect(() => {
     if (!loaded || skinLanguageInitialized) return;
@@ -392,12 +410,18 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
     const body = document.body;
     const main = pageMainRef.current;
     const previousOverflow = body.style.overflow;
+    const previousPaddingRight = body.style.paddingRight;
     const previousAriaHidden = main?.getAttribute("aria-hidden") ?? null;
     const previousInert = main?.hasAttribute("inert") ?? false;
     communityPromptPreviousFocusRef.current = document.activeElement instanceof HTMLElement
       ? document.activeElement
       : null;
     body.style.overflow = "hidden";
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      const currentPadding = Number.parseFloat(getComputedStyle(body).paddingRight) || 0;
+      body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
     body.setAttribute("data-community-prompt-open", "true");
     main?.setAttribute("aria-hidden", "true");
     main?.setAttribute("inert", "");
@@ -428,6 +452,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
       window.cancelAnimationFrame(frame);
       document.removeEventListener("keydown", handleKeyDown);
       body.style.overflow = previousOverflow;
+      body.style.paddingRight = previousPaddingRight;
       body.removeAttribute("data-community-prompt-open");
       if (main) {
         if (previousAriaHidden === null) main.removeAttribute("aria-hidden");
@@ -439,6 +464,71 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
       }
     };
   }, [communityPromptOpen, dismissCommunityPrompt]);
+
+  useEffect(() => {
+    if (!enlargedCommunityId) return;
+    const body = document.body;
+    const main = pageMainRef.current;
+    const previousOverflow = body.style.overflow;
+    const previousPaddingRight = body.style.paddingRight;
+    const previousAriaHidden = main?.getAttribute("aria-hidden") ?? null;
+    const previousInert = main?.hasAttribute("inert") ?? false;
+    communityImagePreviousFocusRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    body.style.overflow = "hidden";
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      const currentPadding = Number.parseFloat(getComputedStyle(body).paddingRight) || 0;
+      body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
+    body.setAttribute("data-skin-image-open", "true");
+    main?.setAttribute("aria-hidden", "true");
+    main?.setAttribute("inert", "");
+    const frame = window.requestAnimationFrame(() => communityImageCloseRef.current?.focus());
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setEnlargedCommunityId(null);
+        return;
+      }
+      if (event.key !== "Tab" || !communityImageDialogRef.current) return;
+      const focusable = Array.from(
+        communityImageDialogRef.current.querySelectorAll<HTMLElement>(
+          "button:not(:disabled), a[href], [tabindex]:not([tabindex='-1'])",
+        ),
+      ).filter((element) => element.offsetParent !== null);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!communityImageDialogRef.current.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", handleKeyDown);
+      body.style.overflow = previousOverflow;
+      body.style.paddingRight = previousPaddingRight;
+      body.removeAttribute("data-skin-image-open");
+      if (main) {
+        if (previousAriaHidden === null) main.removeAttribute("aria-hidden");
+        else main.setAttribute("aria-hidden", previousAriaHidden);
+        if (!previousInert) main.removeAttribute("inert");
+      }
+      if (communityImagePreviousFocusRef.current?.isConnected) {
+        communityImagePreviousFocusRef.current.focus({ preventScroll: true });
+      }
+    };
+  }, [enlargedCommunityId]);
 
   const refreshWall = useCallback(async (beforeId?: number) => {
     const append = beforeId !== undefined;
@@ -522,22 +612,77 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
     void refreshWall();
   }, [language, now, pending, refreshWall]);
 
+  const revealTarget = useCallback((targetId: string, behavior = scrollBehavior(reduceAnimations)) => {
+    const target = document.getElementById(targetId);
+    if (target instanceof HTMLDetailsElement) target.open = true;
+    target?.scrollIntoView({ behavior, block: "start" });
+    if (target instanceof HTMLDetailsElement) target.querySelector("summary")?.focus({ preventScroll: true });
+    else if (target instanceof HTMLElement && target.hasAttribute("tabindex")) target.focus({ preventScroll: true });
+  }, [reduceAnimations]);
+
+  useEffect(() => {
+    const revealHash = () => {
+      const targetId = decodeURIComponent(window.location.hash.slice(1));
+      if (targetId) window.requestAnimationFrame(() => revealTarget(targetId, "auto"));
+    };
+    revealHash();
+    window.addEventListener("hashchange", revealHash);
+    return () => window.removeEventListener("hashchange", revealHash);
+  }, [activeSection, revealTarget]);
+
   const searchResults = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase(language);
     if (!normalized) return [];
     const entries = [
-      ...sections.map((section) => ({ title: section.title, text: section.summary, href: `#${section.id}` })),
+      ...sections.map((section) => ({
+        title: section.title,
+        text: section.summary,
+        href: `/skin-service/${section.id}`,
+        section: section.id,
+        targetId: section.id,
+      })),
       ...communities.map((community) => ({
         title: `${community.name} · ${community.kind}`,
         text: community.value ?? (community.image ? skinText(language, "qrAvailable") : community.kind),
-        href: `#community-${community.id}`,
+        href: `/skin-service/communities#community-${community.id}`,
+        section: "communities" as const,
+        targetId: `community-${community.id}`,
       })),
+      {
+        title: skinText(language, "communityBulletinTitle"),
+        text: `${skinText(language, "communityBulletinBody")} ${skinText(language, "websiteVersion", { version: packageInfo.version })}`,
+        href: "/skin-service/communities#community-bulletin",
+        section: "communities" as const,
+        targetId: "community-bulletin",
+      },
       ...articles.map((article) => ({
         title: article.title,
         text: `${articleCategories.find((category) => category.id === article.category)?.title ?? ""} ${article.content}`,
-        href: `#${article.id}`,
+        href: `/skin-service/questions#${article.id}`,
+        section: "questions" as const,
+        targetId: article.id,
       })),
-      ...wall.map((item) => ({ title: skinText(language, "publicFeedbackSearch"), text: item.content, href: `#feedback-${item.id}` })),
+      ...wall.map((item) => ({
+        title: skinText(language, "publicFeedbackSearch"),
+        text: item.content,
+        href: `/skin-service/feedback#feedback-${item.id}`,
+        section: "feedback" as const,
+        targetId: `feedback-${item.id}`,
+      })),
+      {
+        title: skinText(language, "wechatOfficialReserved"),
+        text: skinText(language, "wechatOfficialBody"),
+        href: "/skin-service/review-notices#official-account-notice",
+        section: "review-notices" as const,
+        targetId: "official-account-notice",
+      },
+      {
+        title: skinText(language, "donationReserved"),
+        text: skinText(language, "donationBody"),
+        href: "/skin-service/support#support-channel",
+        section: "support" as const,
+        targetId: "support-channel",
+      },
     ];
     return entries.filter((entry) => `${entry.title} ${entry.text}`.toLocaleLowerCase(language).includes(normalized)).slice(0, 20);
   }, [language, query, wall]);
@@ -565,16 +710,26 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
       <div className="skinCommunityCardContent">
         {community.image && (
           <>
-            <div className="skinCommunityQr">
-              <Image
-                className="skinCommunityQrImage"
-                src={assetPath(community.image)}
-                alt={skinText(language, "qrImageAlt", { group: community.name })}
-                width={1050}
-                height={1566}
-                sizes="(max-width: 480px) calc(100vw - 90px), (max-width: 800px) calc(50vw - 54px), 270px"
-              />
-            </div>
+            <button
+              className="skinCommunityQrButton"
+              type="button"
+              aria-label={skinText(language, "enlargeQr", { group: community.name })}
+              onClick={() => setEnlargedCommunityId(community.id)}
+            >
+              <span className="skinCommunityQr">
+                <Image
+                  className="skinCommunityQrImage"
+                  src={assetPath(community.image)}
+                  alt={skinText(language, "qrImageAlt", { group: community.name })}
+                  width={1050}
+                  height={1566}
+                  sizes="(max-width: 480px) calc(100vw - 90px), (max-width: 800px) calc(50vw - 54px), 270px"
+                />
+                <span className="skinCommunityQrZoom" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5" /><path d="m15 15 5 5M10.5 8v5M8 10.5h5" /></svg>
+                </span>
+              </span>
+            </button>
             <small className="skinCommunityQrHint">{skinText(language, "scanQrHint")}</small>
           </>
         )}
@@ -585,7 +740,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           </>
         )}
         {community.href && (
-          <a href={community.href} target="_blank" rel="noopener noreferrer">{skinText(language, "openGroup5")}</a>
+          <a href={community.href} target="_blank" rel="noopener noreferrer">{skinText(language, "openDiscord")}</a>
         )}
       </div>
     </details>
@@ -694,13 +849,54 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
           </div>
         </div>
       )}
+      {enlargedCommunity?.image && (
+        <div className="skinCommunityLightboxOverlay" onClick={() => setEnlargedCommunityId(null)}>
+          <div
+            className="skinCommunityLightbox"
+            ref={communityImageDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="skin-community-image-title"
+            aria-describedby="skin-community-image-hint"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header>
+              <div>
+                <span>{skinText(language, "wechat")}</span>
+                <h2 id="skin-community-image-title">{enlargedCommunity.name}</h2>
+              </div>
+              <button
+                ref={communityImageCloseRef}
+                type="button"
+                onClick={() => setEnlargedCommunityId(null)}
+                aria-label={skinText(language, "closeQr")}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+              </button>
+            </header>
+            <div className="skinCommunityLightboxImage">
+              <Image
+                src={assetPath(enlargedCommunity.image)}
+                alt={skinText(language, "qrImageAlt", { group: enlargedCommunity.name })}
+                width={1050}
+                height={1566}
+                sizes="(max-width: 700px) calc(100vw - 48px), 720px"
+                priority
+              />
+            </div>
+            <p id="skin-community-image-hint">{skinText(language, "enlargedQrHint")}</p>
+          </div>
+        </div>
+      )}
       <main className="pageShell gamesShell skinServiceShell" lang={language} ref={pageMainRef}>
       <section className="gamesHero skinServiceHero">
-        <Link href="/" className="gamesHeroBack">{skinText(language, "backHome")}</Link>
+        <Link href={activeSection ? "/skin-service" : "/"} className="gamesHeroBack">
+          {skinText(language, activeSection ? "backServiceCenter" : "backHome")}
+        </Link>
         <div className="gamesHeroInner">
           <span className="gamesHeroEyebrow">{skinText(language, "eyebrow")}</span>
-          <h1 className="gamesHeroTitle">{skinText(language, "pageTitle")}</h1>
-          <p className="gamesHeroSubtitle">{skinText(language, "pageSubtitle")}</p>
+          <h1 className="gamesHeroTitle">{activeSectionDetails?.title ?? skinText(language, "pageTitle")}</h1>
+          <p className="gamesHeroSubtitle">{activeSectionDetails?.description ?? skinText(language, "pageSubtitle")}</p>
         </div>
       </section>
 
@@ -722,46 +918,68 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
         {query && (
           <div className="skinServiceSearchResults" aria-live="polite">
             {searchResults.length > 0 ? searchResults.map((result, index) => (
-              <a
+              <Link
                 key={`${result.href}-${index}`}
                 href={result.href}
                 onClick={(event) => {
-                  event.preventDefault();
                   setQuery("");
                   setActiveArticleCategory("all");
+                  if (result.section !== activeSection) return;
+                  event.preventDefault();
                   window.requestAnimationFrame(() => {
-                    const target = document.getElementById(result.href.slice(1));
-                    if (target instanceof HTMLDetailsElement) target.open = true;
-                    target?.scrollIntoView({ behavior: scrollBehavior(reduceAnimations), block: "start" });
-                    if (target instanceof HTMLDetailsElement) target.querySelector("summary")?.focus({ preventScroll: true });
-                    window.history.replaceState(null, "", result.href);
+                    revealTarget(result.targetId);
+                    window.history.replaceState(null, "", `#${result.targetId}`);
                   });
                 }}
               >
                 <strong>{result.title}</strong>
                 <span>{result.text}</span>
-              </a>
+              </Link>
             )) : <p>{skinText(language, "noResults")}</p>}
           </div>
         )}
       </section>
 
-      <nav className="skinServiceIndex" aria-label={skinText(language, "sectionsAria")}>
+      <nav
+        className={`skinServiceIndex ${activeSection ? "skinServiceSectionNav" : "skinServiceHubGrid"}`}
+        aria-label={skinText(language, "sectionsAria")}
+      >
         {sections.map((section) => (
-          <a key={section.id} className="skinServiceIndexLink" href={`#${section.id}`}>
+          <Link
+            key={section.id}
+            className={`skinServiceIndexLink${activeSection === section.id ? " isActive" : ""}`}
+            href={`/skin-service/${section.id}`}
+            aria-current={activeSection === section.id ? "page" : undefined}
+          >
             <span className="skinServiceIndexIcon" aria-hidden="true"><SectionIcon name={section.icon} /></span>
-            <span><strong>{section.title}</strong><small>{section.summary}</small></span>
-          </a>
+            <span className="skinServiceIndexCopy"><strong>{section.title}</strong><small>{section.summary}</small></span>
+            {!activeSection && (
+              <span className="skinServiceIndexArrow">
+                {skinText(language, "openSection")} <span aria-hidden="true">→</span>
+              </span>
+            )}
+          </Link>
         ))}
       </nav>
 
-      <div className="skinServiceDocument">
-        <section className="skinServiceDocumentSection" id="communities" tabIndex={-1}>
+      {activeSection && <div className="skinServiceDocument">
+        {activeSection === "communities" && <section className="skinServiceDocumentSection" id="communities" tabIndex={-1}>
           <SectionHeader
             icon="communities"
             title={skinText(language, "communitiesTitle")}
             description={skinText(language, "communitiesDescription")}
           />
+          <aside className="skinCommunityBulletin" id="community-bulletin" tabIndex={-1} aria-labelledby="community-bulletin-title">
+            <span className="skinCommunityBulletinIcon" aria-hidden="true"><SectionIcon name="notices" /></span>
+            <div>
+              <div className="skinCommunityBulletinMeta">
+                <span>{skinText(language, "communityBulletinLabel")}</span>
+                <strong>{skinText(language, "websiteVersion", { version: packageInfo.version })}</strong>
+              </div>
+              <h3 id="community-bulletin-title">{skinText(language, "communityBulletinTitle")}</h3>
+              <p>{skinText(language, "communityBulletinBody")}</p>
+            </div>
+          </aside>
           <div className="skinCommunityGroup">
             <h3>{skinText(language, "wechatGroups")}</h3>
             <div className="skinCommunityGrid skinCommunityQrGrid">
@@ -769,15 +987,21 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
             </div>
           </div>
           <div className="skinCommunityGroup">
-            <h3>{skinText(language, "otherGroups")}</h3>
+            <h3>{skinText(language, "qqGroups")}</h3>
             <div className="skinCommunityGrid">
-              {otherCommunities.map(renderCommunityCard)}
+              {qqCommunities.map(renderCommunityCard)}
+            </div>
+          </div>
+          <div className="skinCommunityGroup">
+            <h3>{skinText(language, "discordGroups")}</h3>
+            <div className="skinCommunityGrid skinCommunityDiscordGrid">
+              {discordCommunities.map(renderCommunityCard)}
             </div>
           </div>
           <p className="skinServiceLiveNotice" aria-live="polite">{communityNotice}</p>
-        </section>
+        </section>}
 
-        <section className="skinServiceDocumentSection" id="questions">
+        {activeSection === "questions" && <section className="skinServiceDocumentSection" id="questions" tabIndex={-1}>
           <SectionHeader
             icon="questions"
             title={skinText(language, "questionsTitle")}
@@ -794,10 +1018,10 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
                 {category.title}
               </button>
             ))}
-          </div>
-          <div className="skinArticleGrid">
-            {visibleArticles.map((article) => (
-              <article id={article.id} key={article.id}>
+            </div>
+            <div className="skinArticleGrid">
+              {visibleArticles.map((article) => (
+                <article id={article.id} key={article.id} tabIndex={-1}>
                 <span className="skinArticleCategory">
                   {articleCategories.find((category) => category.id === article.category)?.title}
                 </span>
@@ -806,9 +1030,9 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
               </article>
             ))}
           </div>
-        </section>
+        </section>}
 
-        <section className="skinServiceDocumentSection" id="feedback">
+        {activeSection === "feedback" && <section className="skinServiceDocumentSection" id="feedback" tabIndex={-1}>
           <SectionHeader
             icon="feedback"
             title={skinText(language, "feedbackTitle")}
@@ -866,7 +1090,7 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
               <>
                 <div className="skinFeedbackList">
                   {wall.map((item) => (
-                    <article id={`feedback-${item.id}`} key={item.id}>
+                    <article id={`feedback-${item.id}`} key={item.id} tabIndex={-1}>
                       <p>{item.content}</p>
                       <time dateTime={new Date(item.publishAt * 1000).toISOString()}>{formatDate(item.publishAt, language)}</time>
                     </article>
@@ -886,32 +1110,32 @@ export default function SkinServiceCenter({ serviceUrl }: { serviceUrl: string |
               </>
             )}
           </div>
-        </section>
+        </section>}
 
-        <section className="skinServiceDocumentSection" id="review-notices">
+        {activeSection === "review-notices" && <section className="skinServiceDocumentSection" id="review-notices" tabIndex={-1}>
           <SectionHeader
             icon="notices"
             title={skinText(language, "noticesTitle")}
             description={skinText(language, "noticesDescription")}
           />
-          <div className="skinServicePlaceholder">
+          <div className="skinServicePlaceholder" id="official-account-notice" tabIndex={-1}>
             <strong>{skinText(language, "wechatOfficialReserved")}</strong>
             <p>{skinText(language, "wechatOfficialBody")}</p>
           </div>
-        </section>
+        </section>}
 
-        <section className="skinServiceDocumentSection" id="support">
+        {activeSection === "support" && <section className="skinServiceDocumentSection" id="support" tabIndex={-1}>
           <SectionHeader
             icon="support"
             title={skinText(language, "supportTitle")}
             description={skinText(language, "supportDescription")}
           />
-          <div className="skinServicePlaceholder">
+          <div className="skinServicePlaceholder" id="support-channel" tabIndex={-1}>
             <strong>{skinText(language, "donationReserved")}</strong>
             <p>{skinText(language, "donationBody")}</p>
           </div>
-        </section>
-      </div>
+        </section>}
+      </div>}
       </main>
     </>
   );

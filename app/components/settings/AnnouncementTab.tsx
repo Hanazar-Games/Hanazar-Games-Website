@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.16.0",
+    date: "2026-08-20",
+    title: "Skin Service Community Navigation and QR Viewer",
+    items: [
+      "Moved the skin service hub into five dedicated GitHub Pages routes while keeping global search linked to each exact section and item.",
+      "Organized community entries into WeChat, QQ, and international Discord groups with compact collapsed cards.",
+      "Added an accessible full-size viewer for every WeChat QR image with keyboard focus containment, Escape dismissal, and responsive light and dark layouts.",
+      "Added a community notice that reads the live website version and kept the first-visit Minecraft community invitation linked to the community route.",
+      "Expanded search coverage, route contracts, export guards, responsive checks, modal isolation, and AIGC first-row image loading.",
+      "Rechecked site-wide UI, UX, low-volume SFX, opt-in BGM, themes, accessibility, security, and GitHub Pages deployment output.",
+    ],
+  },
+  {
     version: "2.15.0",
     date: "2026-08-19",
     title: "Focused Skin Service UI and Full-Site QA",

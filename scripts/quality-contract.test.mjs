@@ -98,12 +98,16 @@ test("above-the-fold archive images load eagerly without preloading competing ca
   ]);
 
   assert.match(games, /loading=\{index < 3 \? "eager" : "lazy"\}/);
-  assert.match(aigc, /loading=\{index < 2 \? "eager" : "lazy"\}/);
+  assert.match(aigc, /loading=\{index < 3 \? "eager" : "lazy"\}/);
 });
 
 test("subpage hero titles balance narrow-screen line breaks", async () => {
-  const css = await read("app/globals.css");
+  const [css, layout] = await Promise.all([
+    read("app/globals.css"),
+    read("app/layout.tsx"),
+  ]);
   assert.match(css, /\.gamesHeroTitle \{[\s\S]*?text-wrap: balance;/);
+  assert.match(layout, /data-scroll-behavior="smooth"/);
 });
 
 test("catalog exposes the Go project and the complete tool taxonomy", async () => {
@@ -141,6 +145,29 @@ test("homepage tools cap each group at three cards and link to the archive", asy
   assert.match(css, /\.toolsGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
 });
 
+test("skin service hub exports five dedicated section routes", async () => {
+  const sectionIds = ["communities", "questions", "feedback", "review-notices", "support"];
+  const [center, route, rootPage, verifier, ...sectionPages] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/skin-service/SkinServiceRoute.tsx"),
+    read("app/skin-service/page.tsx"),
+    read("scripts/verify-static-export.mjs"),
+    ...sectionIds.map((id) => read(`app/skin-service/${id}/page.tsx`)),
+  ]);
+
+  assert.match(rootPage, /<SkinServiceRoute\s*\/>/);
+  assert.match(route, /activeSection=\{section\}/);
+  assert.match(center, /activeSection\?: SkinServiceSection/);
+  assert.match(center, /`\/skin-service\/\$\{section\.id\}`/);
+  assert.match(center, /aria-current=\{activeSection === section\.id \? "page" : undefined\}/);
+  assert.match(center, /revealTarget\(targetId, "auto"\)/);
+  assert.match(center, /id=\{article\.id\} key=\{article\.id\} tabIndex=\{-1\}/);
+  sectionPages.forEach((page, index) => {
+    assert.match(page, new RegExp(`section=["']${sectionIds[index]}["']`));
+    assert.match(verifier, new RegExp(`skin-service/${sectionIds[index]}/index\\.html`));
+  });
+});
+
 test("skin service shares system-aware settings with a scoped three-language selector", async () => {
   const [center, copy, settings, panel, languageTab, css] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
@@ -173,7 +200,11 @@ test("skin service uses localized copy, collapsible communities, and one accent 
     read("app/globals.css"),
   ]);
 
-  for (const value of ["我们的社群", "Our Communities", "コミュニティ"]) {
+  for (const value of [
+    "我们的社群", "Our Communities", "コミュニティ",
+    "QQ 交流群", "QQ communities", "QQ 交流グループ",
+    "外区 Discord", "International Discord", "海外向け Discord",
+  ]) {
     assert.match(copy, new RegExp(value));
   }
   assert.match(center, /function SectionIcon/);
@@ -185,6 +216,8 @@ test("skin service uses localized copy, collapsible communities, and one accent 
   assert.doesNotMatch(center, /<span>0[1-5]<\/span>/);
   assert.match(css, /\.skinServiceSectionIcon/);
   assert.match(css, /\.skinServiceShell \{[\s\S]*?--skin-tone:/);
+  assert.match(css, /\.skinServiceShell \.gamesHeroTitle,[\s\S]*?animation: none;/);
+  assert.match(css, /\.skinServiceSectionNav \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   assert.doesNotMatch(css, /\.skinServiceShell \[data-tone="cyan"\]/);
 });
 
@@ -197,6 +230,8 @@ test("community prompt prevents stacked dialogs and hides background content", a
   assert.match(center, /pageMainRef/);
   assert.match(center, /setAttribute\("inert", ""\)/);
   assert.match(center, /setAttribute\("aria-hidden", "true"\)/);
+  assert.match(center, /window\.innerWidth - document\.documentElement\.clientWidth/);
+  assert.match(center, /body\.style\.paddingRight = previousPaddingRight/);
   assert.match(launcher, /\[role=['"]dialog['"]\]\[aria-modal=['"]true['"]\]/);
 });
 
@@ -215,24 +250,33 @@ test("skin service publishes group QR artwork and a first-visit community prompt
   assert.match(center, /COMMUNITY_PROMPT_STORAGE_KEY/);
   assert.match(center, /localStorage\.getItem\(COMMUNITY_PROMPT_STORAGE_KEY\)/);
   assert.match(center, /role="dialog"/);
-  assert.match(center, /document\.getElementById\("communities"\)/);
+  assert.match(center, /router\.push\("\/skin-service\/communities"\)/);
   assert.match(center, /assetPath\(community\.image\)/);
+  assert.match(center, /setEnlargedCommunityId\(community\.id\)/);
+  assert.match(center, /communityImageCloseRef/);
+  assert.match(center, /data-skin-image-open/);
+  assert.match(center, /aria-labelledby="skin-community-image-title"/);
+  assert.match(center, /community-bulletin/);
+  assert.match(center, /packageInfo\.version/);
   assert.match(center, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
   for (const value of ["一起加入社群玩 MC", "Join the community for MC", "コミュニティで MC を遊ぼう"]) {
     assert.match(copy, new RegExp(value));
   }
   assert.match(css, /\.skinCommunityPromptOverlay/);
   assert.match(css, /\.skinCommunityQrImage/);
+  assert.match(css, /\.skinCommunityLightboxOverlay/);
+  assert.match(css, /\.skinCommunityBulletin/);
+  assert.match(css, /body\[data-skin-image-open="true"\] \.settingsFloatingButton/);
 });
 
 test("skin service exposes searchable communities and a protected public feedback wall", async () => {
-  const [page, center, copy] = await Promise.all([
-    read("app/skin-service/page.tsx"),
+  const [route, center, copy] = await Promise.all([
+    read("app/skin-service/SkinServiceRoute.tsx"),
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
   ]);
 
-  assert.match(page, /NEXT_PUBLIC_CHAT_SERVICE_URL/);
+  assert.match(route, /NEXT_PUBLIC_CHAT_SERVICE_URL/);
   for (const value of ["939095145", "853878672", "953014293", "1105843703", "https://discord.gg/XtTbKCSKa"]) {
     assert.match(center, new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }

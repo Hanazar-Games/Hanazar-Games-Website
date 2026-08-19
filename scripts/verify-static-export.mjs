@@ -16,6 +16,7 @@ function httpsUrl(value) {
 }
 
 const basePath = `/${repositoryName}`;
+const packageVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
 const configuredChatService = process.env.NEXT_PUBLIC_CHAT_SERVICE_URL?.trim();
 const chatServiceUrl = httpsUrl(configuredChatService);
 if (configuredChatService && !chatServiceUrl) {
@@ -29,6 +30,11 @@ const requiredFiles = [
   "chat/index.html",
   "transfer/index.html",
   "skin-service/index.html",
+  "skin-service/communities/index.html",
+  "skin-service/questions/index.html",
+  "skin-service/feedback/index.html",
+  "skin-service/review-notices/index.html",
+  "skin-service/support/index.html",
   "tools/index.html",
   "games/guandan.jpg",
   "games/liars-bar.jpg",
@@ -123,21 +129,46 @@ const requiredContent = {
     "服务文档",
     "全局搜索",
     "我们的社群",
-    "使用微信扫描二维码加入",
     "代发皮肤常见问题",
-    "服务入门",
-    "材料准备",
-    "审核与处理",
-    "隐私安全",
     "匿名反馈墙",
     "审核通知",
     "支持与捐赠",
+    "进入分区",
+  ],
+  "skin-service/communities/index.html": [
+    "我们的社群",
+    "使用微信扫描二维码加入",
+    "微信交流群",
+    "QQ 交流群",
+    "外区 Discord",
+    "社群公告",
+    `网站版本 ${packageVersion}`,
     "939095145",
     "853878672",
     "953014293",
     "1105843703",
     "https://discord.gg/XtTbKCSKa",
+  ],
+  "skin-service/questions/index.html": [
+    "代发皮肤常见问题",
+    "服务入门",
+    "材料准备",
+    "审核与处理",
+    "隐私安全",
+    "什么是代发皮肤服务？",
+  ],
+  "skin-service/feedback/index.html": [
+    "匿名反馈墙",
+    "写下匿名反馈",
     "本机可修改五分钟",
+  ],
+  "skin-service/review-notices/index.html": [
+    "审核通知",
+    "公众号入口预留",
+  ],
+  "skin-service/support/index.html": [
+    "支持与捐赠",
+    "捐赠入口预留",
   ],
   "tools/index.html": [
     "工具总览",
@@ -159,7 +190,7 @@ for (const [file, values] of Object.entries(requiredContent)) {
   }
 }
 
-const skinServiceHtml = readFileSync(join("out", "skin-service/index.html"), "utf8");
+const skinServiceHtml = readFileSync(join("out", "skin-service/communities/index.html"), "utf8");
 for (const group of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]) {
   const path = `skin-service/groups/${group}`;
   if (!skinServiceHtml.includes(`src="${basePath}/${path}"`)) {
@@ -178,6 +209,13 @@ const forbiddenContent = {
     "https://github.com/Mirako-Official/AI-Rhythm-Game",
   ],
   "aigc/index.html": ["https://hanazar-games.github.io/GPT-MAX-AIGC-Webgame-Project"],
+  "skin-service/index.html": [
+    "939095145",
+    "什么是代发皮肤服务？",
+    "写下匿名反馈",
+    "公众号入口预留",
+    "捐赠入口预留",
+  ],
   "tools/index.html": [
     "https://github.com/Mirako-Official/New-Aiugc-Pipeline",
     "https://github.com/Mirako-Official/AI-Rhythm-Game",
@@ -191,7 +229,6 @@ for (const [file, values] of Object.entries(forbiddenContent)) {
   }
 }
 
-const packageVersion = JSON.parse(readFileSync("package.json", "utf8")).version;
 const announcements = readFileSync("app/components/settings/AnnouncementTab.tsx", "utf8");
 const announcementVersion = announcements.match(/version: "([^"]+)"/)?.[1];
 if (announcementVersion !== packageVersion) {

@@ -2935,6 +2935,120 @@ body[data-theme="light"] .shareLogRail span {
   outline-offset: 3px;
 }
 
+.skinCommunityLightboxOverlay {
+  --skin-lightbox-surface: rgba(15, 23, 43, 0.98);
+  --skin-lightbox-text: #f4f7ff;
+  --skin-lightbox-muted: #acb8d0;
+  --skin-lightbox-border: rgba(183, 198, 232, 0.2);
+  position: fixed;
+  z-index: 170;
+  inset: 0;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(3, 7, 17, 0.78);
+  backdrop-filter: blur(14px);
+  animation: skinPromptFade 0.18s ease-out both;
+}
+
+.skinCommunityLightbox {
+  width: min(820px, 100%);
+  max-height: calc(100dvh - 48px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  border: 1px solid var(--skin-lightbox-border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(150, 137, 246, 0.15), transparent 34%),
+    var(--skin-lightbox-surface);
+  color: var(--skin-lightbox-text);
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.48);
+  animation: skinPromptEnter 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.skinCommunityLightbox header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skinCommunityLightbox header span {
+  color: var(--skin-lightbox-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+
+.skinCommunityLightbox h2 {
+  margin: 4px 0 0;
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+  font-weight: 560;
+}
+
+.skinCommunityLightbox header button {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--skin-lightbox-border);
+  border-radius: 12px;
+  background: rgba(150, 137, 246, 0.1);
+  color: var(--skin-lightbox-text);
+  cursor: pointer;
+}
+
+.skinCommunityLightbox header button:hover {
+  border-color: #9689f6;
+  background: rgba(150, 137, 246, 0.18);
+}
+
+.skinCommunityLightbox header button:focus-visible {
+  outline: 3px solid rgba(150, 137, 246, 0.4);
+  outline-offset: 3px;
+}
+
+.skinCommunityLightbox header svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+.skinCommunityLightboxImage {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  border: 1px solid var(--skin-lightbox-border);
+  border-radius: 16px;
+  background: #111;
+}
+
+.skinCommunityLightboxImage img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: calc(100dvh - 210px);
+  display: block;
+  object-fit: contain;
+}
+
+.skinCommunityLightbox > p {
+  margin: 0;
+  color: var(--skin-lightbox-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
 body[data-theme="light"] .skinCommunityPromptOverlay {
   --skin-prompt-surface: rgba(251, 252, 255, 0.98);
   --skin-prompt-card: rgba(241, 244, 252, 0.98);
@@ -2958,6 +3072,18 @@ body[data-theme="light"] .skinCommunityPromptIcon {
 
 body[data-theme="light"] .skinCommunityPromptEyebrow {
   color: #6756d9;
+}
+
+body[data-theme="light"] .skinCommunityLightboxOverlay {
+  --skin-lightbox-surface: rgba(251, 252, 255, 0.99);
+  --skin-lightbox-text: #1c2740;
+  --skin-lightbox-muted: #5e6d87;
+  --skin-lightbox-border: rgba(63, 79, 118, 0.16);
+  background: rgba(28, 38, 62, 0.52);
+}
+
+body[data-theme="light"] .skinCommunityLightbox {
+  box-shadow: 0 30px 90px rgba(38, 51, 83, 0.24);
 }
 
 @keyframes skinPromptFade {
@@ -3042,6 +3168,9 @@ body[data-theme="light"] .skinServiceHero {
 .skinServiceShell .gamesHeroSubtitle {
   color: #f7f8ff;
   text-shadow: 0 8px 34px rgba(2, 7, 24, 0.26);
+  opacity: 1;
+  transform: none;
+  animation: none;
 }
 
 body[data-theme="light"] .skinServiceShell .gamesHeroTitle,
@@ -3222,6 +3351,73 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   transform: translateY(-1px);
 }
 
+.skinServiceIndexLink.isActive {
+  border-color: var(--skin-tone);
+  background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
+}
+
+.skinServiceHubGrid {
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.skinServiceHubGrid .skinServiceIndexLink {
+  min-height: 138px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  align-items: start;
+  border-color: var(--skin-border);
+  background:
+    linear-gradient(135deg, var(--skin-tone-soft), transparent 46%),
+    var(--skin-surface);
+  box-shadow: 0 14px 38px rgba(2, 8, 22, 0.12);
+}
+
+.skinServiceHubGrid .skinServiceIndexIcon {
+  grid-row: 1 / 3;
+  width: 46px;
+  height: 46px;
+}
+
+.skinServiceIndexArrow {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--skin-tone);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.skinServiceSectionNav {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.skinServiceSectionNav .skinServiceIndexLink {
+  min-height: 62px;
+  padding: 10px;
+}
+
+.skinServiceSectionNav .skinServiceIndexIcon {
+  width: 34px;
+  height: 34px;
+}
+
+.skinServiceSectionNav .skinServiceIndexIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.skinServiceSectionNav .skinServiceIndexLink small {
+  display: none;
+}
+
 .skinServiceIndexIcon {
   flex: 0 0 auto;
   width: 38px;
@@ -3244,7 +3440,7 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   stroke-width: 1.7;
 }
 
-.skinServiceIndexLink > span:last-child {
+.skinServiceIndexCopy {
   min-width: 0;
   display: grid;
   gap: 4px;
@@ -3338,6 +3534,71 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   gap: 12px;
 }
 
+.skinCommunityBulletin {
+  margin: 0 0 28px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  scroll-margin-top: 24px;
+  border: 1px solid color-mix(in srgb, var(--skin-tone) 44%, var(--skin-border));
+  border-radius: 17px;
+  background:
+    linear-gradient(135deg, var(--skin-tone-soft), transparent 58%),
+    var(--skin-card);
+}
+
+.skinCommunityBulletinIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--skin-tone);
+  border-radius: 13px;
+  background: var(--skin-tone-soft);
+  color: var(--skin-tone);
+}
+
+.skinCommunityBulletinIcon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.skinCommunityBulletinMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--skin-muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+}
+
+.skinCommunityBulletinMeta strong {
+  color: var(--skin-tone);
+  font-weight: 620;
+  letter-spacing: 0.02em;
+}
+
+.skinCommunityBulletin h3 {
+  margin: 8px 0 6px;
+  font-size: 1.05rem;
+  font-weight: 580;
+}
+
+.skinCommunityBulletin p {
+  margin: 0;
+  color: var(--skin-muted);
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+
 .skinCommunityGroup + .skinCommunityGroup {
   margin-top: 28px;
 }
@@ -3352,6 +3613,11 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
 
 .skinCommunityQrGrid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.skinCommunityDiscordGrid {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 560px;
 }
 
 .skinCommunityCard {
@@ -3439,7 +3705,21 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   cursor: pointer;
 }
 
+.skinCommunityCard .skinCommunityQrButton {
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  text-align: initial;
+}
+
 .skinCommunityQr {
+  position: relative;
+  display: block;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
   border-radius: 13px;
@@ -3450,6 +3730,36 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   width: 100%;
   height: auto;
   display: block;
+  transition: transform 0.2s ease;
+}
+
+.skinCommunityQrButton:hover .skinCommunityQrImage {
+  transform: scale(1.012);
+}
+
+.skinCommunityQrZoom {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 11px;
+  background: rgba(8, 12, 22, 0.8);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+.skinCommunityQrZoom svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 
 .skinCommunityQrHint {
@@ -3830,6 +4140,10 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .skinCommunityDiscordGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .skinFeedbackLayout {
     grid-template-columns: 1fr;
   }
@@ -3848,6 +4162,20 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
 
   .skinCommunityPromptActions {
     grid-template-columns: 1fr;
+  }
+
+  .skinCommunityLightboxOverlay {
+    padding: 12px;
+  }
+
+  .skinCommunityLightbox {
+    max-height: calc(100dvh - 24px);
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .skinCommunityLightboxImage img {
+    max-height: calc(100dvh - 182px);
   }
 
   .skinServiceSearch {
@@ -3871,6 +4199,11 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
     grid-template-columns: 1fr;
   }
 
+  .skinCommunityBulletin {
+    grid-template-columns: 1fr;
+    padding: 17px;
+  }
+
   .skinServiceIndex {
     padding: 10px;
     grid-template-columns: 1fr;
@@ -3879,6 +4212,26 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   .skinServiceIndexLink {
     min-height: 60px;
     padding: 14px;
+  }
+
+  .skinServiceHubGrid .skinServiceIndexLink {
+    min-height: 112px;
+    padding: 17px;
+  }
+
+  .skinServiceSectionNav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .skinServiceSectionNav .skinServiceIndexLink {
+    min-height: 68px;
+    padding: 10px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .skinServiceSectionNav .skinServiceIndexIcon {
+    display: none;
   }
 
   .skinServiceDocument {
@@ -4759,6 +5112,7 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
 }
 
 body[data-disable-blur="true"] .skinCommunityPromptOverlay,
+body[data-disable-blur="true"] .skinCommunityLightboxOverlay,
 body[data-disable-blur="true"] .skinServiceSearch,
 body[data-disable-blur="true"] .skinServiceIndex {
   backdrop-filter: none;
@@ -4767,8 +5121,12 @@ body[data-disable-blur="true"] .skinServiceIndex {
 
 body[data-disable-ui-fade="true"] .skinCommunityPromptOverlay,
 body[data-disable-ui-fade="true"] .skinCommunityPrompt,
+body[data-disable-ui-fade="true"] .skinCommunityLightboxOverlay,
+body[data-disable-ui-fade="true"] .skinCommunityLightbox,
 body[data-disable-modal-anim="true"] .skinCommunityPromptOverlay,
-body[data-disable-modal-anim="true"] .skinCommunityPrompt {
+body[data-disable-modal-anim="true"] .skinCommunityPrompt,
+body[data-disable-modal-anim="true"] .skinCommunityLightboxOverlay,
+body[data-disable-modal-anim="true"] .skinCommunityLightbox {
   animation: none;
 }
 
@@ -4781,7 +5139,13 @@ body[data-community-prompt-open="true"] .settingsFloatingButton {
   pointer-events: none;
 }
 
+body[data-skin-image-open="true"] .settingsFloatingButton {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 body[data-disable-btn-hover="true"] .skinCommunityCard:hover,
+body[data-disable-btn-hover="true"] .skinCommunityQrButton:hover .skinCommunityQrImage,
 body[data-disable-btn-hover="true"] .skinArticleGrid article:hover,
 body[data-disable-btn-hover="true"] .skinServiceIndexLink:hover,
 body[data-disable-btn-hover="true"] .skinServiceSearchResults a:hover {
