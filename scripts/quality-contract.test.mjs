@@ -167,8 +167,8 @@ test("homepage tools cap each group at three cards and link to the archive", asy
   assert.match(css, /\.toolsGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
 });
 
-test("skin service hub exports five dedicated section routes", async () => {
-  const sectionIds = ["communities", "questions", "feedback", "review-notices", "support"];
+test("skin service hub exports six dedicated section routes", async () => {
+  const sectionIds = ["communities", "questions", "feedback", "review-notices", "updates", "support"];
   const [center, route, rootPage, verifier, ...sectionPages] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/skin-service/SkinServiceRoute.tsx"),
@@ -191,12 +191,12 @@ test("skin service hub exports five dedicated section routes", async () => {
 });
 
 test("main and skin service settings use independent defaults and storage", async () => {
-  const [center, copy, settings, panel, languageTab, translationHook, layout, i18n] = await Promise.all([
+  const [center, copy, settings, launcher, panel, translationHook, layout, i18n] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
     read("app/components/SettingsContext.tsx"),
+    read("app/components/SettingsLauncher.tsx"),
     read("app/components/SettingsPanel.tsx"),
-    read("app/components/settings/LanguageTab.tsx"),
     read("app/hooks/useTranslation.ts"),
     read("app/layout.tsx"),
     read("app/lib/i18n.ts"),
@@ -212,10 +212,12 @@ test("main and skin service settings use independent defaults and storage", asyn
   assert.match(copy, /skinServiceLanguages = \["zh-CN", "ja", "en"\]/);
   assert.match(center, /useSettingsContext/);
   assert.match(center, /skinServiceLanguage\(settings\.language\)/);
+  assert.match(center, /skinServiceQuickSettings/);
+  assert.match(center, /update\("theme", theme\)/);
+  assert.match(center, /update\("language", option\.code\)/);
   assert.doesNotMatch(translationHook, /useSkinServiceLanguage|pathname/);
-  assert.match(panel, /skinServiceLanguages/);
-  assert.match(panel, /<LanguageTab allowedCodes=\{skinServiceLanguages\}/);
-  assert.match(languageTab, /allowedCodes/);
+  assert.match(launcher, /pathname\.startsWith\("\/skin-service"\) \? null/);
+  assert.doesNotMatch(panel, /skinServiceLanguages|isSkinService/);
   assert.doesNotMatch(settings, /hanazar\.skin-service-language\.v1/);
 });
 
@@ -225,6 +227,25 @@ test("skin service hub contains only section entries and owns the first-visit pr
   assert.match(center, /if \(activeSection\) return;[\s\S]*?COMMUNITY_PROMPT_STORAGE_KEY/);
   assert.match(center, /\{activeSection && \(\s*<section className="skinServiceSearch"/);
   assert.match(center, /className=\{`skinServiceIndex \$\{activeSection \? "skinServiceSectionNav" : "skinServiceHubGrid"\}`\}/);
+});
+
+test("skin service publishes localized update history", async () => {
+  const [center, copy, css, verifier] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/globals.css"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+
+  for (const value of ["更新公告", "Service Updates", "更新情報", "独立快捷设置与第 203 批结果"]) {
+    assert.match(copy, new RegExp(value));
+  }
+  assert.match(center, /serviceUpdateDefinitions/);
+  assert.match(center, /activeSection === "updates"/);
+  assert.match(center, /skinServiceUpdateList/);
+  assert.match(css, /\.skinServiceQuickSettings/);
+  assert.match(css, /\.skinServiceUpdateList/);
+  assert.match(verifier, /skin-service\/updates\/index\.html/);
 });
 
 test("skin service uses localized copy, collapsible communities, and one accent tone", async () => {
@@ -361,23 +382,24 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes batch 203 and preserves the two system-test batches", async () => {
+test("review tracker exposes batch 204 after publishing batch 203", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
   const historical = completed.filter((batch) => batch.number <= 201);
 
-  assert.equal(reviewBatches.length, 203);
-  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 203 }, (_, index) => 203 - index));
-  assert.equal(completed.length, 202);
+  assert.equal(reviewBatches.length, 204);
+  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 204 }, (_, index) => 204 - index));
+  assert.equal(completed.length, 203);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
-  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_071);
+  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_168);
   assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 201)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 202)?.componentCount, 71);
+  assert.equal(completed.find((batch) => batch.number === 203)?.componentCount, 97);
   assert.ok(historical.every((batch) => [121, 201].includes(batch.number)
     || (batch.componentCount !== null && batch.componentCount >= 10 && batch.componentCount <= 82)));
-  assert.deepEqual(reviewing, [{ number: 203, status: "reviewing", componentCount: null }]);
+  assert.deepEqual(reviewing, [{ number: 204, status: "reviewing", componentCount: null }]);
 });
 
 test("review notices publish the Qianchuan Bit account and collapsible batch archive", async () => {

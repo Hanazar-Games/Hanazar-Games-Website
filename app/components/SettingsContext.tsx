@@ -180,7 +180,11 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       if (raw) {
         const parsed = JSON.parse(raw);
         const normalized = normalizeSettings(parsed, skinServiceDefaultSettings);
-        if (normalized) setSkinServiceSettings(normalized);
+        if (normalized) {
+          if (normalized.theme === "auto") normalized.theme = "light";
+          if (!["zh-CN", "en", "ja"].includes(normalized.language)) normalized.language = "zh-CN";
+          setSkinServiceSettings(normalized);
+        }
       }
     } catch {
       // ignore parse errors

@@ -39,9 +39,9 @@ interface ApiEnvelope {
 type WallState = "loading" | "ready" | "unavailable" | "failed";
 type ArticleCategoryId = "introduction" | "preparation" | "review" | "privacy";
 type ArticleCategory = "all" | ArticleCategoryId;
-type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "support";
+type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "updates" | "support";
 type CommunityPlatform = "wechat" | "qq" | "discord";
-export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "support";
+export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "updates" | "support";
 
 const EDIT_WINDOW_MS = 5 * 60 * 1000;
 const WALL_PAGE_SIZE = 20;
@@ -66,6 +66,7 @@ const sectionDefinitions: Array<{
   { id: "questions", icon: "questions", title: "questionsTitle", summary: "questionsSummary", description: "questionsDescription" },
   { id: "feedback", icon: "feedback", title: "feedbackTitle", summary: "feedbackSummary", description: "feedbackDescription" },
   { id: "review-notices", icon: "notices", title: "noticesTitle", summary: "noticesSummary", description: "noticesDescription" },
+  { id: "updates", icon: "updates", title: "updatesTitle", summary: "updatesSummary", description: "updatesDescription" },
   { id: "support", icon: "support", title: "supportTitle", summary: "supportSummary", description: "supportDescription" },
 ];
 
@@ -111,12 +112,30 @@ const articleDefinitions: Array<{
   { id: "privacy-protection", category: "privacy", title: "article6Title", content: "article6Body" },
 ];
 
+const serviceUpdateDefinitions: Array<{
+  version: string;
+  date: string;
+  title: SkinTextKey;
+  body: SkinTextKey;
+}> = [
+  { version: "2.17.0", date: "2026-08-22", title: "update170Title", body: "update170Body" },
+  { version: "2.16.0", date: "2026-08-20", title: "update160Title", body: "update160Body" },
+  { version: "2.15.0", date: "2026-08-19", title: "update150Title", body: "update150Body" },
+];
+
+const quickLanguageOptions: Array<{ code: SkinServiceLanguage; label: string }> = [
+  { code: "zh-CN", label: "中" },
+  { code: "en", label: "EN" },
+  { code: "ja", label: "日" },
+];
+
 function SectionIcon({ name }: { name: SectionIconName }) {
   const paths = {
     communities: <><circle cx="8" cy="8" r="3" /><circle cx="17" cy="9" r="2.5" /><path d="M2.8 20c.5-4.2 2.4-6.3 5.2-6.3s4.8 2.1 5.2 6.3M14.2 14.1c3.8-.7 6.3 1.2 6.9 5" /></>,
     questions: <><path d="M6 3.5h12a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z" /><path d="M9.4 9a2.7 2.7 0 1 1 4.1 2.3c-1 .6-1.5 1.1-1.5 2.2M12 16.8h.01" /></>,
     feedback: <><path d="M4 5.5h16v11H9l-5 4v-15Z" /><path d="m15.8 3 .5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4-1.4-.5 1.4-.5.5-1.4Z" /></>,
     notices: <><path d="M6.5 17.5h11l-1.4-2.1V10a4.1 4.1 0 0 0-8.2 0v5.4l-1.4 2.1Z" /><path d="M10 20.2h4M12 3V1.8M4.8 5.2 3.9 4.3M19.2 5.2l.9-.9" /></>,
+    updates: <><path d="M4 5h16v14H4z" /><path d="M8 9h8M8 13h6M8 17h4M7 2v5M17 2v5" /></>,
     support: <><path d="M12 20S4 15.5 4 9.4A4.1 4.1 0 0 1 11.2 6L12 7l.8-1A4.1 4.1 0 0 1 20 9.4C20 15.5 12 20 12 20Z" /><path d="M8.6 12h2l1-2.2 1.5 4.2 1-2h1.5" /></>,
   } satisfies Record<SectionIconName, React.ReactNode>;
 
@@ -299,7 +318,7 @@ export default function SkinServiceCenter({
   activeSection?: SkinServiceSection;
 }) {
   const router = useRouter();
-  const { settings } = useSettingsContext();
+  const { settings, update } = useSettingsContext();
   const language = skinServiceLanguage(settings.language);
   const [query, setQuery] = useState("");
   const [activeArticleCategory, setActiveArticleCategory] = useState<ArticleCategory>("all");
@@ -347,6 +366,11 @@ export default function SkinServiceCenter({
     ...article,
     title: skinText(language, article.title),
     content: skinText(language, article.content),
+  }));
+  const serviceUpdates = serviceUpdateDefinitions.map((update) => ({
+    ...update,
+    title: skinText(language, update.title),
+    body: skinText(language, update.body),
   }));
   const wechatCommunities = communities.filter((community) => community.platform === "wechat");
   const qqCommunities = communities.filter((community) => community.platform === "qq");
@@ -657,6 +681,13 @@ export default function SkinServiceCenter({
         section: "review-notices" as const,
         targetId: "official-account-notice",
       },
+      ...serviceUpdates.map((update) => ({
+        title: `${update.version} · ${update.title}`,
+        text: update.body,
+        href: `/skin-service/updates#update-${update.version.replaceAll(".", "-")}`,
+        section: "updates" as const,
+        targetId: `update-${update.version.replaceAll(".", "-")}`,
+      })),
       {
         title: skinText(language, "donationReserved"),
         text: skinText(language, "donationBody"),
@@ -876,6 +907,34 @@ export default function SkinServiceCenter({
         <Link href={activeSection ? "/skin-service" : "/"} className="gamesHeroBack">
           {skinText(language, activeSection ? "backServiceCenter" : "backHome")}
         </Link>
+        <div className="skinServiceQuickSettings" aria-label={skinText(language, "quickSettingsAria")}>
+          <div className="skinServiceQuickToggle" role="group" aria-label={skinText(language, "quickThemeAria")}>
+            {(["light", "dark"] as const).map((theme) => (
+              <button
+                type="button"
+                key={theme}
+                aria-pressed={settings.theme === theme}
+                onClick={() => update("theme", theme)}
+              >
+                <span aria-hidden="true">{theme === "light" ? "☀" : "☾"}</span>
+                {skinText(language, theme === "light" ? "quickThemeLight" : "quickThemeDark")}
+              </button>
+            ))}
+          </div>
+          <div className="skinServiceQuickToggle isLanguage" role="group" aria-label={skinText(language, "quickLanguageAria")}>
+            {quickLanguageOptions.map((option) => (
+              <button
+                type="button"
+                key={option.code}
+                lang={option.code}
+                aria-pressed={language === option.code}
+                onClick={() => update("language", option.code)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="gamesHeroInner">
           <span className="gamesHeroEyebrow">{skinText(language, "eyebrow")}</span>
           <h1 className="gamesHeroTitle">{activeSectionDetails?.title ?? skinText(language, "pageTitle")}</h1>
@@ -1173,6 +1232,27 @@ export default function SkinServiceCenter({
                 })}
               </div>
             </details>
+          </div>
+        </section>}
+
+        {activeSection === "updates" && <section className="skinServiceDocumentSection" id="updates" tabIndex={-1}>
+          <SectionHeader
+            icon="updates"
+            title={skinText(language, "updatesTitle")}
+            description={skinText(language, "updatesDescription")}
+          />
+          <div className="skinServiceUpdateList">
+            {serviceUpdates.map((entry, index) => (
+              <article id={`update-${entry.version.replaceAll(".", "-")}`} key={entry.version} tabIndex={-1}>
+                <div className="skinServiceUpdateMeta">
+                  <strong>v{entry.version}</strong>
+                  <span>{skinText(language, index === 0 ? "updateCurrent" : "updatePublished")}</span>
+                  <time dateTime={entry.date}>{entry.date}</time>
+                </div>
+                <h3>{entry.title}</h3>
+                <p>{entry.body}</p>
+              </article>
+            ))}
           </div>
         </section>}
 

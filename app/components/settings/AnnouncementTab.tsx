@@ -4,6 +4,19 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.17.0",
+    date: "2026-08-22",
+    title: "Independent Skin Service Controls and Batch 203 Release",
+    items: [
+      "Added a sixth skin service route for versioned update notices and included every notice in service-wide search.",
+      "Replaced the main-site settings entry inside the skin service with compact, independently stored light, dark, Chinese, English, and Japanese controls.",
+      "Published Batch 203 with 97 approved components, advanced Batch 204 to review, and updated the cumulative completed total to 10,168.",
+      "Preserved Batch 121 and Batch 201 as zero-component system-update tests while keeping all 204 records in the collapsible tracker.",
+      "Refined update cards, navigation density, responsive controls, focus states, reduced-motion behavior, and narrow-screen spacing.",
+      "Rechecked the production build, GitHub Pages static export, localized content, dependency security, and desktop and mobile interaction paths.",
+    ],
+  },
+  {
     version: "2.16.0",
     date: "2026-08-20",
     title: "Skin Service Community Navigation and QR Viewer",

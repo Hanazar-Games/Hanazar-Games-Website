@@ -42,7 +42,8 @@ const completed = completedCounts().map<ReviewBatch>((componentCount, index) => 
 }));
 
 export const reviewBatches: ReviewBatch[] = [
-  { number: 203, status: "reviewing", componentCount: null },
+  { number: 204, status: "reviewing", componentCount: null },
+  { number: 203, status: "completed", componentCount: 97 },
   { number: 202, status: "completed", componentCount: 71 },
   ...completed.reverse(),
 ];

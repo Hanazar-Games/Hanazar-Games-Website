@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import SettingsPanel from "./SettingsPanel";
 import { useSettingsContext } from "./SettingsContext";
 import { useTranslation } from "../hooks/useTranslation";
@@ -16,7 +17,7 @@ function isEditableTarget(target: EventTarget | null) {
   );
 }
 
-export default function SettingsLauncher() {
+function MainSettingsLauncher() {
   const [open, setOpen] = useState(false);
   const [shortcutStatus, setShortcutStatus] = useState("");
   const lastVolumeRef = useRef(80);
@@ -116,4 +117,9 @@ export default function SettingsLauncher() {
       ) : null}
     </>
   );
+}
+
+export default function SettingsLauncher() {
+  const pathname = usePathname();
+  return pathname.startsWith("/skin-service") ? null : <MainSettingsLauncher />;
 }

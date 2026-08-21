@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { usePathname } from "next/navigation";
 import { useTranslation } from "../hooks/useTranslation";
 import StyleTab from "./settings/StyleTab";
 import LanguageTab from "./settings/LanguageTab";
@@ -14,7 +13,6 @@ import OtherTab from "./settings/OtherTab";
 import AnnouncementTab from "./settings/AnnouncementTab";
 import AboutTab from "./settings/AboutTab";
 import { useSettingsContext } from "./SettingsContext";
-import { skinServiceLanguages } from "../lib/skinServiceI18n";
 
 const tabs = [
   { key: "style", label: "tabStyle", icon: "S" },
@@ -34,8 +32,6 @@ interface SettingsPanelProps {
 }
 
 export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
-  const pathname = usePathname();
-  const isSkinService = pathname.includes("/skin-service");
   const [activeTab, setActiveTab] = useState("style");
   const [visible, setVisible] = useState(false);
   const [animating, setAnimating] = useState(false);
@@ -162,9 +158,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const renderTab = () => {
     switch (activeTab) {
       case "style": return <StyleTab />;
-      case "language": return isSkinService
-        ? <LanguageTab allowedCodes={skinServiceLanguages} />
-        : <LanguageTab />;
+      case "language": return <LanguageTab />;
       case "audio": return <AudioTab />;
       case "animation": return <AnimationTab />;
       case "performance": return <PerformanceTab />;
