@@ -190,37 +190,41 @@ test("skin service hub exports five dedicated section routes", async () => {
   });
 });
 
-test("main site defaults to English while skin service keeps an independent Chinese default", async () => {
-  const [center, copy, settings, panel, languageTab, languageHook, translationHook, layout, i18n, css] = await Promise.all([
+test("main and skin service settings use independent defaults and storage", async () => {
+  const [center, copy, settings, panel, languageTab, translationHook, layout, i18n] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
     read("app/components/SettingsContext.tsx"),
     read("app/components/SettingsPanel.tsx"),
     read("app/components/settings/LanguageTab.tsx"),
-    read("app/hooks/useSkinServiceLanguage.ts"),
     read("app/hooks/useTranslation.ts"),
     read("app/layout.tsx"),
     read("app/lib/i18n.ts"),
-    read("app/globals.css"),
   ]);
 
-  assert.match(settings, /theme: "auto"/);
-  assert.match(settings, /language: "en"/);
+  assert.match(settings, /const mainDefaultSettings[\s\S]*?theme: "dark"[\s\S]*?language: "en"/);
+  assert.match(settings, /const skinServiceDefaultSettings[\s\S]*?theme: "light"[\s\S]*?language: "zh-CN"/);
+  assert.match(settings, /hanazar-settings-v1/);
+  assert.match(settings, /hanazar-skin-service-settings-v1/);
+  assert.match(settings, /pathname\.startsWith\("\/skin-service"\)/);
   assert.match(layout, /<html lang="en"/);
   assert.match(i18n, /defaultLang = "en"/);
   assert.match(copy, /skinServiceLanguages = \["zh-CN", "ja", "en"\]/);
   assert.match(center, /useSettingsContext/);
-  assert.match(center, /useSkinServiceLanguage\(\)/);
-  assert.doesNotMatch(center, /update\("language"/);
-  assert.match(languageHook, /hanazar\.skin-service-language\.v1/);
-  assert.match(languageHook, /"zh-CN"/);
-  assert.match(translationHook, /pathname\.includes\("\/skin-service"\)/);
+  assert.match(center, /skinServiceLanguage\(settings\.language\)/);
+  assert.doesNotMatch(translationHook, /useSkinServiceLanguage|pathname/);
   assert.match(panel, /skinServiceLanguages/);
-  assert.match(panel, /value=\{skinLanguage\}/);
+  assert.match(panel, /<LanguageTab allowedCodes=\{skinServiceLanguages\}/);
   assert.match(languageTab, /allowedCodes/);
-  assert.match(languageTab, /value\?: LangCode/);
-  assert.doesNotMatch(css, /body:has\(\.skinServiceShell\)[^{]*\{[\s\S]*?color-scheme: light;/);
-  assert.match(css, /body\[data-theme="light"\] \.skinServiceShell/);
+  assert.doesNotMatch(settings, /hanazar\.skin-service-language\.v1/);
+});
+
+test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
+  const center = await read("app/components/SkinServiceCenter.tsx");
+
+  assert.match(center, /if \(activeSection\) return;[\s\S]*?COMMUNITY_PROMPT_STORAGE_KEY/);
+  assert.match(center, /\{activeSection && \(\s*<section className="skinServiceSearch"/);
+  assert.match(center, /className=\{`skinServiceIndex \$\{activeSection \? "skinServiceSectionNav" : "skinServiceHubGrid"\}`\}/);
 });
 
 test("skin service uses localized copy, collapsible communities, and one accent tone", async () => {
@@ -357,17 +361,23 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes 202 batches and exactly 10,000 completed components", async () => {
+test("review tracker exposes batch 203 and preserves the two system-test batches", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
+  const historical = completed.filter((batch) => batch.number <= 201);
 
-  assert.equal(reviewBatches.length, 202);
-  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 202 }, (_, index) => 202 - index));
-  assert.equal(completed.length, 201);
-  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
-  assert.ok(completed.every((batch) => batch.componentCount !== null && batch.componentCount >= 10 && batch.componentCount <= 82));
-  assert.deepEqual(reviewing, [{ number: 202, status: "reviewing", componentCount: null }]);
+  assert.equal(reviewBatches.length, 203);
+  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 203 }, (_, index) => 203 - index));
+  assert.equal(completed.length, 202);
+  assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
+  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_071);
+  assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
+  assert.equal(completed.find((batch) => batch.number === 201)?.componentCount, 0);
+  assert.equal(completed.find((batch) => batch.number === 202)?.componentCount, 71);
+  assert.ok(historical.every((batch) => [121, 201].includes(batch.number)
+    || (batch.componentCount !== null && batch.componentCount >= 10 && batch.componentCount <= 82)));
+  assert.deepEqual(reviewing, [{ number: 203, status: "reviewing", componentCount: null }]);
 });
 
 test("review notices publish the Qianchuan Bit account and collapsible batch archive", async () => {
@@ -381,10 +391,10 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   assert.match(center, /reviewBatches\.map/);
   assert.match(center, /skinReviewArchive/);
   assert.match(center, /skinReviewBatch/);
-  assert.match(center, /review-account-qr\.png/);
+  assert.match(center, /review-account-qr\.svg/);
   assert.match(copy, /千川bit/);
   assert.match(css, /\.skinReviewBatch/);
-  assert.match(verifier, /skin-service\/review-account-qr\.png/);
+  assert.match(verifier, /skin-service\/review-account-qr\.svg/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

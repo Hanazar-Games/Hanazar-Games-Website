@@ -50,7 +50,7 @@ const requiredFiles = [
   "skin-service/groups/group-4.jpg",
   "skin-service/groups/group-7.jpg",
   "skin-service/groups/group-9.jpg",
-  "skin-service/review-account-qr.png",
+  "skin-service/review-account-qr.svg",
 ];
 const forbiddenFiles = [
   "IntroPic.jpg",
@@ -130,7 +130,6 @@ const requiredContent = {
   "skin-service/index.html": [
     "代发皮肤服务中心",
     "服务文档",
-    "全局搜索",
     "我们的社群",
     "代发皮肤常见问题",
     "匿名反馈墙",
@@ -169,7 +168,8 @@ const requiredContent = {
     "审核通知",
     "千川bit",
     "审核通知记录",
-    "展开查看全部 202 个批次",
+    "展开查看全部 203 个批次",
+    "第 203 批次",
     "第 202 批次",
     "审核中",
   ],
@@ -208,6 +208,15 @@ for (const group of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]
   }
 }
 
+const reviewNoticesHtml = readFileSync(join("out", "skin-service/review-notices/index.html"), "utf8");
+const reviewQrPath = "skin-service/review-account-qr.svg";
+if (!reviewNoticesHtml.includes(`src="${basePath}/${reviewQrPath}"`)) {
+  throw new Error(`Missing base path for ${reviewQrPath}`);
+}
+if (reviewNoticesHtml.includes(`src="/${reviewQrPath}"`)) {
+  throw new Error(`Root-relative skin service image: ${reviewQrPath}`);
+}
+
 const forbiddenContent = {
   "index.html": [
     "https://hanazar-games.github.io/Tic-Tac-Toe/",
@@ -220,6 +229,7 @@ const forbiddenContent = {
     "939095145",
     "什么是代发皮肤服务？",
     "写下匿名反馈",
+    "全局搜索",
     "捐赠入口预留",
   ],
   "tools/index.html": [

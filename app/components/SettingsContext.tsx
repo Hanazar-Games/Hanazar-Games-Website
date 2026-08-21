@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
 
 export interface SettingsState {
   // Style
@@ -35,13 +36,11 @@ export const sfxStyles = [
   "Drum", "Piano", "Synth", "Chiptune", "Pluck", "Crystal",
 ] as const;
 
-const defaultSettings: SettingsState = {
-  theme: "auto",
+const sharedDefaults = {
   font: "sans",
   customFont: "",
   colorPreset: "graphite",
   contrast: 100,
-  language: "en",
   masterVolume: 75,
   sfxEnabled: true,
   sfxVolume: 28,
@@ -56,9 +55,22 @@ const defaultSettings: SettingsState = {
   reduceAnimations: false,
   disableBlur: false,
   disableDecorations: false,
+} satisfies Omit<SettingsState, "theme" | "language">;
+
+const mainDefaultSettings: SettingsState = {
+  ...sharedDefaults,
+  theme: "dark",
+  language: "en",
 };
 
-const STORAGE_KEY = "hanazar-settings-v1";
+const skinServiceDefaultSettings: SettingsState = {
+  ...sharedDefaults,
+  theme: "light",
+  language: "zh-CN",
+};
+
+const MAIN_STORAGE_KEY = "hanazar-settings-v1";
+const SKIN_SERVICE_STORAGE_KEY = "hanazar-skin-service-settings-v1";
 
 const optionSets = {
   theme: ["dark", "light", "auto"],
@@ -104,7 +116,7 @@ function clampNumber(value: unknown, min: number, max: number) {
   return Math.min(max, Math.max(min, Math.round(value)));
 }
 
-function normalizeSettings(input: unknown, base: SettingsState = defaultSettings) {
+function normalizeSettings(input: unknown, base: SettingsState) {
   if (!isRecord(input)) return null;
 
   const next: SettingsState = { ...base };
@@ -143,16 +155,32 @@ interface SettingsContextValue {
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<SettingsState>(defaultSettings);
+  const pathname = usePathname();
+  const isSkinService = pathname.startsWith("/skin-service");
+  const [mainSettings, setMainSettings] = useState<SettingsState>(mainDefaultSettings);
+  const [skinServiceSettings, setSkinServiceSettings] = useState<SettingsState>(skinServiceDefaultSettings);
   const [loaded, setLoaded] = useState(false);
+  const settings = isSkinService ? skinServiceSettings : mainSettings;
+  const defaultSettings = isSkinService ? skinServiceDefaultSettings : mainDefaultSettings;
+  const storageKey = isSkinService ? SKIN_SERVICE_STORAGE_KEY : MAIN_STORAGE_KEY;
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(MAIN_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        const normalized = normalizeSettings(parsed, defaultSettings);
-        if (normalized) setSettings(normalized);
+        const normalized = normalizeSettings(parsed, mainDefaultSettings);
+        if (normalized) setMainSettings(normalized);
+      }
+    } catch {
+      // ignore parse errors
+    }
+    try {
+      const raw = localStorage.getItem(SKIN_SERVICE_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const normalized = normalizeSettings(parsed, skinServiceDefaultSettings);
+        if (normalized) setSkinServiceSettings(normalized);
       }
     } catch {
       // ignore parse errors
@@ -163,32 +191,43 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loaded) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+      localStorage.setItem(MAIN_STORAGE_KEY, JSON.stringify(mainSettings));
     } catch {
       // Keep in-memory settings working when storage is unavailable.
     }
-  }, [settings, loaded]);
+  }, [mainSettings, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+    try {
+      localStorage.setItem(SKIN_SERVICE_STORAGE_KEY, JSON.stringify(skinServiceSettings));
+    } catch {
+      // Keep in-memory settings working when storage is unavailable.
+    }
+  }, [skinServiceSettings, loaded]);
 
   const update = useCallback(<K extends keyof SettingsState>(key: K, value: SettingsState[K]) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-  }, []);
+    const setSettings = isSkinService ? setSkinServiceSettings : setMainSettings;
+    setSettings((previous) => ({ ...previous, [key]: value }));
+  }, [isSkinService]);
 
   const reset = useCallback(() => {
+    const setSettings = isSkinService ? setSkinServiceSettings : setMainSettings;
     setSettings(defaultSettings);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultSettings));
+      localStorage.setItem(storageKey, JSON.stringify(defaultSettings));
     } catch {
       // ignore storage errors
     }
-  }, []);
+  }, [defaultSettings, isSkinService, storageKey]);
 
   const clearCache = useCallback(() => {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(storageKey);
     } catch {
       // Keep the current in-memory settings when storage is unavailable.
     }
-  }, []);
+  }, [storageKey]);
 
   const exportJson = useCallback(() => JSON.stringify(settings, null, 2), [settings]);
 
@@ -197,12 +236,13 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
       const parsed = JSON.parse(json);
       const normalized = normalizeSettings(parsed, settings);
       if (!normalized) return false;
+      const setSettings = isSkinService ? setSkinServiceSettings : setMainSettings;
       setSettings(normalized);
       return true;
     } catch {
       return false;
     }
-  }, [settings]);
+  }, [isSkinService, settings]);
 
   return (
     <SettingsContext.Provider value={{ settings, loaded, update, reset, clearCache, exportJson, importJson }}>

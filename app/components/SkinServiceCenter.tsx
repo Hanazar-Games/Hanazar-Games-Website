@@ -9,11 +9,11 @@ import { assetPath } from "../lib/paths";
 import { reviewBatches } from "../lib/reviewBatches";
 import packageInfo from "../../package.json";
 import {
+  skinServiceLanguage,
   skinText,
   type SkinServiceLanguage,
   type SkinTextKey,
 } from "../lib/skinServiceI18n";
-import { useSkinServiceLanguage } from "../hooks/useSkinServiceLanguage";
 
 interface FeedbackItem {
   id: number;
@@ -300,7 +300,7 @@ export default function SkinServiceCenter({
 }) {
   const router = useRouter();
   const { settings } = useSettingsContext();
-  const language = useSkinServiceLanguage();
+  const language = skinServiceLanguage(settings.language);
   const [query, setQuery] = useState("");
   const [activeArticleCategory, setActiveArticleCategory] = useState<ArticleCategory>("all");
   const [communityPromptOpen, setCommunityPromptOpen] = useState(false);
@@ -356,9 +356,12 @@ export default function SkinServiceCenter({
         id: "review-account",
         name: "千川bit",
         kind: skinText(language, "noticesTitle"),
-        image: "/skin-service/review-account-qr.png",
+        image: "/skin-service/review-account-qr.svg",
       }
     : communities.find((community) => community.id === enlargedCommunityId && community.image);
+  const enlargedImageDimensions = enlargedCommunity?.id === "review-account"
+    ? { width: 430, height: 430 }
+    : { width: 1050, height: 1566 };
   const reduceAnimations = settings.reduceAnimations || !settings.animationsEnabled;
 
   const dismissCommunityPrompt = useCallback((showCommunities: boolean) => {
@@ -373,6 +376,7 @@ export default function SkinServiceCenter({
   }, [router]);
 
   useEffect(() => {
+    if (activeSection) return;
     try {
       if (localStorage.getItem(COMMUNITY_PROMPT_STORAGE_KEY) !== "1") {
         setCommunityPromptOpen(true);
@@ -380,7 +384,7 @@ export default function SkinServiceCenter({
     } catch {
       setCommunityPromptOpen(true);
     }
-  }, []);
+  }, [activeSection]);
 
   useEffect(() => {
     if (!communityPromptOpen) return;
@@ -854,9 +858,11 @@ export default function SkinServiceCenter({
             <div className="skinCommunityLightboxImage">
               <Image
                 src={assetPath(enlargedCommunity.image)}
-                alt={skinText(language, "qrImageAlt", { group: enlargedCommunity.name })}
-                width={1050}
-                height={1566}
+                alt={enlargedCommunity.id === "review-account"
+                  ? skinText(language, "reviewQrAlt")
+                  : skinText(language, "qrImageAlt", { group: enlargedCommunity.name })}
+                width={enlargedImageDimensions.width}
+                height={enlargedImageDimensions.height}
                 sizes="(max-width: 700px) calc(100vw - 48px), 720px"
                 priority
               />
@@ -877,6 +883,7 @@ export default function SkinServiceCenter({
         </div>
       </section>
 
+      {activeSection && (
       <section className="skinServiceSearch" aria-labelledby="skin-search-title">
         <div>
           <span>{skinText(language, "searchLabel")}</span>
@@ -916,6 +923,7 @@ export default function SkinServiceCenter({
           </div>
         )}
       </section>
+      )}
 
       <nav
         className={`skinServiceIndex ${activeSection ? "skinServiceSectionNav" : "skinServiceHubGrid"}`}
@@ -1108,10 +1116,10 @@ export default function SkinServiceCenter({
               onClick={() => setEnlargedCommunityId("review-account")}
             >
               <Image
-                src={assetPath("/skin-service/review-account-qr.png")}
+                src={assetPath("/skin-service/review-account-qr.svg")}
                 alt={skinText(language, "reviewQrAlt")}
-                width={418}
-                height={437}
+                width={430}
+                height={430}
                 sizes="(max-width: 480px) calc(100vw - 84px), 230px"
               />
               <span className="skinCommunityQrZoom" aria-hidden="true">
