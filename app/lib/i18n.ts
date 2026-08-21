@@ -1,4 +1,4 @@
-export const defaultLang = "zh-CN";
+export const defaultLang = "en";
 
 export type LangCode =
   | "zh-CN" | "zh-TW" | "en" | "ja" | "ko"
@@ -53,7 +53,7 @@ const raw: Record<string, { en: string } & Partial<Record<LangCode, string>>> = 
   sectionDocuments: T("Documents", { "zh-CN": "文档", "zh-TW": "文件", ja: "ドキュメント", ko: "문서", fr: "Documents", de: "Dokumente", es: "Documentos", ru: "Документы", pt: "Documentos" }),
   sectionUpdates: T("Updates", { "zh-CN": "更新", "zh-TW": "更新", ja: "更新情報", ko: "업데이트", fr: "Mises à jour", de: "Updates", es: "Actualizaciones", ru: "Обновления", pt: "Atualizações" }),
   sectionContact: T("Contact", { "zh-CN": "联系", "zh-TW": "聯繫", ja: "お問い合わせ", ko: "연락처", fr: "Contact", de: "Kontakt", es: "Contacto", ru: "Контакты", pt: "Contato" }),
-  skinServiceTitle: T("代发皮肤服务中心", { "zh-CN": "代发皮肤服务中心", "zh-TW": "代發皮膚服務中心" }),
+  skinServiceTitle: T("Skin Publishing Service Center", { "zh-CN": "代发皮肤服务中心", "zh-TW": "代發皮膚服務中心" }),
   skinServiceEyebrow: T("Service Documentation", { "zh-CN": "服务文档", "zh-TW": "服務文件" }),
   skinServiceOpen: T("Open documentation", { "zh-CN": "打开文档", "zh-TW": "開啟文件" }),
   productFeaturedTitle: T("Featured Title", { "zh-CN": "精选作品", "zh-TW": "精選作品", ja: "注目作品", ko: "주요 작품", fr: "Titre en vedette", de: "Haupttitel", es: "Título destacado", ru: "Избранное", pt: "Título em destaque" }),

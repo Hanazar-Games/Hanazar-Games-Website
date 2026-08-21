@@ -6,14 +6,14 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
+import { reviewBatches } from "../lib/reviewBatches";
 import packageInfo from "../../package.json";
 import {
-  skinServiceLanguages,
-  skinServiceLanguage,
   skinText,
   type SkinServiceLanguage,
   type SkinTextKey,
 } from "../lib/skinServiceI18n";
+import { useSkinServiceLanguage } from "../hooks/useSkinServiceLanguage";
 
 interface FeedbackItem {
   id: number;
@@ -48,8 +48,12 @@ const WALL_PAGE_SIZE = 20;
 const MAX_UNIX_SECONDS = Math.floor(8.64e15 / 1000);
 const STORAGE_KEY = "hanazar.skin-feedback-edit.v1";
 const COMMUNITY_PROMPT_STORAGE_KEY = "hanazar.skin-service-community-prompt.v1";
-const SKIN_LANGUAGE_STORAGE_KEY = "hanazar.skin-service-language.v1";
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+const COMPLETED_REVIEW_BATCHES = reviewBatches.filter((batch) => batch.status === "completed");
+const COMPLETED_REVIEW_COMPONENTS = COMPLETED_REVIEW_BATCHES.reduce(
+  (total, batch) => total + (batch.componentCount ?? 0),
+  0,
+);
 
 const sectionDefinitions: Array<{
   id: SkinServiceSection;
@@ -287,12 +291,6 @@ function scrollBehavior(reduceAnimations: boolean): ScrollBehavior {
     : "smooth";
 }
 
-function storedSkinLanguage(value: string | null): SkinServiceLanguage {
-  return skinServiceLanguages.includes(value as SkinServiceLanguage)
-    ? value as SkinServiceLanguage
-    : "zh-CN";
-}
-
 export default function SkinServiceCenter({
   serviceUrl,
   activeSection,
@@ -301,9 +299,8 @@ export default function SkinServiceCenter({
   activeSection?: SkinServiceSection;
 }) {
   const router = useRouter();
-  const { settings, loaded, update } = useSettingsContext();
-  const [skinLanguageInitialized, setSkinLanguageInitialized] = useState(false);
-  const language = skinLanguageInitialized ? skinServiceLanguage(settings.language) : "zh-CN";
+  const { settings } = useSettingsContext();
+  const language = useSkinServiceLanguage();
   const [query, setQuery] = useState("");
   const [activeArticleCategory, setActiveArticleCategory] = useState<ArticleCategory>("all");
   const [communityPromptOpen, setCommunityPromptOpen] = useState(false);
@@ -354,9 +351,14 @@ export default function SkinServiceCenter({
   const wechatCommunities = communities.filter((community) => community.platform === "wechat");
   const qqCommunities = communities.filter((community) => community.platform === "qq");
   const discordCommunities = communities.filter((community) => community.platform === "discord");
-  const enlargedCommunity = communities.find((community) => (
-    community.id === enlargedCommunityId && community.image
-  ));
+  const enlargedCommunity = enlargedCommunityId === "review-account"
+    ? {
+        id: "review-account",
+        name: "千川bit",
+        kind: skinText(language, "noticesTitle"),
+        image: "/skin-service/review-account-qr.png",
+      }
+    : communities.find((community) => community.id === enlargedCommunityId && community.image);
   const reduceAnimations = settings.reduceAnimations || !settings.animationsEnabled;
 
   const dismissCommunityPrompt = useCallback((showCommunities: boolean) => {
@@ -369,31 +371,6 @@ export default function SkinServiceCenter({
     if (!showCommunities) return;
     router.push("/skin-service/communities");
   }, [router]);
-
-  useEffect(() => {
-    if (!loaded || skinLanguageInitialized) return;
-    let preferred: SkinServiceLanguage = "zh-CN";
-    try {
-      preferred = storedSkinLanguage(localStorage.getItem(SKIN_LANGUAGE_STORAGE_KEY));
-    } catch {
-      // Chinese remains the page default when storage is unavailable.
-    }
-    if (settings.language !== preferred) update("language", preferred);
-    setSkinLanguageInitialized(true);
-  }, [loaded, settings.language, skinLanguageInitialized, update]);
-
-  useEffect(() => {
-    if (!skinLanguageInitialized) return;
-    if (settings.language !== language) {
-      update("language", language);
-      return;
-    }
-    try {
-      localStorage.setItem(SKIN_LANGUAGE_STORAGE_KEY, language);
-    } catch {
-      // The language still works for the current page session.
-    }
-  }, [language, settings.language, skinLanguageInitialized, update]);
 
   useEffect(() => {
     try {
@@ -1118,9 +1095,76 @@ export default function SkinServiceCenter({
             title={skinText(language, "noticesTitle")}
             description={skinText(language, "noticesDescription")}
           />
-          <div className="skinServicePlaceholder" id="official-account-notice" tabIndex={-1}>
-            <strong>{skinText(language, "wechatOfficialReserved")}</strong>
-            <p>{skinText(language, "wechatOfficialBody")}</p>
+          <div className="skinReviewAccount" id="official-account-notice" tabIndex={-1}>
+            <div className="skinReviewAccountCopy">
+              <span>{skinText(language, "noticesTitle")}</span>
+              <strong>{skinText(language, "wechatOfficialReserved")}</strong>
+              <p>{skinText(language, "wechatOfficialBody")}</p>
+            </div>
+            <button
+              className="skinReviewQrButton"
+              type="button"
+              aria-label={skinText(language, "reviewQrAlt")}
+              onClick={() => setEnlargedCommunityId("review-account")}
+            >
+              <Image
+                src={assetPath("/skin-service/review-account-qr.png")}
+                alt={skinText(language, "reviewQrAlt")}
+                width={418}
+                height={437}
+                sizes="(max-width: 480px) calc(100vw - 84px), 230px"
+              />
+              <span className="skinCommunityQrZoom" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5" /><path d="m15 15 4 4M10.5 8v5M8 10.5h5" /></svg>
+              </span>
+            </button>
+          </div>
+
+          <div className="skinReviewTracker">
+            <header className="skinReviewTrackerHeader">
+              <div>
+                <span>{skinText(language, "reviewTrackerLabel")}</span>
+                <h3>{skinText(language, "reviewTrackerTitle")}</h3>
+                <p>{skinText(language, "reviewTrackerSummary", {
+                  batches: COMPLETED_REVIEW_BATCHES.length,
+                  count: COMPLETED_REVIEW_COMPONENTS.toLocaleString(language),
+                })}</p>
+              </div>
+              <span className="skinReviewCurrentStatus">{skinText(language, "reviewStatusReviewing")}</span>
+            </header>
+
+            <details className="skinReviewArchive">
+              <summary>
+                <span><strong>{skinText(language, "reviewArchiveTitle")}</strong><small>{skinText(language, "reviewArchiveHint")}</small></span>
+                <span aria-hidden="true">⌄</span>
+              </summary>
+              <div className="skinReviewColumns" aria-hidden="true">
+                <span>{skinText(language, "reviewBatchColumn")}</span>
+                <span>{skinText(language, "reviewStatusColumn")}</span>
+                <span>{skinText(language, "reviewComponentsColumn")}</span>
+              </div>
+              <div className="skinReviewBatchList">
+                {reviewBatches.map((batch) => {
+                  const reviewing = batch.status === "reviewing";
+                  const componentCount = batch.componentCount === null
+                    ? skinText(language, "reviewComponentsPending")
+                    : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
+                  return (
+                    <details className={`skinReviewBatch${reviewing ? " isReviewing" : ""}`} key={batch.number}>
+                      <summary>
+                        <strong>{skinText(language, "reviewBatchName", { batch: batch.number })}</strong>
+                        <span className="skinReviewStatus">{skinText(language, reviewing ? "reviewStatusReviewing" : "reviewStatusCompleted")}</span>
+                        <span>{componentCount}</span>
+                        <span className="skinReviewBatchChevron" aria-hidden="true">⌄</span>
+                      </summary>
+                      <p>{skinText(language, reviewing ? "reviewBatchReviewingDetail" : "reviewBatchCompletedDetail", {
+                        count: batch.componentCount ?? 0,
+                      })}</p>
+                    </details>
+                  );
+                })}
+              </div>
+            </details>
           </div>
         </section>}
 

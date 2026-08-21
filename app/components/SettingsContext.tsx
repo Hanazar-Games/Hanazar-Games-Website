@@ -41,7 +41,7 @@ const defaultSettings: SettingsState = {
   customFont: "",
   colorPreset: "graphite",
   contrast: 100,
-  language: "zh-CN",
+  language: "en",
   masterVolume: 75,
   sfxEnabled: true,
   sfxVolume: 28,

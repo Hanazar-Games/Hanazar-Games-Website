@@ -84,6 +84,21 @@ test("site audio stays opt-in and below the reduced output ceiling", async () =>
   assert.match(audio, /button:not\(:disabled\)/);
 });
 
+test("skin service motion and effects respect accessibility settings", async () => {
+  const [audio, css] = await Promise.all([
+    read("app/components/AudioEngine.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(audio, /summary:not\(:disabled\)/);
+  assert.match(audio, /target\.closest\("summary/);
+  assert.match(css, /@keyframes skinAmbientDrift/);
+  assert.match(css, /@keyframes skinCardEnter/);
+  assert.match(css, /@keyframes skinDetailsOpen/);
+  assert.match(css, /body\[data-disable-decorations="true"\] \.skinServiceHero::before/);
+  assert.match(css, /body\[data-disable-ui-fade="true"\] \.skinServiceSearch/);
+});
+
 test("audio recovery handles nonstandard interrupted contexts", async () => {
   const audio = await read("app/components/AudioEngine.tsx");
 
@@ -99,6 +114,13 @@ test("above-the-fold archive images load eagerly without preloading competing ca
 
   assert.match(games, /loading=\{index < 3 \? "eager" : "lazy"\}/);
   assert.match(aigc, /loading=\{index < 3 \? "eager" : "lazy"\}/);
+});
+
+test("homepage hero uses a right-sized modern image for static hosting", async () => {
+  const home = await read("app/page.tsx");
+
+  assert.match(home, /const heroBackdropImage = "\/IntroPic\.webp"/);
+  assert.doesNotMatch(home, /IntroPic\.jpg/);
 });
 
 test("subpage hero titles balance narrow-screen line breaks", async () => {
@@ -168,27 +190,35 @@ test("skin service hub exports five dedicated section routes", async () => {
   });
 });
 
-test("skin service shares system-aware settings with a scoped three-language selector", async () => {
-  const [center, copy, settings, panel, languageTab, css] = await Promise.all([
+test("main site defaults to English while skin service keeps an independent Chinese default", async () => {
+  const [center, copy, settings, panel, languageTab, languageHook, translationHook, layout, i18n, css] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
     read("app/components/SettingsContext.tsx"),
     read("app/components/SettingsPanel.tsx"),
     read("app/components/settings/LanguageTab.tsx"),
+    read("app/hooks/useSkinServiceLanguage.ts"),
+    read("app/hooks/useTranslation.ts"),
+    read("app/layout.tsx"),
+    read("app/lib/i18n.ts"),
     read("app/globals.css"),
   ]);
 
   assert.match(settings, /theme: "auto"/);
-  assert.match(settings, /language: "zh-CN"/);
-  assert.match(settings, /loaded,/);
+  assert.match(settings, /language: "en"/);
+  assert.match(layout, /<html lang="en"/);
+  assert.match(i18n, /defaultLang = "en"/);
   assert.match(copy, /skinServiceLanguages = \["zh-CN", "ja", "en"\]/);
   assert.match(center, /useSettingsContext/);
-  assert.match(center, /skinServiceLanguage\(settings\.language\)/);
-  assert.match(center, /SKIN_LANGUAGE_STORAGE_KEY/);
-  assert.match(center, /localStorage\.getItem\(SKIN_LANGUAGE_STORAGE_KEY\)/);
-  assert.match(center, /"zh-CN"/);
+  assert.match(center, /useSkinServiceLanguage\(\)/);
+  assert.doesNotMatch(center, /update\("language"/);
+  assert.match(languageHook, /hanazar\.skin-service-language\.v1/);
+  assert.match(languageHook, /"zh-CN"/);
+  assert.match(translationHook, /pathname\.includes\("\/skin-service"\)/);
   assert.match(panel, /skinServiceLanguages/);
+  assert.match(panel, /value=\{skinLanguage\}/);
   assert.match(languageTab, /allowedCodes/);
+  assert.match(languageTab, /value\?: LangCode/);
   assert.doesNotMatch(css, /body:has\(\.skinServiceShell\)[^{]*\{[\s\S]*?color-scheme: light;/);
   assert.match(css, /body\[data-theme="light"\] \.skinServiceShell/);
 });
@@ -325,6 +355,36 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(config, /trustedProxy/);
   assert.match(identity, /prefix < 1|prefix > strlen\(\$packedIp\) \* 8/);
   assert.match(limiter, /Rate limit state is invalid/);
+});
+
+test("review tracker exposes 202 batches and exactly 10,000 completed components", async () => {
+  const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
+  const completed = reviewBatches.filter((batch) => batch.status === "completed");
+  const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
+
+  assert.equal(reviewBatches.length, 202);
+  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 202 }, (_, index) => 202 - index));
+  assert.equal(completed.length, 201);
+  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
+  assert.ok(completed.every((batch) => batch.componentCount !== null && batch.componentCount >= 10 && batch.componentCount <= 82));
+  assert.deepEqual(reviewing, [{ number: 202, status: "reviewing", componentCount: null }]);
+});
+
+test("review notices publish the Qianchuan Bit account and collapsible batch archive", async () => {
+  const [center, copy, css, verifier] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/globals.css"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+
+  assert.match(center, /reviewBatches\.map/);
+  assert.match(center, /skinReviewArchive/);
+  assert.match(center, /skinReviewBatch/);
+  assert.match(center, /review-account-qr\.png/);
+  assert.match(copy, /千川bit/);
+  assert.match(css, /\.skinReviewBatch/);
+  assert.match(verifier, /skin-service\/review-account-qr\.png/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

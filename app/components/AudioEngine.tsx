@@ -56,7 +56,7 @@ function ambientVolume(settings: SettingsState) {
 function getSfxKind(target: Element): SfxKind {
   if (target.closest("a")) return "navigate";
   if (target.closest(".settingsCloseBtn, .danger")) return "close";
-  if (target.closest("input[type='checkbox'], .settingsTabBtn, .seg-btn, .colorPreset, .languageItem")) {
+  if (target.closest("summary, input[type='checkbox'], .settingsTabBtn, .seg-btn, .colorPreset, .languageItem")) {
     return "toggle";
   }
   return "click";
@@ -295,7 +295,7 @@ export default function AudioEngine() {
 
   useEffect(() => {
     const interactiveSelector =
-      "button:not(:disabled), a[href], input[type='checkbox']:not(:disabled), .colorPreset, .languageItem";
+      "button:not(:disabled), a[href], summary:not(:disabled), input[type='checkbox']:not(:disabled), .colorPreset, .languageItem";
 
     const handlePointerDown = async (event: PointerEvent) => {
       const target = event.target;

@@ -14,7 +14,8 @@ import OtherTab from "./settings/OtherTab";
 import AnnouncementTab from "./settings/AnnouncementTab";
 import AboutTab from "./settings/AboutTab";
 import { useSettingsContext } from "./SettingsContext";
-import { skinServiceLanguages } from "../lib/skinServiceI18n";
+import { skinServiceLanguage, skinServiceLanguages } from "../lib/skinServiceI18n";
+import { setSkinServiceLanguage, useSkinServiceLanguage } from "../hooks/useSkinServiceLanguage";
 
 const tabs = [
   { key: "style", label: "tabStyle", icon: "S" },
@@ -49,6 +50,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const previousMainInertRef = useRef(false);
   const { tr } = useTranslation();
   const { settings } = useSettingsContext();
+  const skinLanguage = useSkinServiceLanguage();
   const modalTransitionMs = (
     !settings.animationsEnabled || settings.reduceAnimations || !settings.animModal
   ) ? 0 : Math.round(280 * (100 / settings.animSpeed));
@@ -162,7 +164,13 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const renderTab = () => {
     switch (activeTab) {
       case "style": return <StyleTab />;
-      case "language": return <LanguageTab allowedCodes={isSkinService ? skinServiceLanguages : undefined} />;
+      case "language": return isSkinService
+        ? <LanguageTab
+            allowedCodes={skinServiceLanguages}
+            value={skinLanguage}
+            onChange={(language) => setSkinServiceLanguage(skinServiceLanguage(language))}
+          />
+        : <LanguageTab />;
       case "audio": return <AudioTab />;
       case "animation": return <AnimationTab />;
       case "performance": return <PerformanceTab />;

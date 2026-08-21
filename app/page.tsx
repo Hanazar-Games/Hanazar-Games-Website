@@ -10,7 +10,7 @@ import { assetPath } from "./lib/paths";
 const githubUrl = "https://github.com/hzagaming";
 const chatUrl = "chat/";
 const transferUrl = "transfer/";
-const heroBackdropImage = "/IntroPic.jpg";
+const heroBackdropImage = "/IntroPic.webp";
 
 const heroLinks = [
   { label: "navGames", href: "#games" },
