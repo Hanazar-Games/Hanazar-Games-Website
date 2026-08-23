@@ -3770,6 +3770,52 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   letter-spacing: 0.08em;
 }
 
+.skinCommunityUnavailable {
+  max-width: 760px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 15px;
+  scroll-margin-top: 24px;
+  border: 1px solid color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
+}
+
+.skinCommunityUnavailableIcon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--skin-tone);
+  border-radius: 12px;
+  color: var(--skin-tone);
+  background: var(--skin-tone-soft);
+}
+
+.skinCommunityUnavailableIcon svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.skinCommunityUnavailable strong {
+  display: block;
+  margin: 2px 0 7px;
+  font-size: 1rem;
+}
+
+.skinCommunityUnavailable p {
+  margin: 0;
+  color: var(--skin-muted);
+  line-height: 1.7;
+}
+
 .skinCommunityQrGrid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -4021,6 +4067,78 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   gap: 14px;
 }
 
+.skinFeedbackReplyNotice {
+  margin-bottom: 14px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  scroll-margin-top: 24px;
+  border: 1px solid color-mix(in srgb, var(--skin-tone) 48%, var(--skin-border));
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card) 68%);
+}
+
+.skinFeedbackReplyNoticeIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--skin-tone);
+  border-radius: 13px;
+  background: var(--skin-card);
+  color: var(--skin-tone);
+}
+
+.skinFeedbackReplyNoticeIcon svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.skinFeedbackReplyNotice > div {
+  min-width: 0;
+}
+
+.skinFeedbackReplyNotice strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.98rem;
+}
+
+.skinFeedbackReplyNotice p {
+  margin: 0;
+  color: var(--skin-muted);
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
+.skinFeedbackReplyNotice > a {
+  min-height: 40px;
+  padding: 9px 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--skin-tone);
+  border-radius: 11px;
+  color: var(--skin-tone);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.skinFeedbackReplyNotice > a:hover {
+  background: var(--skin-tone);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
 .skinFeedbackForm,
 .skinFeedbackPending,
 .skinFeedbackWall,
@@ -4189,6 +4307,81 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     var(--skin-card);
 }
 
+.skinServiceStatusNotice {
+  margin-bottom: 18px;
+  padding: clamp(20px, 4vw, 28px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 18px;
+  scroll-margin-top: 24px;
+  border: 1px solid color-mix(in srgb, var(--skin-tone) 58%, var(--skin-border));
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--skin-tone) 16%, transparent), transparent 64%),
+    var(--skin-card);
+  box-shadow: inset 3px 0 0 var(--skin-tone);
+}
+
+.skinServiceStatusNoticeIcon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--skin-tone);
+  border-radius: 14px;
+  background: var(--skin-tone-soft);
+  color: var(--skin-tone);
+}
+
+.skinServiceStatusNoticeIcon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.skinServiceStatusNotice > div {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.skinServiceStatusNotice > div > span {
+  color: var(--skin-tone);
+  font-size: 0.74rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+}
+
+.skinServiceStatusNotice strong {
+  font-size: clamp(1.15rem, 2.5vw, 1.5rem);
+  font-weight: 590;
+}
+
+.skinServiceStatusNotice p {
+  margin: 0;
+  color: var(--skin-muted);
+  line-height: 1.75;
+}
+
+.skinServiceStatusBadge {
+  min-height: 32px;
+  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--skin-tone);
+  border-radius: 999px;
+  background: var(--skin-tone-soft);
+  color: var(--skin-tone);
+  font-size: 0.76rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
 .skinReviewAccountCopy {
   min-width: 0;
   display: grid;
@@ -4349,7 +4542,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinReviewColumns,
 .skinReviewBatch > summary {
   display: grid;
-  grid-template-columns: minmax(112px, 1.2fr) minmax(86px, 0.7fr) minmax(78px, 0.7fr) 22px;
+  grid-template-columns: minmax(112px, 1.15fr) minmax(86px, 0.66fr) minmax(78px, 0.68fr) minmax(116px, 0.9fr) 22px;
   align-items: center;
   gap: 12px;
 }
@@ -4402,6 +4595,11 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
 .skinReviewBatch > summary strong {
   font-weight: 590;
+}
+
+.skinReviewCumulative {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .skinReviewStatus {
@@ -4510,6 +4708,28 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   display: block;
   margin-bottom: 10px;
   font-size: 1.05rem;
+}
+
+.skinServiceSupportLink {
+  width: fit-content;
+  min-height: 42px;
+  margin-top: 18px;
+  padding: 10px 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--skin-tone);
+  border-radius: 11px;
+  background: var(--skin-tone);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 580;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skinServiceSupportLink:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px var(--skin-tone-soft);
 }
 
 .skinServiceShell button:focus-visible,
@@ -4749,6 +4969,16 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     grid-template-columns: 1fr;
   }
 
+  .skinServiceStatusNotice {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .skinServiceStatusBadge {
+    grid-column: 2;
+    width: fit-content;
+  }
+
   .skinReviewQrButton {
     width: min(230px, 100%);
     justify-self: center;
@@ -4760,8 +4990,8 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
   .skinReviewColumns,
   .skinReviewBatch > summary {
-    grid-template-columns: minmax(96px, 1fr) minmax(72px, 0.7fr) minmax(62px, 0.6fr) 18px;
-    gap: 8px;
+    grid-template-columns: minmax(74px, 1fr) minmax(58px, 0.68fr) minmax(54px, 0.64fr) minmax(74px, 0.86fr) 14px;
+    gap: 5px;
   }
 
   .skinReviewColumns {
@@ -4770,7 +5000,26 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
   .skinReviewBatch > summary {
     padding-inline: 10px;
-    font-size: 0.76rem;
+    font-size: 0.7rem;
+  }
+
+  .skinReviewStatus {
+    min-height: 25px;
+    padding: 4px 6px;
+    font-size: 0.68rem;
+  }
+
+  .skinFeedbackReplyNotice {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .skinFeedbackReplyNotice > a {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
   }
 
   .skinServiceSearchField {

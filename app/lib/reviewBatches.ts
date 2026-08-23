@@ -2,7 +2,10 @@ export interface ReviewBatch {
   number: number;
   status: "completed" | "reviewing";
   componentCount: number | null;
+  cumulativeComponentCount: number;
 }
+
+type ReviewBatchInput = Omit<ReviewBatch, "cumulativeComponentCount">;
 
 const HISTORICAL_BATCHES = 201;
 const HISTORICAL_COMPONENTS = 10_000;
@@ -35,15 +38,22 @@ function completedCounts() {
   return counts;
 }
 
-const completed = completedCounts().map<ReviewBatch>((componentCount, index) => ({
+const completed = completedCounts().map<ReviewBatchInput>((componentCount, index) => ({
   number: index + 1,
   status: "completed",
   componentCount,
 }));
 
-export const reviewBatches: ReviewBatch[] = [
-  { number: 204, status: "reviewing", componentCount: null },
-  { number: 203, status: "completed", componentCount: 97 },
+const ascendingBatches: ReviewBatchInput[] = [
+  ...completed,
   { number: 202, status: "completed", componentCount: 71 },
-  ...completed.reverse(),
+  { number: 203, status: "completed", componentCount: 97 },
+  { number: 204, status: "reviewing", componentCount: null },
+  { number: 205, status: "reviewing", componentCount: null },
 ];
+
+let cumulativeComponentCount = 0;
+export const reviewBatches: ReviewBatch[] = ascendingBatches.map((batch) => {
+  cumulativeComponentCount += batch.componentCount ?? 0;
+  return { ...batch, cumulativeComponentCount };
+}).reverse();

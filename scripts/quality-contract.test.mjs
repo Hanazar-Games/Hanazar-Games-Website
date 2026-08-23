@@ -237,7 +237,12 @@ test("skin service publishes localized update history", async () => {
     read("scripts/verify-static-export.mjs"),
   ]);
 
-  for (const value of ["更新公告", "Service Updates", "更新情報", "独立快捷设置与第 203 批结果"]) {
+  for (const value of [
+    "更新公告", "Service Updates", "更新情報",
+    "第205批审核与累计组件统计",
+    "代发工作暂停3天与公众号恢复通知",
+    "微信群暂停开放与公众号赞赏说明", "独立快捷设置与第 203 批结果",
+  ]) {
     assert.match(copy, new RegExp(value));
   }
   assert.match(center, /serviceUpdateDefinitions/);
@@ -246,6 +251,55 @@ test("skin service publishes localized update history", async () => {
   assert.match(css, /\.skinServiceQuickSettings/);
   assert.match(css, /\.skinServiceUpdateList/);
   assert.match(verifier, /skin-service\/updates\/index\.html/);
+});
+
+test("skin service pauses WeChat groups and publishes the official-account appreciation path", async () => {
+  const [center, copy, css, verifier] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/globals.css"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+
+  for (const value of [
+    "微信交流群暂不开放",
+    "前往公众号“千川bit”",
+    "点击“赞赏作者”",
+    "非常感谢大家的赞赏与支持",
+  ]) {
+    assert.match(copy, new RegExp(value));
+    assert.match(verifier, new RegExp(value));
+  }
+  assert.match(center, /skinCommunityUnavailable/);
+  assert.match(center, /communities\.filter\(\(community\) => community\.platform !== "wechat"\)/);
+  assert.doesNotMatch(center, /wechatCommunities\.map\(renderCommunityCard\)/);
+  assert.match(center, /href="\/skin-service\/review-notices#official-account-notice"/);
+  assert.match(css, /\.skinCommunityUnavailable/);
+  assert.match(css, /\.skinServiceSupportLink/);
+});
+
+test("skin service publishes the three-day work pause and restored official-account status", async () => {
+  const [center, copy, css, verifier] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/globals.css"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+
+  for (const value of [
+    "代发皮肤工作暂停3天",
+    "自本公告发布起暂停 3 天",
+    "微信账号受限",
+    "公众号“千川bit”现已恢复正常使用",
+    "恢复安排以最新公告为准",
+  ]) {
+    assert.match(copy, new RegExp(value));
+    assert.match(verifier, new RegExp(value));
+  }
+  assert.match(center, /skinServiceStatusNotice/);
+  assert.match(center, /id="service-pause-notice"/);
+  assert.match(center, /href: "\/skin-service\/review-notices#service-pause-notice"/);
+  assert.match(css, /\.skinServiceStatusNotice/);
 });
 
 test("skin service uses localized copy, collapsible communities, and one accent tone", async () => {
@@ -312,7 +366,7 @@ test("skin service publishes group QR artwork and a first-visit community prompt
   assert.match(center, /data-skin-image-open/);
   assert.match(center, /aria-labelledby="skin-community-image-title"/);
   assert.match(center, /community-bulletin/);
-  assert.match(center, /packageInfo\.version/);
+  assert.match(center, /currentServiceVersion = serviceUpdateDefinitions\[0\]\.version/);
   assert.match(center, /matchMedia\("\(prefers-reduced-motion: reduce\)"\)/);
   for (const value of ["一起加入社群玩 MC", "Join the community for MC", "コミュニティで MC を遊ぼう"]) {
     assert.match(copy, new RegExp(value));
@@ -344,6 +398,11 @@ test("skin service exposes searchable communities and a protected public feedbac
   assert.match(center, /5\s*\*\s*60\s*\*\s*1000/);
   assert.match(center, /localStorage/);
   assert.match(center, /name="website"/);
+  assert.match(center, /skinFeedbackReplyNotice/);
+  assert.match(center, /href="\/skin-service\/review-notices#official-account-notice"/);
+  for (const value of ["微信内反馈，都会回复", "匿名反馈墙不会收集联系方式", "查看公众号二维码"]) {
+    assert.match(copy, new RegExp(value));
+  }
   assert.doesNotMatch(center, /dangerouslySetInnerHTML|innerHTML/);
 });
 
@@ -382,14 +441,14 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes batch 204 after publishing batch 203", async () => {
+test("review tracker exposes batches 204 and 205 with cumulative component totals", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
   const historical = completed.filter((batch) => batch.number <= 201);
 
-  assert.equal(reviewBatches.length, 204);
-  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 204 }, (_, index) => 204 - index));
+  assert.equal(reviewBatches.length, 205);
+  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 205 }, (_, index) => 205 - index));
   assert.equal(completed.length, 203);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
   assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_168);
@@ -399,7 +458,16 @@ test("review tracker exposes batch 204 after publishing batch 203", async () => 
   assert.equal(completed.find((batch) => batch.number === 203)?.componentCount, 97);
   assert.ok(historical.every((batch) => [121, 201].includes(batch.number)
     || (batch.componentCount !== null && batch.componentCount >= 10 && batch.componentCount <= 82)));
-  assert.deepEqual(reviewing, [{ number: 204, status: "reviewing", componentCount: null }]);
+  assert.deepEqual(reviewing.map((batch) => batch.number), [205, 204]);
+  assert.equal(reviewBatches.find((batch) => batch.number === 1)?.cumulativeComponentCount, reviewBatches.find((batch) => batch.number === 1)?.componentCount);
+  assert.equal(reviewBatches.find((batch) => batch.number === 201)?.cumulativeComponentCount, 10_000);
+  assert.equal(reviewBatches.find((batch) => batch.number === 202)?.cumulativeComponentCount, 10_071);
+  assert.equal(reviewBatches.find((batch) => batch.number === 203)?.cumulativeComponentCount, 10_168);
+  assert.equal(reviewBatches.find((batch) => batch.number === 204)?.cumulativeComponentCount, 10_168);
+  assert.equal(reviewBatches.find((batch) => batch.number === 205)?.cumulativeComponentCount, 10_168);
+  const ascending = [...reviewBatches].reverse();
+  assert.ok(ascending.every((batch, index) => index === 0
+    || batch.cumulativeComponentCount >= ascending[index - 1].cumulativeComponentCount));
 });
 
 test("review notices publish the Qianchuan Bit account and collapsible batch archive", async () => {
@@ -413,9 +481,12 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   assert.match(center, /reviewBatches\.map/);
   assert.match(center, /skinReviewArchive/);
   assert.match(center, /skinReviewBatch/);
+  assert.match(center, /reviewCumulativeColumn/);
+  assert.match(center, /batch\.cumulativeComponentCount/);
   assert.match(center, /review-account-qr\.svg/);
   assert.match(copy, /千川bit/);
   assert.match(css, /\.skinReviewBatch/);
+  assert.match(css, /\.skinReviewCumulative/);
   assert.match(verifier, /skin-service\/review-account-qr\.svg/);
 });
 

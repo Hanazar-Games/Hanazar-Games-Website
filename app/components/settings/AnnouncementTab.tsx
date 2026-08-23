@@ -4,6 +4,40 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.17.3",
+    date: "2026-08-23",
+    title: "Batch 205 Tracking, Cumulative Totals, and WeChat Feedback",
+    items: [
+      "Added Batch 205 as under review alongside Batch 204 while keeping the published component total at 10,168.",
+      "Added a cumulative component-total column to every review row, calculated from Batch 1 through the selected batch on desktop and mobile.",
+      "Added a prominent WeChat feedback notice above the anonymous wall and linked directly to the 千川bit official-account QR entry.",
+      "Clarified that WeChat feedback receives replies while anonymous wall posts cannot receive one-to-one responses because they contain no contact details.",
+      "Extended automated, responsive, and GitHub Pages export checks for the new batch, cumulative values, feedback guidance, and announcement.",
+    ],
+  },
+  {
+    version: "2.17.2",
+    date: "2026-08-23",
+    title: "Three-Day Publishing Pause and Official Account Recovery",
+    items: [
+      "Paused skin publishing work for three days from this announcement because the operator’s WeChat account was restricted.",
+      "Confirmed that the 千川bit official account is available again for notices, review tracking, and author appreciation.",
+      "Added a prominent, searchable service-status notice to the review page while keeping the service-center home focused on section entries.",
+      "Clarified that resumption timing will follow the latest notice and retained the existing WeChat community pause.",
+    ],
+  },
+  {
+    version: "2.17.1",
+    date: "2026-08-23",
+    title: "WeChat Community Pause and Official Account Appreciation",
+    items: [
+      "Temporarily closed the WeChat community entries and replaced their QR cards with a clear availability notice while keeping QQ and Discord open.",
+      "Added guidance for supporting the author through the ‘赞赏作者’ action at the bottom of the 千川bit official account.",
+      "Kept the official-account QR entry easy to reach and retained the warning against payment codes sent through direct messages.",
+      "Published both changes in the skin service update history and extended GitHub Pages deployment checks for the revised content.",
+    ],
+  },
+  {
     version: "2.17.0",
     date: "2026-08-22",
     title: "Independent Skin Service Controls and Batch 203 Release",

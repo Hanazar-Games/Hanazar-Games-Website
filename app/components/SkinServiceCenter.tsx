@@ -7,7 +7,6 @@ import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
 import { reviewBatches } from "../lib/reviewBatches";
-import packageInfo from "../../package.json";
 import {
   skinServiceLanguage,
   skinText,
@@ -118,10 +117,14 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.17.3", date: "2026-08-23", title: "update173Title", body: "update173Body" },
+  { version: "2.17.2", date: "2026-08-23", title: "update172Title", body: "update172Body" },
+  { version: "2.17.1", date: "2026-08-23", title: "update171Title", body: "update171Body" },
   { version: "2.17.0", date: "2026-08-22", title: "update170Title", body: "update170Body" },
   { version: "2.16.0", date: "2026-08-20", title: "update160Title", body: "update160Body" },
   { version: "2.15.0", date: "2026-08-19", title: "update150Title", body: "update150Body" },
 ];
+const currentServiceVersion = serviceUpdateDefinitions[0].version;
 
 const quickLanguageOptions: Array<{ code: SkinServiceLanguage; label: string }> = [
   { code: "zh-CN", label: "中" },
@@ -372,7 +375,6 @@ export default function SkinServiceCenter({
     title: skinText(language, update.title),
     body: skinText(language, update.body),
   }));
-  const wechatCommunities = communities.filter((community) => community.platform === "wechat");
   const qqCommunities = communities.filter((community) => community.platform === "qq");
   const discordCommunities = communities.filter((community) => community.platform === "discord");
   const enlargedCommunity = enlargedCommunityId === "review-account"
@@ -646,7 +648,7 @@ export default function SkinServiceCenter({
         section: section.id,
         targetId: section.id,
       })),
-      ...communities.map((community) => ({
+      ...communities.filter((community) => community.platform !== "wechat").map((community) => ({
         title: `${community.name} · ${community.kind}`,
         text: community.value ?? (community.image ? skinText(language, "qrAvailable") : community.kind),
         href: `/skin-service/communities#community-${community.id}`,
@@ -655,10 +657,17 @@ export default function SkinServiceCenter({
       })),
       {
         title: skinText(language, "communityBulletinTitle"),
-        text: `${skinText(language, "communityBulletinBody")} ${skinText(language, "websiteVersion", { version: packageInfo.version })}`,
+        text: `${skinText(language, "communityBulletinBody")} ${skinText(language, "websiteVersion", { version: currentServiceVersion })}`,
         href: "/skin-service/communities#community-bulletin",
         section: "communities" as const,
         targetId: "community-bulletin",
+      },
+      {
+        title: skinText(language, "wechatUnavailableTitle"),
+        text: skinText(language, "wechatUnavailableBody"),
+        href: "/skin-service/communities#wechat-communities-status",
+        section: "communities" as const,
+        targetId: "wechat-communities-status",
       },
       ...articles.map((article) => ({
         title: article.title,
@@ -667,6 +676,13 @@ export default function SkinServiceCenter({
         section: "questions" as const,
         targetId: article.id,
       })),
+      {
+        title: skinText(language, "feedbackWechatTitle"),
+        text: skinText(language, "feedbackWechatBody"),
+        href: "/skin-service/feedback#wechat-feedback-reply",
+        section: "feedback" as const,
+        targetId: "wechat-feedback-reply",
+      },
       ...wall.map((item) => ({
         title: skinText(language, "publicFeedbackSearch"),
         text: item.content,
@@ -674,6 +690,13 @@ export default function SkinServiceCenter({
         section: "feedback" as const,
         targetId: `feedback-${item.id}`,
       })),
+      {
+        title: skinText(language, "servicePauseTitle"),
+        text: skinText(language, "servicePauseBody"),
+        href: "/skin-service/review-notices#service-pause-notice",
+        section: "review-notices" as const,
+        targetId: "service-pause-notice",
+      },
       {
         title: skinText(language, "wechatOfficialReserved"),
         text: skinText(language, "wechatOfficialBody"),
@@ -1018,7 +1041,7 @@ export default function SkinServiceCenter({
             <div>
               <div className="skinCommunityBulletinMeta">
                 <span>{skinText(language, "communityBulletinLabel")}</span>
-                <strong>{skinText(language, "websiteVersion", { version: packageInfo.version })}</strong>
+                <strong>{skinText(language, "websiteVersion", { version: currentServiceVersion })}</strong>
               </div>
               <h3 id="community-bulletin-title">{skinText(language, "communityBulletinTitle")}</h3>
               <p>{skinText(language, "communityBulletinBody")}</p>
@@ -1026,8 +1049,12 @@ export default function SkinServiceCenter({
           </aside>
           <div className="skinCommunityGroup">
             <h3>{skinText(language, "wechatGroups")}</h3>
-            <div className="skinCommunityGrid skinCommunityQrGrid">
-              {wechatCommunities.map(renderCommunityCard)}
+            <div className="skinCommunityUnavailable" id="wechat-communities-status" tabIndex={-1}>
+              <span className="skinCommunityUnavailableIcon" aria-hidden="true"><SectionIcon name="notices" /></span>
+              <div>
+                <strong>{skinText(language, "wechatUnavailableTitle")}</strong>
+                <p>{skinText(language, "wechatUnavailableBody")}</p>
+              </div>
             </div>
           </div>
           <div className="skinCommunityGroup">
@@ -1082,6 +1109,16 @@ export default function SkinServiceCenter({
             title={skinText(language, "feedbackTitle")}
             description={skinText(language, "feedbackDescription")}
           />
+          <aside className="skinFeedbackReplyNotice" id="wechat-feedback-reply" tabIndex={-1}>
+            <span className="skinFeedbackReplyNoticeIcon" aria-hidden="true"><SectionIcon name="feedback" /></span>
+            <div>
+              <strong>{skinText(language, "feedbackWechatTitle")}</strong>
+              <p>{skinText(language, "feedbackWechatBody")}</p>
+            </div>
+            <Link href="/skin-service/review-notices#official-account-notice">
+              {skinText(language, "feedbackWechatLink")} <span aria-hidden="true">→</span>
+            </Link>
+          </aside>
           <div className="skinFeedbackLayout">
             <form className="skinFeedbackForm" onSubmit={submitFeedback}>
               <label htmlFor="skin-feedback-content">{skinText(language, editingId ? "editPending" : "writeFeedback")}</label>
@@ -1162,6 +1199,15 @@ export default function SkinServiceCenter({
             title={skinText(language, "noticesTitle")}
             description={skinText(language, "noticesDescription")}
           />
+          <aside className="skinServiceStatusNotice" id="service-pause-notice" tabIndex={-1} aria-labelledby="service-pause-title">
+            <span className="skinServiceStatusNoticeIcon" aria-hidden="true"><SectionIcon name="notices" /></span>
+            <div>
+              <span>{skinText(language, "servicePauseLabel")}</span>
+              <strong id="service-pause-title">{skinText(language, "servicePauseTitle")}</strong>
+              <p>{skinText(language, "servicePauseBody")}</p>
+            </div>
+            <span className="skinServiceStatusBadge">{skinText(language, "servicePauseStatus")}</span>
+          </aside>
           <div className="skinReviewAccount" id="official-account-notice" tabIndex={-1}>
             <div className="skinReviewAccountCopy">
               <span>{skinText(language, "noticesTitle")}</span>
@@ -1209,6 +1255,7 @@ export default function SkinServiceCenter({
                 <span>{skinText(language, "reviewBatchColumn")}</span>
                 <span>{skinText(language, "reviewStatusColumn")}</span>
                 <span>{skinText(language, "reviewComponentsColumn")}</span>
+                <span>{skinText(language, "reviewCumulativeColumn")}</span>
               </div>
               <div className="skinReviewBatchList">
                 {reviewBatches.map((batch) => {
@@ -1216,12 +1263,16 @@ export default function SkinServiceCenter({
                   const componentCount = batch.componentCount === null
                     ? skinText(language, "reviewComponentsPending")
                     : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
+                  const cumulativeComponentCount = skinText(language, "reviewComponentsCount", {
+                    count: batch.cumulativeComponentCount.toLocaleString(language),
+                  });
                   return (
                     <details className={`skinReviewBatch${reviewing ? " isReviewing" : ""}`} key={batch.number}>
                       <summary>
                         <strong>{skinText(language, "reviewBatchName", { batch: batch.number })}</strong>
                         <span className="skinReviewStatus">{skinText(language, reviewing ? "reviewStatusReviewing" : "reviewStatusCompleted")}</span>
                         <span>{componentCount}</span>
+                        <span className="skinReviewCumulative">{cumulativeComponentCount}</span>
                         <span className="skinReviewBatchChevron" aria-hidden="true">⌄</span>
                       </summary>
                       <p>{skinText(language, reviewing ? "reviewBatchReviewingDetail" : "reviewBatchCompletedDetail", {
@@ -1265,6 +1316,9 @@ export default function SkinServiceCenter({
           <div className="skinServicePlaceholder" id="support-channel" tabIndex={-1}>
             <strong>{skinText(language, "donationReserved")}</strong>
             <p>{skinText(language, "donationBody")}</p>
+            <Link className="skinServiceSupportLink" href="/skin-service/review-notices#official-account-notice">
+              {skinText(language, "donationOfficialAccountLink")} <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </section>}
       </div>}

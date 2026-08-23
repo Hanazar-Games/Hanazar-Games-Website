@@ -141,8 +141,9 @@ const requiredContent = {
   ],
   "skin-service/communities/index.html": [
     "我们的社群",
-    "使用微信扫描二维码加入",
     "微信交流群",
+    "微信交流群暂不开放",
+    "微信群二维码入口现已暂停",
     "QQ 交流群",
     "外区 Discord",
     "社群公告",
@@ -163,23 +164,50 @@ const requiredContent = {
   ],
   "skin-service/feedback/index.html": [
     "匿名反馈墙",
+    "微信内反馈，都会回复",
+    "匿名反馈墙不会收集联系方式",
+    "查看公众号二维码",
     "写下匿名反馈",
     "本机可修改五分钟",
   ],
   "skin-service/review-notices/index.html": [
     "审核通知",
     "千川bit",
+    "代发皮肤工作暂停3天",
+    "自本公告发布起暂停 3 天",
+    "微信账号受限",
+    "公众号“千川bit”现已恢复正常使用",
+    "恢复安排以最新公告为准",
     "审核通知记录",
-    "展开查看全部 204 个批次",
+    "展开查看全部 205 个批次",
+    "第 205 批次",
     "第 204 批次",
     "第 203 批次",
     "第 202 批次",
+    "累计组件总数",
     "97 个",
     "10,168",
     "审核中",
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.17.3",
+    "第205批审核与累计组件统计",
+    "第 205 批次已与第 204 批次同时进入审核",
+    "累计组件总数",
+    "微信内反馈，都会回复",
+    "2.17.2",
+    "代发工作暂停3天与公众号恢复通知",
+    "自本公告发布起暂停 3 天",
+    "微信账号受限",
+    "公众号“千川bit”现已恢复正常使用",
+    "恢复安排以最新公告为准",
+    "2.17.1",
+    "微信群暂停开放与公众号赞赏说明",
+    "微信交流群暂不开放",
+    "前往公众号“千川bit”",
+    "点击“赞赏作者”",
+    "非常感谢大家的赞赏与支持",
     "2.17.0",
     "独立快捷设置与第 203 批结果",
     "第 203 批已出 97 个组件",
@@ -187,7 +215,11 @@ const requiredContent = {
   ],
   "skin-service/support/index.html": [
     "支持与捐赠",
-    "捐赠入口预留",
+    "通过公众号赞赏作者",
+    "前往公众号“千川bit”",
+    "点击“赞赏作者”",
+    "非常感谢大家的赞赏与支持",
+    "查看公众号二维码",
   ],
   "tools/index.html": [
     "Tools Archive",
@@ -212,11 +244,8 @@ for (const [file, values] of Object.entries(requiredContent)) {
 const skinServiceHtml = readFileSync(join("out", "skin-service/communities/index.html"), "utf8");
 for (const group of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]) {
   const path = `skin-service/groups/${group}`;
-  if (!skinServiceHtml.includes(`src="${basePath}/${path}"`)) {
-    throw new Error(`Missing base path for ${path}`);
-  }
-  if (skinServiceHtml.includes(`src="/${path}"`)) {
-    throw new Error(`Root-relative skin service image: ${path}`);
+  if (skinServiceHtml.includes(`src="${basePath}/${path}"`) || skinServiceHtml.includes(`src="/${path}"`)) {
+    throw new Error(`Temporarily closed WeChat entry exposed in page: ${path}`);
   }
 }
 
