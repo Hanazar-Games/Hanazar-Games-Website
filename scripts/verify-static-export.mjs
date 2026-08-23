@@ -47,10 +47,6 @@ const requiredFiles = [
   "tools/listener.jpg",
   "tools/hanazar-transfer.jpg",
   "aigc/gpt-56-sol-ultra.jpg",
-  "skin-service/groups/group-2.jpg",
-  "skin-service/groups/group-4.jpg",
-  "skin-service/groups/group-7.jpg",
-  "skin-service/groups/group-9.jpg",
   "skin-service/review-account-qr.svg",
 ];
 const forbiddenFiles = [
@@ -60,6 +56,10 @@ const forbiddenFiles = [
   "aigc/gpt-55-extrahigh.jpg",
   "tools/aiugc-pipeline.jpg",
   "tools/ai-rhythm-game.jpg",
+  "skin-service/groups/group-2.jpg",
+  "skin-service/groups/group-4.jpg",
+  "skin-service/groups/group-7.jpg",
+  "skin-service/groups/group-9.jpg",
 ];
 
 for (const file of requiredFiles) {
@@ -142,8 +142,10 @@ const requiredContent = {
   "skin-service/communities/index.html": [
     "我们的社群",
     "微信交流群",
-    "微信交流群暂不开放",
-    "微信群二维码入口现已暂停",
+    "目前微信群暂不支持加入",
+    "4 个微信群二维码入口已移除",
+    "请前往下方 QQ 群组",
+    "前往 QQ 群组",
     "QQ 交流群",
     "外区 Discord",
     "社群公告",
@@ -191,6 +193,10 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.17.4",
+    "微信群入口移除与界面动效优化",
+    "已彻底移除 4 个微信群二维码入口及图片",
+    "目前微信群暂不支持加入，请前往 QQ 群组",
     "2.17.3",
     "第205批审核与累计组件统计",
     "第 205 批次已与第 204 批次同时进入审核",
@@ -241,14 +247,6 @@ for (const [file, values] of Object.entries(requiredContent)) {
   }
 }
 
-const skinServiceHtml = readFileSync(join("out", "skin-service/communities/index.html"), "utf8");
-for (const group of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]) {
-  const path = `skin-service/groups/${group}`;
-  if (skinServiceHtml.includes(`src="${basePath}/${path}"`) || skinServiceHtml.includes(`src="/${path}"`)) {
-    throw new Error(`Temporarily closed WeChat entry exposed in page: ${path}`);
-  }
-}
-
 const reviewNoticesHtml = readFileSync(join("out", "skin-service/review-notices/index.html"), "utf8");
 const reviewQrPath = "skin-service/review-account-qr.svg";
 if (!reviewNoticesHtml.includes(`src="${basePath}/${reviewQrPath}"`)) {
@@ -272,6 +270,12 @@ const forbiddenContent = {
     "写下匿名反馈",
     "全局搜索",
     "捐赠入口预留",
+  ],
+  "skin-service/communities/index.html": [
+    "group-2.jpg",
+    "group-4.jpg",
+    "group-7.jpg",
+    "group-9.jpg",
   ],
   "tools/index.html": [
     "https://github.com/Mirako-Official/New-Aiugc-Pipeline",

@@ -3532,12 +3532,22 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
 .skinServiceSectionNav {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  animation: skinSurfaceRise calc(0.5s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
 }
 
 .skinServiceSectionNav .skinServiceIndexLink {
   min-height: 62px;
   padding: 10px;
+  opacity: 0;
+  animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(1) { animation-delay: 0.22s; }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(2) { animation-delay: 0.26s; }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(3) { animation-delay: 0.3s; }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(4) { animation-delay: 0.34s; }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(5) { animation-delay: 0.38s; }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(6) { animation-delay: 0.42s; }
 
 .skinServiceSectionNav .skinServiceIndexIcon {
   width: 34px;
@@ -3636,6 +3646,20 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     0 0 0 58px color-mix(in srgb, var(--skin-tone) 3%, transparent);
   pointer-events: none;
 }
+
+.skinServiceDocumentSection > * {
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.skinServiceDocumentSection > :nth-child(1) { animation-delay: 0.08s; }
+.skinServiceDocumentSection > :nth-child(2) { animation-delay: 0.14s; }
+.skinServiceDocumentSection > :nth-child(3) { animation-delay: 0.2s; }
+.skinServiceDocumentSection > :nth-child(4) { animation-delay: 0.26s; }
+.skinServiceDocumentSection > :nth-child(5) { animation-delay: 0.32s; }
+.skinServiceDocumentSection > :nth-child(n + 6) { animation-delay: 0.38s; }
 
 .skinServiceSectionHeader {
   display: flex;
@@ -3762,6 +3786,10 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   margin-top: 28px;
 }
 
+.skinCommunityGroup {
+  scroll-margin-top: 24px;
+}
+
 .skinCommunityGroup > h3 {
   margin: 0 0 14px;
   color: var(--skin-muted);
@@ -3771,16 +3799,36 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 }
 
 .skinCommunityUnavailable {
-  max-width: 760px;
+  position: relative;
+  max-width: 900px;
   padding: 20px;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
   gap: 15px;
+  overflow: hidden;
   scroll-margin-top: 24px;
   border: 1px solid color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
   border-radius: 16px;
   background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--skin-tone) 10%, transparent);
+  animation: skinCardEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.skinCommunityUnavailable::after {
+  content: "";
+  position: absolute;
+  inset: -70% auto -70% -28%;
+  width: 18%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--skin-tone) 15%, transparent), transparent);
+  pointer-events: none;
+  animation: skinCommunityGlow calc(5.2s * var(--anim-speed, 1)) ease-in-out infinite;
+}
+
+.skinCommunityUnavailable > * {
+  position: relative;
+  z-index: 1;
 }
 
 .skinCommunityUnavailableIcon {
@@ -3816,8 +3864,34 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   line-height: 1.7;
 }
 
-.skinCommunityQrGrid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+.skinCommunityUnavailable > a {
+  min-height: 42px;
+  padding: 10px 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid var(--skin-tone);
+  border-radius: 11px;
+  background: var(--skin-tone);
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 620;
+  white-space: nowrap;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.skinCommunityUnavailable > a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px var(--skin-tone-soft);
+}
+
+.skinCommunityUnavailable > a span {
+  transition: transform 0.22s ease;
+}
+
+.skinCommunityUnavailable > a:hover span {
+  transform: translateY(2px);
 }
 
 .skinCommunityDiscordGrid {
@@ -3832,12 +3906,20 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border: 1px solid var(--skin-border);
   border-radius: 16px;
   background: var(--skin-card);
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  opacity: 0;
+  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
+
+.skinCommunityCard:nth-child(1) { animation-delay: 0.12s; }
+.skinCommunityCard:nth-child(2) { animation-delay: 0.17s; }
+.skinCommunityCard:nth-child(3) { animation-delay: 0.22s; }
+.skinCommunityCard:nth-child(4) { animation-delay: 0.27s; }
 
 .skinCommunityCard:hover {
   border-color: var(--skin-tone);
   transform: translateY(-2px);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--skin-tone) 10%, transparent);
 }
 
 .skinCommunityCard > summary {
@@ -3848,6 +3930,11 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   gap: 12px;
   list-style: none;
   cursor: pointer;
+  transition: background 0.22s ease;
+}
+
+.skinCommunityCard > summary:hover {
+  background: var(--skin-tone-soft);
 }
 
 .skinCommunityCard > summary::-webkit-details-marker {
@@ -3929,38 +4016,6 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   box-shadow: 0 10px 24px var(--skin-tone-soft);
 }
 
-.skinCommunityCard .skinCommunityQrButton {
-  width: 100%;
-  min-height: 0;
-  padding: 0;
-  display: block;
-  overflow: hidden;
-  border: 0;
-  border-radius: 13px;
-  background: transparent;
-  text-align: initial;
-}
-
-.skinCommunityQr {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
-  border-radius: 13px;
-  background: #fff;
-}
-
-.skinCommunityQrImage {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.2s ease;
-}
-
-.skinCommunityQrButton:hover .skinCommunityQrImage {
-  transform: scale(1.012);
-}
-
 .skinCommunityQrZoom {
   position: absolute;
   right: 10px;
@@ -3984,13 +4039,6 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.8;
-}
-
-.skinCommunityQrHint {
-  margin: 0;
-  color: var(--skin-muted);
-  font-size: 0.77rem;
-  line-height: 1.5;
 }
 
 .skinServiceLiveNotice {
@@ -4775,6 +4823,12 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   50% { opacity: 0.45; transform: scale(0.82); }
 }
 
+@keyframes skinCommunityGlow {
+  0%, 18% { left: -28%; opacity: 0; }
+  32% { opacity: 1; }
+  55%, 100% { left: 120%; opacity: 0; }
+}
+
 @media (max-width: 800px) {
   .pageShell {
     padding: 0 18px 56px;
@@ -4892,10 +4946,6 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   .skinCommunityGrid,
   .skinArticleGrid,
   .skinFeedbackList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .skinCommunityQrGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -5033,8 +5083,15 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     grid-template-columns: 1fr;
   }
 
-  .skinCommunityQrGrid {
-    grid-template-columns: 1fr;
+  .skinCommunityUnavailable {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    padding: 17px;
+  }
+
+  .skinCommunityUnavailable > a {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .skinCommunityBulletin {
@@ -5988,7 +6045,7 @@ body[data-skin-image-open="true"] .settingsFloatingButton {
 }
 
 body[data-disable-btn-hover="true"] .skinCommunityCard:hover,
-body[data-disable-btn-hover="true"] .skinCommunityQrButton:hover .skinCommunityQrImage,
+body[data-disable-btn-hover="true"] .skinCommunityUnavailable > a:hover,
 body[data-disable-btn-hover="true"] .skinArticleGrid article:hover,
 body[data-disable-btn-hover="true"] .skinServiceIndexLink:hover,
 body[data-disable-btn-hover="true"] .skinServiceSearchResults a:hover {

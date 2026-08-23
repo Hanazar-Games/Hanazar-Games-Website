@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.17.4",
+    date: "2026-08-23",
+    title: "WeChat Entry Removal and Service Motion Refinement",
+    items: [
+      "Removed all four WeChat group QR entries and their image assets from the site and GitHub Pages export.",
+      "Clarified that WeChat groups cannot currently accept new members and directed visitors to the available QQ communities.",
+      "Added a direct QQ-group action to the community status card with responsive desktop and mobile layouts.",
+      "Refined section navigation, staged content entry, community-card expansion, hover feedback, and status-card motion.",
+      "Kept every new effect compatible with reduced-motion preferences and the service center’s independent settings.",
+    ],
+  },
+  {
     version: "2.17.3",
     date: "2026-08-23",
     title: "Batch 205 Tracking, Cumulative Totals, and WeChat Feedback",

@@ -239,6 +239,7 @@ test("skin service publishes localized update history", async () => {
 
   for (const value of [
     "更新公告", "Service Updates", "更新情報",
+    "微信群入口移除与界面动效优化",
     "第205批审核与累计组件统计",
     "代发工作暂停3天与公众号恢复通知",
     "微信群暂停开放与公众号赞赏说明", "独立快捷设置与第 203 批结果",
@@ -253,7 +254,7 @@ test("skin service publishes localized update history", async () => {
   assert.match(verifier, /skin-service\/updates\/index\.html/);
 });
 
-test("skin service pauses WeChat groups and publishes the official-account appreciation path", async () => {
+test("skin service directs unavailable WeChat visitors to QQ and publishes the appreciation path", async () => {
   const [center, copy, css, verifier] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
@@ -262,7 +263,9 @@ test("skin service pauses WeChat groups and publishes the official-account appre
   ]);
 
   for (const value of [
-    "微信交流群暂不开放",
+    "目前微信群暂不支持加入",
+    "请前往下方 QQ 群组",
+    "前往 QQ 群组",
     "前往公众号“千川bit”",
     "点击“赞赏作者”",
     "非常感谢大家的赞赏与支持",
@@ -271,10 +274,12 @@ test("skin service pauses WeChat groups and publishes the official-account appre
     assert.match(verifier, new RegExp(value));
   }
   assert.match(center, /skinCommunityUnavailable/);
-  assert.match(center, /communities\.filter\(\(community\) => community\.platform !== "wechat"\)/);
-  assert.doesNotMatch(center, /wechatCommunities\.map\(renderCommunityCard\)/);
+  assert.match(center, /href="#qq-groups"/);
+  assert.match(center, /id="qq-groups"/);
+  assert.doesNotMatch(center, /platform: "wechat"/);
   assert.match(center, /href="\/skin-service\/review-notices#official-account-notice"/);
   assert.match(css, /\.skinCommunityUnavailable/);
+  assert.match(css, /@keyframes skinCommunityGlow/);
   assert.match(css, /\.skinServiceSupportLink/);
 });
 
@@ -344,7 +349,7 @@ test("community prompt prevents stacked dialogs and hides background content", a
   assert.match(launcher, /\[role=['"]dialog['"]\]\[aria-modal=['"]true['"]\]/);
 });
 
-test("skin service publishes group QR artwork and a first-visit community prompt", async () => {
+test("skin service removes WeChat QR artwork and keeps the first-visit community prompt", async () => {
   const [center, copy, css, verifier] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
@@ -353,15 +358,15 @@ test("skin service publishes group QR artwork and a first-visit community prompt
   ]);
 
   for (const path of ["group-2.jpg", "group-4.jpg", "group-7.jpg", "group-9.jpg"]) {
-    assert.match(center, new RegExp(path));
+    assert.doesNotMatch(center, new RegExp(path));
     assert.match(verifier, new RegExp(`skin-service/groups/${path}`));
   }
   assert.match(center, /COMMUNITY_PROMPT_STORAGE_KEY/);
   assert.match(center, /localStorage\.getItem\(COMMUNITY_PROMPT_STORAGE_KEY\)/);
   assert.match(center, /role="dialog"/);
   assert.match(center, /router\.push\("\/skin-service\/communities"\)/);
-  assert.match(center, /assetPath\(community\.image\)/);
-  assert.match(center, /setEnlargedCommunityId\(community\.id\)/);
+  assert.doesNotMatch(center, /assetPath\(community\.image\)/);
+  assert.doesNotMatch(center, /setEnlargedCommunityId\(community\.id\)/);
   assert.match(center, /communityImageCloseRef/);
   assert.match(center, /data-skin-image-open/);
   assert.match(center, /aria-labelledby="skin-community-image-title"/);
@@ -372,9 +377,11 @@ test("skin service publishes group QR artwork and a first-visit community prompt
     assert.match(copy, new RegExp(value));
   }
   assert.match(css, /\.skinCommunityPromptOverlay/);
-  assert.match(css, /\.skinCommunityQrImage/);
+  assert.doesNotMatch(css, /\.skinCommunityQrImage/);
   assert.match(css, /\.skinCommunityLightboxOverlay/);
   assert.match(css, /\.skinCommunityBulletin/);
+  assert.match(css, /\.skinServiceDocumentSection > \*/);
+  assert.match(css, /\.skinServiceSectionNav \.skinServiceIndexLink:nth-child\(6\)/);
   assert.match(css, /body\[data-skin-image-open="true"\] \.settingsFloatingButton/);
 });
 

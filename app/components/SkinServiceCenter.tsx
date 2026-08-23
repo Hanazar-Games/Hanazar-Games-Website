@@ -39,7 +39,7 @@ type WallState = "loading" | "ready" | "unavailable" | "failed";
 type ArticleCategoryId = "introduction" | "preparation" | "review" | "privacy";
 type ArticleCategory = "all" | ArticleCategoryId;
 type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "updates" | "support";
-type CommunityPlatform = "wechat" | "qq" | "discord";
+type CommunityPlatform = "qq" | "discord";
 export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "updates" | "support";
 
 const EDIT_WINDOW_MS = 5 * 60 * 1000;
@@ -74,18 +74,13 @@ const communityDefinitions: Array<{
   name: SkinTextKey;
   kind: SkinTextKey;
   platform: CommunityPlatform;
-  image?: string;
   value?: string;
   href?: string;
 }> = [
-  { id: "group-2", name: "group2", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-2.jpg" },
   { id: "group-3", name: "group3", kind: "qqGroup", platform: "qq", value: "939095145" },
-  { id: "group-4", name: "group4", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-4.jpg" },
   { id: "group-5", name: "group5", kind: "discord", platform: "discord", href: "https://discord.gg/XtTbKCSKa" },
   { id: "group-6", name: "group6", kind: "qqGroup", platform: "qq", value: "853878672" },
-  { id: "group-7", name: "group7", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-7.jpg" },
   { id: "group-8", name: "group8", kind: "qqGroup", platform: "qq", value: "953014293" },
-  { id: "group-9", name: "group9", kind: "wechat", platform: "wechat", image: "/skin-service/groups/group-9.jpg" },
   { id: "group-10", name: "group10", kind: "qqGroup", platform: "qq", value: "1105843703" },
 ];
 
@@ -117,6 +112,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.17.4", date: "2026-08-23", title: "update174Title", body: "update174Body" },
   { version: "2.17.3", date: "2026-08-23", title: "update173Title", body: "update173Body" },
   { version: "2.17.2", date: "2026-08-23", title: "update172Title", body: "update172Body" },
   { version: "2.17.1", date: "2026-08-23", title: "update171Title", body: "update171Body" },
@@ -384,10 +380,7 @@ export default function SkinServiceCenter({
         kind: skinText(language, "noticesTitle"),
         image: "/skin-service/review-account-qr.svg",
       }
-    : communities.find((community) => community.id === enlargedCommunityId && community.image);
-  const enlargedImageDimensions = enlargedCommunity?.id === "review-account"
-    ? { width: 430, height: 430 }
-    : { width: 1050, height: 1566 };
+    : undefined;
   const reduceAnimations = settings.reduceAnimations || !settings.animationsEnabled;
 
   const dismissCommunityPrompt = useCallback((showCommunities: boolean) => {
@@ -648,9 +641,9 @@ export default function SkinServiceCenter({
         section: section.id,
         targetId: section.id,
       })),
-      ...communities.filter((community) => community.platform !== "wechat").map((community) => ({
+      ...communities.map((community) => ({
         title: `${community.name} · ${community.kind}`,
-        text: community.value ?? (community.image ? skinText(language, "qrAvailable") : community.kind),
+        text: community.value ?? community.href ?? community.kind,
         href: `/skin-service/communities#community-${community.id}`,
         section: "communities" as const,
         targetId: `community-${community.id}`,
@@ -738,36 +731,11 @@ export default function SkinServiceCenter({
   const renderCommunityCard = (community: typeof communities[number]) => (
     <details
       id={`community-${community.id}`}
-      className={`skinCommunityCard${community.image ? " skinCommunityCardQr" : ""}`}
+      className="skinCommunityCard"
       key={community.id}
     >
       <summary><span>{community.kind}</span><strong>{community.name}</strong></summary>
       <div className="skinCommunityCardContent">
-        {community.image && (
-          <>
-            <button
-              className="skinCommunityQrButton"
-              type="button"
-              aria-label={skinText(language, "enlargeQr", { group: community.name })}
-              onClick={() => setEnlargedCommunityId(community.id)}
-            >
-              <span className="skinCommunityQr">
-                <Image
-                  className="skinCommunityQrImage"
-                  src={assetPath(community.image)}
-                  alt={skinText(language, "qrImageAlt", { group: community.name })}
-                  width={1050}
-                  height={1566}
-                  sizes="(max-width: 480px) calc(100vw - 90px), (max-width: 800px) calc(50vw - 54px), 270px"
-                />
-                <span className="skinCommunityQrZoom" aria-hidden="true">
-                  <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5" /><path d="m15 15 5 5M10.5 8v5M8 10.5h5" /></svg>
-                </span>
-              </span>
-            </button>
-            <small className="skinCommunityQrHint">{skinText(language, "scanQrHint")}</small>
-          </>
-        )}
         {community.value && (
           <>
             <code>{community.value}</code>
@@ -912,11 +880,9 @@ export default function SkinServiceCenter({
             <div className="skinCommunityLightboxImage">
               <Image
                 src={assetPath(enlargedCommunity.image)}
-                alt={enlargedCommunity.id === "review-account"
-                  ? skinText(language, "reviewQrAlt")
-                  : skinText(language, "qrImageAlt", { group: enlargedCommunity.name })}
-                width={enlargedImageDimensions.width}
-                height={enlargedImageDimensions.height}
+                alt={skinText(language, "reviewQrAlt")}
+                width={430}
+                height={430}
                 sizes="(max-width: 700px) calc(100vw - 48px), 720px"
                 priority
               />
@@ -1055,9 +1021,10 @@ export default function SkinServiceCenter({
                 <strong>{skinText(language, "wechatUnavailableTitle")}</strong>
                 <p>{skinText(language, "wechatUnavailableBody")}</p>
               </div>
+              <a href="#qq-groups">{skinText(language, "wechatUnavailableAction")} <span aria-hidden="true">↓</span></a>
             </div>
           </div>
-          <div className="skinCommunityGroup">
+          <div className="skinCommunityGroup" id="qq-groups" tabIndex={-1}>
             <h3>{skinText(language, "qqGroups")}</h3>
             <div className="skinCommunityGrid">
               {qqCommunities.map(renderCommunityCard)}
