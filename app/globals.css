@@ -364,6 +364,9 @@ body[data-disable-decorations="true"] .skinServiceHero::before {
 
 body[data-disable-decorations="true"] .skinServiceIndexLink::before,
 body[data-disable-decorations="true"] .skinServiceDocumentSection::after,
+body[data-disable-decorations="true"] .skinCommunityUnavailable::after,
+body[data-disable-decorations="true"] .skinServiceStatusNotice::after,
+body[data-disable-decorations="true"] .skinServiceUpdateList article:first-child::after,
 body[data-disable-decorations="true"] .skinServiceHero::before {
   display: none;
 }
@@ -371,11 +374,26 @@ body[data-disable-decorations="true"] .skinServiceHero::before {
 /* ── Individual Animation Toggles ── */
 body[data-disable-ui-fade="true"] .reveal,
 body[data-disable-ui-fade="true"] [data-reveal],
+body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroBack,
+body[data-disable-ui-fade="true"] .skinServiceQuickSettings,
 body[data-disable-ui-fade="true"] .skinServiceSearch,
+body[data-disable-ui-fade="true"] .skinServiceSearchResults a,
+body[data-disable-ui-fade="true"] .skinServiceSearchResults > p,
 body[data-disable-ui-fade="true"] .skinServiceHubGrid .skinServiceIndexLink,
+body[data-disable-ui-fade="true"] .skinServiceSectionNav,
+body[data-disable-ui-fade="true"] .skinServiceSectionNav .skinServiceIndexLink,
+body[data-disable-ui-fade="true"] .skinServiceIndexLink.isActive::after,
 body[data-disable-ui-fade="true"] .skinServiceDocumentSection,
+body[data-disable-ui-fade="true"] .skinServiceDocumentSection > *,
+body[data-disable-ui-fade="true"] .skinCommunityUnavailable,
+body[data-disable-ui-fade="true"] .skinCommunityUnavailable::after,
+body[data-disable-ui-fade="true"] .skinCommunityCard,
 body[data-disable-ui-fade="true"] .skinCommunityCardContent,
 body[data-disable-ui-fade="true"] .skinArticleGrid article,
+body[data-disable-ui-fade="true"] .skinFeedbackList article,
+body[data-disable-ui-fade="true"] .skinReviewQrButton,
+body[data-disable-ui-fade="true"] .skinServiceUpdateList article,
+body[data-disable-ui-fade="true"] .skinServiceSectionIcon svg,
 body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroEyebrow,
 body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroTitle,
 body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroSubtitle {
@@ -395,12 +413,18 @@ body[data-disable-btn-hover="true"] .settingsTabBtn:hover,
 body[data-disable-btn-hover="true"] .seg-btn:hover,
 body[data-disable-btn-hover="true"] .colorPreset:hover,
 body[data-disable-btn-hover="true"] .languageItem:hover,
+body[data-disable-btn-hover="true"] .skinServiceQuickToggle button:hover,
 body[data-disable-btn-hover="true"] .skinServiceIndexLink:hover,
 body[data-disable-btn-hover="true"] .skinServiceIndexLink:hover .skinServiceIndexIcon,
 body[data-disable-btn-hover="true"] .skinCommunityCard:hover,
 body[data-disable-btn-hover="true"] .skinCommunityCard button:hover,
 body[data-disable-btn-hover="true"] .skinCommunityCard a:hover,
 body[data-disable-btn-hover="true"] .skinFeedbackForm button:hover,
+body[data-disable-btn-hover="true"] .skinFeedbackReplyNotice > a:hover,
+body[data-disable-btn-hover="true"] .skinReviewQrButton:hover,
+body[data-disable-btn-hover="true"] .skinServiceSupportLink:hover,
+body[data-disable-btn-hover="true"] .skinServiceSupportLink:hover span,
+body[data-disable-btn-hover="true"] .skinCommunityUnavailable > a:hover span,
 body[data-disable-btn-hover="true"] .skinArticleGrid article:hover {
   transform: none !important;
 }
@@ -3226,6 +3250,8 @@ body[data-theme="light"] .skinServiceShell .gamesHeroSubtitle {
   border-color: rgba(220, 228, 255, 0.24);
   background: rgba(12, 19, 40, 0.56);
   color: #eef2ff;
+  opacity: 0;
+  animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
 }
 
 body[data-theme="light"] .skinServiceShell .gamesHeroBack {
@@ -3242,6 +3268,8 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   display: flex;
   align-items: center;
   gap: 8px;
+  opacity: 0;
+  animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
 }
 
 .skinServiceQuickToggle {
@@ -3403,7 +3431,14 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border-radius: 12px;
   color: var(--skin-text);
   background: var(--skin-card);
+  opacity: 0;
+  animation: skinSearchResultEnter calc(0.34s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+.skinServiceSearchResults > :nth-child(2) { animation-delay: calc(0.035s * var(--anim-speed, 1)); }
+.skinServiceSearchResults > :nth-child(3) { animation-delay: calc(0.07s * var(--anim-speed, 1)); }
+.skinServiceSearchResults > :nth-child(4) { animation-delay: calc(0.105s * var(--anim-speed, 1)); }
+.skinServiceSearchResults > :nth-child(n + 5) { animation-delay: calc(0.14s * var(--anim-speed, 1)); }
 
 .skinServiceSearchResults a {
   display: grid;
@@ -3480,6 +3515,19 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinServiceIndexLink.isActive {
   border-color: var(--skin-tone);
   background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
+}
+
+.skinServiceIndexLink.isActive::after {
+  content: "";
+  position: absolute;
+  right: 13px;
+  bottom: 7px;
+  left: 13px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--skin-tone);
+  transform-origin: left;
+  animation: skinActiveRail calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .skinServiceHubGrid {
@@ -3689,6 +3737,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.65;
+  animation: skinIconSettle calc(0.64s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
 .skinServiceSectionHeader h2 {
@@ -4313,7 +4362,11 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border: 1px solid var(--skin-border);
   border-radius: 13px;
   background: var(--skin-input);
+  opacity: 0;
+  animation: skinSearchResultEnter calc(0.4s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+.skinFeedbackList article:nth-child(2n) { animation-delay: calc(0.05s * var(--anim-speed, 1)); }
 
 .skinFeedbackList p {
   margin: 0 0 14px;
@@ -4356,6 +4409,8 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 }
 
 .skinServiceStatusNotice {
+  position: relative;
+  overflow: hidden;
   margin-bottom: 18px;
   padding: clamp(20px, 4vw, 28px);
   display: grid;
@@ -4369,6 +4424,22 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     linear-gradient(135deg, color-mix(in srgb, var(--skin-tone) 16%, transparent), transparent 64%),
     var(--skin-card);
   box-shadow: inset 3px 0 0 var(--skin-tone);
+}
+
+.skinServiceStatusNotice::after {
+  content: "";
+  position: absolute;
+  inset: -70% auto -70% -24%;
+  width: 14%;
+  transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--skin-tone) 18%, transparent), transparent);
+  pointer-events: none;
+  animation: skinStatusSweep calc(5.8s * var(--anim-speed, 1)) ease-in-out infinite;
+}
+
+.skinServiceStatusNotice > * {
+  position: relative;
+  z-index: 1;
 }
 
 .skinServiceStatusNoticeIcon {
@@ -4467,6 +4538,8 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   background: #fff;
   box-shadow: 0 18px 44px rgba(2, 8, 22, 0.18);
   cursor: zoom-in;
+  opacity: 0;
+  animation: skinQrSettle calc(0.62s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
   transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -4703,6 +4776,18 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   box-shadow: inset 3px 0 0 var(--skin-tone);
 }
 
+.skinServiceUpdateList article:first-child::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34%;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--skin-tone), transparent);
+  animation: skinUpdateRail calc(4.8s * var(--anim-speed, 1)) ease-in-out infinite;
+}
+
 .skinServiceUpdateList article:nth-child(2) { animation-delay: 0.05s; }
 .skinServiceUpdateList article:nth-child(3) { animation-delay: 0.1s; }
 
@@ -4780,6 +4865,14 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   box-shadow: 0 10px 24px var(--skin-tone-soft);
 }
 
+.skinServiceSupportLink span {
+  transition: transform 0.2s ease;
+}
+
+.skinServiceSupportLink:hover span {
+  transform: translateX(3px);
+}
+
 .skinServiceShell button:focus-visible,
 .skinServiceShell a:focus-visible,
 .skinServiceShell summary:focus-visible,
@@ -4792,6 +4885,43 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 @keyframes skinAmbientDrift {
   from { transform: translate3d(-58%, -2%, 0) rotate(-8deg) scale(0.92); }
   to { transform: translate3d(-42%, 10%, 0) rotate(12deg) scale(1.08); }
+}
+
+@keyframes skinControlEnter {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes skinSearchResultEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes skinActiveRail {
+  from { opacity: 0; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes skinIconSettle {
+  from { opacity: 0; transform: rotate(-8deg) scale(0.72); }
+  to { opacity: 1; transform: rotate(0) scale(1); }
+}
+
+@keyframes skinQrSettle {
+  from { opacity: 0; transform: translateY(12px) rotate(-1.2deg) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+}
+
+@keyframes skinStatusSweep {
+  0%, 28% { left: -24%; opacity: 0; }
+  40% { opacity: 1; }
+  62%, 100% { left: 118%; opacity: 0; }
+}
+
+@keyframes skinUpdateRail {
+  0%, 22% { transform: translateX(-110%); opacity: 0; }
+  34% { opacity: 1; }
+  64%, 100% { transform: translateX(320%); opacity: 0; }
 }
 
 @keyframes skinSurfaceRise {

@@ -79,9 +79,13 @@ test("site audio stays opt-in and below the reduced output ceiling", async () =>
   ]);
 
   assert.match(settings, /bgmEnabled: false/);
+  assert.match(settings, /sfxVolume: 28/);
+  assert.match(audio, /const SFX_THROTTLE_MS = 190/);
   assert.match(audio, /Math\.min\(0\.012,/);
   assert.match(audio, /Math\.min\(\s*0\.024,/);
   assert.match(audio, /button:not\(:disabled\)/);
+  assert.match(audio, /document\.visibilityState !== "visible"/);
+  assert.match(audio, /document\.addEventListener\("visibilitychange", handleVisibility\)/);
 });
 
 test("skin service motion and effects respect accessibility settings", async () => {
@@ -95,8 +99,15 @@ test("skin service motion and effects respect accessibility settings", async () 
   assert.match(css, /@keyframes skinAmbientDrift/);
   assert.match(css, /@keyframes skinCardEnter/);
   assert.match(css, /@keyframes skinDetailsOpen/);
+  assert.match(css, /@keyframes skinStatusSweep/);
+  assert.match(css, /@keyframes skinSearchResultEnter/);
   assert.match(css, /body\[data-disable-decorations="true"\] \.skinServiceHero::before/);
   assert.match(css, /body\[data-disable-ui-fade="true"\] \.skinServiceSearch/);
+  assert.match(css, /body\[data-disable-ui-fade="true"\] \.skinServiceDocumentSection > \*/);
+  assert.match(css, /body\[data-disable-ui-fade="true"\] \.skinCommunityCard/);
+  assert.match(css, /body\[data-disable-ui-fade="true"\] \.skinServiceSearchResults a/);
+  assert.match(css, /body\[data-disable-btn-hover="true"\] \.skinReviewQrButton:hover/);
+  assert.match(css, /body\[data-disable-btn-hover="true"\] \.skinServiceSupportLink:hover/);
 });
 
 test("audio recovery handles nonstandard interrupted contexts", async () => {
@@ -239,6 +250,7 @@ test("skin service publishes localized update history", async () => {
 
   for (const value of [
     "更新公告", "Service Updates", "更新情報",
+    "新增人员暂停7天与整体体验优化",
     "微信群入口移除与界面动效优化",
     "第205批审核与累计组件统计",
     "代发工作暂停3天与公众号恢复通知",
@@ -283,7 +295,7 @@ test("skin service directs unavailable WeChat visitors to QQ and publishes the a
   assert.match(css, /\.skinServiceSupportLink/);
 });
 
-test("skin service publishes the three-day work pause and restored official-account status", async () => {
+test("skin service publishes the seven-day new-member pause and blocked WeChat status", async () => {
   const [center, copy, css, verifier] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/lib/skinServiceI18n.ts"),
@@ -292,9 +304,10 @@ test("skin service publishes the three-day work pause and restored official-acco
   ]);
 
   for (const value of [
-    "代发皮肤工作暂停3天",
-    "自本公告发布起暂停 3 天",
-    "微信账号受限",
+    "代发皮肤新增人员暂停7天",
+    "自本公告发布起暂停 7 天",
+    "微信账号被封号",
+    "暂停期间暂不接收或添加新人",
     "公众号“千川bit”现已恢复正常使用",
     "恢复安排以最新公告为准",
   ]) {

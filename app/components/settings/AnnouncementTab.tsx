@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.17.5",
+    date: "2026-08-24",
+    title: "Seven-Day New-Member Pause and Skin Service Experience Refinement",
+    items: [
+      "Paused accepting or adding new skin-service members for seven days from this announcement because the operator’s WeChat account was blocked.",
+      "Kept the prior three-day notice in history while publishing the current status prominently on the review-notices page and in service-wide search.",
+      "Refined hero controls, search-result feedback, active-section navigation, status surfaces, feedback entries, QR interaction, and the latest-update treatment.",
+      "Fixed content remaining hidden when interface fades were disabled and buttons still moving when hover effects were disabled.",
+      "Rechecked low-volume throttled SFX, opt-in BGM, reduced-motion behavior, responsive routes, and GitHub Pages export contracts.",
+    ],
+  },
+  {
     version: "2.17.4",
     date: "2026-08-23",
     title: "WeChat Entry Removal and Service Motion Refinement",
