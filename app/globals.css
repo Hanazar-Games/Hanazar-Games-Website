@@ -913,11 +913,6 @@ select:focus-visible {
   text-transform: uppercase;
 }
 
-.homepageGamesGrid,
-.homepageAigcGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 .toolCardWide {
   min-height: 360px;
   display: grid;
@@ -2691,7 +2686,12 @@ body[data-theme="light"] .shareLogRail span {
 }
 
 .aigcGrid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.homepageGamesGrid,
+.homepageAigcGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (min-width: 801px) and (max-width: 980px) {
@@ -4598,7 +4598,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   padding: 7px 13px;
 }
 
-.skinReviewCurrentStatus::before,
+.skinReviewCurrentStatus.isReviewing::before,
 .skinReviewBatch.isReviewing .skinReviewStatus::before {
   content: "";
   width: 7px;
@@ -4708,6 +4708,11 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
 }
 
+.skinReviewBatch.isTest {
+  border-color: color-mix(in srgb, var(--skin-tone) 30%, var(--skin-border));
+  border-style: dashed;
+}
+
 .skinReviewBatch > summary {
   min-height: 52px;
   padding: 10px 12px;
@@ -4716,6 +4721,14 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
 .skinReviewBatch > summary strong {
   font-weight: 590;
+}
+
+.skinReviewMetric {
+  min-width: 0;
+}
+
+.skinReviewMetric > small {
+  display: none;
 }
 
 .skinReviewCumulative {
@@ -4734,6 +4747,12 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
 .skinReviewBatch.isReviewing .skinReviewStatus {
   border-color: color-mix(in srgb, var(--skin-tone) 58%, var(--skin-border));
+  background: var(--skin-tone-soft);
+  color: var(--skin-tone);
+}
+
+.skinReviewBatch.isTest .skinReviewStatus {
+  border-color: color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
   background: var(--skin-tone-soft);
   color: var(--skin-tone);
 }
@@ -5168,22 +5187,59 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     flex-direction: column;
   }
 
-  .skinReviewColumns,
-  .skinReviewBatch > summary {
-    grid-template-columns: minmax(74px, 1fr) minmax(58px, 0.68fr) minmax(54px, 0.64fr) minmax(74px, 0.86fr) 14px;
-    gap: 5px;
-  }
-
   .skinReviewColumns {
-    padding-inline: 12px;
+    display: none;
   }
 
   .skinReviewBatch > summary {
-    padding-inline: 10px;
-    font-size: 0.7rem;
+    grid-template-columns: minmax(0, 1fr) auto 14px;
+    gap: 9px 10px;
+    min-height: 76px;
+    padding: 11px 10px;
+    font-size: 0.72rem;
+  }
+
+  .skinReviewBatch > summary > strong {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .skinReviewBatchChevron {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .skinReviewMetric {
+    display: grid;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .skinReviewMetric > small {
+    display: block;
+    color: var(--skin-muted);
+    font-size: 0.58rem;
+    font-weight: 520;
+    letter-spacing: 0.04em;
+  }
+
+  .skinReviewComponents {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .skinReviewCumulative {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    justify-self: end;
+    text-align: right;
   }
 
   .skinReviewStatus {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
     min-height: 25px;
     padding: 4px 6px;
     font-size: 0.68rem;

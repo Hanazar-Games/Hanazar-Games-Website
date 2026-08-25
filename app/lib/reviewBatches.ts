@@ -1,5 +1,7 @@
 export interface ReviewBatch {
   number: number;
+  variant?: "A" | "B" | "C";
+  purpose?: "system-test";
   status: "completed" | "reviewing";
   componentCount: number | null;
   cumulativeComponentCount: number;
@@ -40,6 +42,7 @@ function completedCounts() {
 
 const completed = completedCounts().map<ReviewBatchInput>((componentCount, index) => ({
   number: index + 1,
+  purpose: SYSTEM_TEST_BATCHES.has(index + 1) ? "system-test" : undefined,
   status: "completed",
   componentCount,
 }));
@@ -48,8 +51,10 @@ const ascendingBatches: ReviewBatchInput[] = [
   ...completed,
   { number: 202, status: "completed", componentCount: 71 },
   { number: 203, status: "completed", componentCount: 97 },
-  { number: 204, status: "reviewing", componentCount: null },
-  { number: 205, status: "reviewing", componentCount: null },
+  { number: 204, variant: "A", status: "completed", componentCount: 90 },
+  { number: 204, variant: "B", purpose: "system-test", status: "completed", componentCount: 0 },
+  { number: 204, variant: "C", purpose: "system-test", status: "completed", componentCount: 0 },
+  { number: 205, status: "completed", componentCount: 81 },
 ];
 
 let cumulativeComponentCount = 0;

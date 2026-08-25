@@ -49,6 +49,7 @@ const STORAGE_KEY = "hanazar.skin-feedback-edit.v1";
 const COMMUNITY_PROMPT_STORAGE_KEY = "hanazar.skin-service-community-prompt.v1";
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 const COMPLETED_REVIEW_BATCHES = reviewBatches.filter((batch) => batch.status === "completed");
+const REVIEWING_REVIEW_BATCHES = reviewBatches.filter((batch) => batch.status === "reviewing");
 const COMPLETED_REVIEW_COMPONENTS = COMPLETED_REVIEW_BATCHES.reduce(
   (total, batch) => total + (batch.componentCount ?? 0),
   0,
@@ -112,6 +113,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.0", date: "2026-08-26", title: "update180Title", body: "update180Body" },
   { version: "2.17.5", date: "2026-08-24", title: "update175Title", body: "update175Body" },
   { version: "2.17.4", date: "2026-08-23", title: "update174Title", body: "update174Body" },
   { version: "2.17.3", date: "2026-08-23", title: "update173Title", body: "update173Body" },
@@ -1211,7 +1213,9 @@ export default function SkinServiceCenter({
                   count: COMPLETED_REVIEW_COMPONENTS.toLocaleString(language),
                 })}</p>
               </div>
-              <span className="skinReviewCurrentStatus">{skinText(language, "reviewStatusReviewing")}</span>
+              <span className={`skinReviewCurrentStatus${REVIEWING_REVIEW_BATCHES.length > 0 ? " isReviewing" : ""}`}>
+                {skinText(language, REVIEWING_REVIEW_BATCHES.length > 0 ? "reviewStatusReviewing" : "reviewStatusAllCompleted")}
+              </span>
             </header>
 
             <details className="skinReviewArchive">
@@ -1228,6 +1232,8 @@ export default function SkinServiceCenter({
               <div className="skinReviewBatchList">
                 {reviewBatches.map((batch) => {
                   const reviewing = batch.status === "reviewing";
+                  const systemTest = batch.purpose === "system-test";
+                  const batchName = `${batch.number}${batch.variant ?? ""}`;
                   const componentCount = batch.componentCount === null
                     ? skinText(language, "reviewComponentsPending")
                     : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
@@ -1235,15 +1241,25 @@ export default function SkinServiceCenter({
                     count: batch.cumulativeComponentCount.toLocaleString(language),
                   });
                   return (
-                    <details className={`skinReviewBatch${reviewing ? " isReviewing" : ""}`} key={batch.number}>
+                    <details className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`} key={batchName}>
                       <summary>
-                        <strong>{skinText(language, "reviewBatchName", { batch: batch.number })}</strong>
-                        <span className="skinReviewStatus">{skinText(language, reviewing ? "reviewStatusReviewing" : "reviewStatusCompleted")}</span>
-                        <span>{componentCount}</span>
-                        <span className="skinReviewCumulative">{cumulativeComponentCount}</span>
+                        <strong>{skinText(language, "reviewBatchName", { batch: batchName })}</strong>
+                        <span className="skinReviewStatus">{skinText(language, reviewing
+                          ? "reviewStatusReviewing"
+                          : systemTest ? "reviewStatusTestCompleted" : "reviewStatusCompleted")}</span>
+                        <span className="skinReviewMetric skinReviewComponents">
+                          <small>{skinText(language, "reviewComponentsColumn")}</small>
+                          <span>{componentCount}</span>
+                        </span>
+                        <span className="skinReviewMetric skinReviewCumulative">
+                          <small>{skinText(language, "reviewCumulativeColumn")}</small>
+                          <span>{cumulativeComponentCount}</span>
+                        </span>
                         <span className="skinReviewBatchChevron" aria-hidden="true">⌄</span>
                       </summary>
-                      <p>{skinText(language, reviewing ? "reviewBatchReviewingDetail" : "reviewBatchCompletedDetail", {
+                      <p>{skinText(language, systemTest
+                        ? "reviewBatchTestDetail"
+                        : reviewing ? "reviewBatchReviewingDetail" : "reviewBatchCompletedDetail", {
                         count: batch.componentCount ?? 0,
                       })}</p>
                     </details>

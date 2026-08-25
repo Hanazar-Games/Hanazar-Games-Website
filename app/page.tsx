@@ -217,7 +217,7 @@ export default function HomePage() {
                   className="gameCardImage"
                   width={1280}
                   height={720}
-                  sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
+                  sizes="(max-width: 800px) 100vw, 50vw"
                 />
               </div>
               <div className="gameCardBody">
@@ -268,7 +268,7 @@ export default function HomePage() {
                   className="gameCardImage"
                   width={1280}
                   height={720}
-                  sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
+                  sizes="(max-width: 800px) 100vw, 50vw"
                 />
               </div>
               <div className="gameCardBody">

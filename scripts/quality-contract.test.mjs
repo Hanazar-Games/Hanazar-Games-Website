@@ -143,10 +143,19 @@ test("subpage hero titles balance narrow-screen line breaks", async () => {
   assert.match(layout, /data-scroll-behavior="smooth"/);
 });
 
-test("catalog exposes the Go project and the complete tool taxonomy", async () => {
-  const { games, homepageGames, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
+test("catalog exposes featured games, AIGC projects, and the complete tool taxonomy", async () => {
+  const { aigcExperiments, games, homepageGames, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
+  const claudeOpus5Project = {
+    href: "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
+    image: "/aigc/claude-opus5-starfall.jpg",
+  };
 
-  assert.deepEqual(homepageGames, games.slice(0, 3));
+  assert.deepEqual(homepageGames, games.slice(0, 4));
+  for (const collection of [games, homepageGames, aigcExperiments]) {
+    assert.ok(collection.some(({ href, image }) => (
+      href === claudeOpus5Project.href && image === claudeOpus5Project.image
+    )));
+  }
   assert.ok(games.some((game) => (
     game.href === "https://hanazar-games.github.io/Go/" && game.image === "/games/go.jpg"
   )));
@@ -165,6 +174,23 @@ test("catalog exposes the Go project and the complete tool taxonomy", async () =
   ]) {
     assert.ok(tools.some(({ href, image }) => href === expected.href && image === expected.image));
   }
+});
+
+test("four-card homepage and AIGC collections use balanced responsive grids", async () => {
+  const [home, aigc, css] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/aigc/page.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(css, /\.homepageGamesGrid,\s*\.homepageAigcGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.aigcGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.ok(
+    css.lastIndexOf(".homepageGamesGrid,") > css.indexOf(".gamesGrid {\n  display: grid"),
+    "homepage grid override must follow the base grid",
+  );
+  assert.match(home, /sizes="\(max-width: 800px\) 100vw, 50vw"/);
+  assert.match(aigc, /sizes="\(max-width: 800px\) 100vw, 50vw"/);
 });
 
 test("homepage tools cap each group at three cards and link to the archive", async () => {
@@ -461,30 +487,50 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes batches 204 and 205 with cumulative component totals", async () => {
+test("review tracker exposes batches 204A, 204B, 204C, and 205 with cumulative component totals", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
   const historical = completed.filter((batch) => batch.number <= 201);
+  const findBatch = (number, variant) => reviewBatches.find((batch) => (
+    batch.number === number && batch.variant === variant
+  ));
 
-  assert.equal(reviewBatches.length, 205);
-  assert.deepEqual(reviewBatches.map((batch) => batch.number), Array.from({ length: 205 }, (_, index) => 205 - index));
-  assert.equal(completed.length, 203);
+  assert.equal(reviewBatches.length, 207);
+  assert.deepEqual(reviewBatches.slice(0, 6).map(({ number, variant }) => [number, variant]), [
+    [205, undefined],
+    [204, "C"],
+    [204, "B"],
+    [204, "A"],
+    [203, undefined],
+    [202, undefined],
+  ]);
+  assert.equal(completed.length, 207);
+  assert.equal(reviewing.length, 0);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
-  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_168);
+  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_339);
   assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 201)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 202)?.componentCount, 71);
   assert.equal(completed.find((batch) => batch.number === 203)?.componentCount, 97);
   assert.ok(historical.every((batch) => [121, 201].includes(batch.number)
     || (batch.componentCount !== null && batch.componentCount >= 10 && batch.componentCount <= 82)));
-  assert.deepEqual(reviewing.map((batch) => batch.number), [205, 204]);
   assert.equal(reviewBatches.find((batch) => batch.number === 1)?.cumulativeComponentCount, reviewBatches.find((batch) => batch.number === 1)?.componentCount);
   assert.equal(reviewBatches.find((batch) => batch.number === 201)?.cumulativeComponentCount, 10_000);
   assert.equal(reviewBatches.find((batch) => batch.number === 202)?.cumulativeComponentCount, 10_071);
   assert.equal(reviewBatches.find((batch) => batch.number === 203)?.cumulativeComponentCount, 10_168);
-  assert.equal(reviewBatches.find((batch) => batch.number === 204)?.cumulativeComponentCount, 10_168);
-  assert.equal(reviewBatches.find((batch) => batch.number === 205)?.cumulativeComponentCount, 10_168);
+  assert.equal(findBatch(204, "A")?.componentCount, 90);
+  assert.equal(findBatch(204, "A")?.cumulativeComponentCount, 10_258);
+  assert.equal(findBatch(204, "B")?.componentCount, 0);
+  assert.equal(findBatch(204, "B")?.purpose, "system-test");
+  assert.equal(findBatch(204, "B")?.cumulativeComponentCount, 10_258);
+  assert.equal(findBatch(204, "C")?.componentCount, 0);
+  assert.equal(findBatch(204, "C")?.purpose, "system-test");
+  assert.equal(findBatch(204, "C")?.cumulativeComponentCount, 10_258);
+  assert.equal(findBatch(121)?.purpose, "system-test");
+  assert.equal(findBatch(201)?.purpose, "system-test");
+  assert.equal(findBatch(205)?.componentCount, 81);
+  assert.equal(findBatch(205)?.cumulativeComponentCount, 10_339);
   const ascending = [...reviewBatches].reverse();
   assert.ok(ascending.every((batch, index) => index === 0
     || batch.cumulativeComponentCount >= ascending[index - 1].cumulativeComponentCount));
@@ -503,11 +549,28 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   assert.match(center, /skinReviewBatch/);
   assert.match(center, /reviewCumulativeColumn/);
   assert.match(center, /batch\.cumulativeComponentCount/);
+  assert.match(center, /batch\.purpose === "system-test"/);
   assert.match(center, /review-account-qr\.svg/);
   assert.match(copy, /千川bit/);
+  assert.match(copy, /测试已出/);
+  assert.match(copy, /本批次为系统更新测试/);
   assert.match(css, /\.skinReviewBatch/);
+  assert.match(css, /\.skinReviewBatch\.isTest/);
   assert.match(css, /\.skinReviewCumulative/);
   assert.match(verifier, /skin-service\/review-account-qr\.svg/);
+});
+
+test("review batch summaries remain readable at 320px", async () => {
+  const [center, css] = await Promise.all([
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/globals.css"),
+  ]);
+
+  assert.match(center, /className="skinReviewMetric skinReviewComponents"/);
+  assert.match(center, /className="skinReviewMetric skinReviewCumulative"/);
+  assert.match(css, /\.skinReviewMetric > small \{\s*display: none;/);
+  assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewColumns \{\s*display: none;/);
+  assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewBatch > summary \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto 14px;/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {
@@ -536,7 +599,7 @@ test("Pages verification rejects malformed configured Chat service URLs", async 
   assert.match(verifier, /if \(configuredChatService && !chatServiceUrl\)/);
 });
 
-test("tablet card grids and responsive image hints stay aligned", async () => {
+test("archive card grids and responsive image hints stay aligned", async () => {
   const [css, games, aigc] = await Promise.all([
     read("app/globals.css"),
     read("app/games/page.tsx"),
@@ -548,7 +611,7 @@ test("tablet card grids and responsive image hints stay aligned", async () => {
   assert.ok(tabletGrid > baseGrid, "tablet grid override must follow the base grid");
   assert.match(css.slice(tabletGrid), /\.gamesGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
   assert.match(games, /sizes="\(max-width: 800px\) 100vw, \(max-width: 980px\) 50vw, 33vw"/);
-  assert.match(aigc, /sizes="\(max-width: 800px\) 100vw, \(max-width: 980px\) 50vw, 33vw"/);
+  assert.match(aigc, /sizes="\(max-width: 800px\) 100vw, 50vw"/);
 });
 
 test("disconnecting a peer fails pending transfers and releases incoming chunks", async () => {

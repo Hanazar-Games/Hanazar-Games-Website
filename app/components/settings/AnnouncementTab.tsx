@@ -4,6 +4,20 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.0",
+    date: "2026-08-26",
+    title: "Review Batch Results and Claude Opus 5 AIGC Project",
+    items: [
+      "Published Batch 204A with 90 components and Batch 205 with 81 components.",
+      "Recorded Batches 204B and 204C as completed zero-component test batches.",
+      "Updated the review archive to 207 completed batches and 10,339 cumulative components, with no batch currently under review.",
+      "Added Claude Opus 5 AIGC Webgame Project to the homepage GamesHub, full Games Hub, and AIGC archive with real project artwork.",
+      "Balanced four-card homepage and AIGC collections into two-column desktop layouts and gave completed system-test batches distinct labels and explanations.",
+      "Reflowed review-batch summaries into two rows on narrow screens so component totals and expand controls remain fully visible at 320 px.",
+      "Extended automated and GitHub Pages export checks for the lettered batches, exact totals, normalized project URL, and new static image.",
+    ],
+  },
+  {
     version: "2.17.5",
     date: "2026-08-24",
     title: "Seven-Day New-Member Pause and Skin Service Experience Refinement",

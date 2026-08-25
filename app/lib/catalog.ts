@@ -39,6 +39,13 @@ export const games: GameEntry[] = [
     image: "/aigc/gpt-56-sol-ultra.jpg",
   },
   {
+    title: "aigcClaudeOpus5Title",
+    description: "aigcClaudeOpus5Desc",
+    href: "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
+    tag: "aigcTagClaudeOpus5",
+    image: "/aigc/claude-opus5-starfall.jpg",
+  },
+  {
     title: "gameWeidaTitle",
     description: "gameWeidaDesc",
     href: "https://hanazar-games.github.io/Go/",
@@ -159,7 +166,7 @@ export const games: GameEntry[] = [
   },
 ];
 
-export const homepageGames = games.slice(0, 3);
+export const homepageGames = games.slice(0, 4);
 
 export const toolGroups: ToolGroup[] = [
   {
@@ -256,6 +263,13 @@ export const aigcExperiments: GameEntry[] = [
     href: "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     tag: "aigcTagGpt56Ultra",
     image: "/aigc/gpt-56-sol-ultra.jpg",
+  },
+  {
+    title: "aigcClaudeOpus5Title",
+    description: "aigcClaudeOpus5Desc",
+    href: "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
+    tag: "aigcTagClaudeOpus5",
+    image: "/aigc/claude-opus5-starfall.jpg",
   },
   {
     title: "aigcKimiTitle",
