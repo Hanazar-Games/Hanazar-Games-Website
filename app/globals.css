@@ -3101,7 +3101,7 @@ body[data-theme="light"] .skinCommunityPromptOverlay {
   --skin-prompt-text: #1c2740;
   --skin-prompt-muted: #5e6d87;
   --skin-prompt-border: rgba(63, 79, 118, 0.16);
-  background: rgba(28, 38, 62, 0.42);
+  background: rgba(28, 38, 62, 0.56);
 }
 
 body[data-theme="light"] .skinCommunityPrompt {

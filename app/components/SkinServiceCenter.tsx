@@ -113,6 +113,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.1", date: "2026-08-28", title: "update181Title", body: "update181Body" },
   { version: "2.18.0", date: "2026-08-26", title: "update180Title", body: "update180Body" },
   { version: "2.17.5", date: "2026-08-24", title: "update175Title", body: "update175Body" },
   { version: "2.17.4", date: "2026-08-23", title: "update174Title", body: "update174Body" },

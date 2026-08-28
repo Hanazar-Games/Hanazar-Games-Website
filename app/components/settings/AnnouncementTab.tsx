@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.1",
+    date: "2026-08-28",
+    title: "Accessibility and Modal Polish",
+    items: [
+      "Removed dangling dialog-control references from settings launchers while preserving clear dialog semantics.",
+      "Strengthened the skin-service first-visit overlay in light mode so background section boundaries no longer distract from the prompt.",
+      "Revalidated all 13 site routes across desktop, tablet, and 320 px layouts with no broken images, overflow, unsafe links, or runtime errors.",
+      "Rechecked low-volume SFX, opt-in BGM, playback state, focus restoration, and the GitHub Pages static export.",
+    ],
+  },
+  {
     version: "2.18.0",
     date: "2026-08-26",
     title: "Review Batch Results and Claude Opus 5 AIGC Project",

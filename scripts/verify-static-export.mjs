@@ -207,6 +207,9 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.18.1",
+    "全站无障碍与弹窗视觉优化",
+    "GitHub Pages 静态导出",
     "2.18.0",
     "审核批次结果与 Claude Opus 5 项目",
     "第 204A 批次已出 90 个组件",

@@ -258,6 +258,39 @@ test("main and skin service settings use independent defaults and storage", asyn
   assert.doesNotMatch(settings, /hanazar\.skin-service-language\.v1/);
 });
 
+test("settings dialog launchers avoid dangling control references", async () => {
+  const [home, launcher] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/components/SettingsLauncher.tsx"),
+  ]);
+
+  assert.match(home, /aria-haspopup="dialog"/);
+  assert.match(launcher, /aria-haspopup="dialog"/);
+  assert.doesNotMatch(home, /aria-controls="project-settings-dialog"/);
+  assert.doesNotMatch(launcher, /aria-controls="project-settings-dialog"/);
+});
+
+test("patch release metadata stays synchronized", async () => {
+  const [packageText, lockText, center, copy, announcement, verifier] = await Promise.all([
+    read("package.json"),
+    read("package-lock.json"),
+    read("app/components/SkinServiceCenter.tsx"),
+    read("app/lib/skinServiceI18n.ts"),
+    read("app/components/settings/AnnouncementTab.tsx"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+  const packageData = JSON.parse(packageText);
+  const lockData = JSON.parse(lockText);
+
+  assert.equal(packageData.version, "2.18.1");
+  assert.equal(lockData.version, "2.18.1");
+  assert.equal(lockData.packages[""].version, "2.18.1");
+  assert.match(center, /version: "2\.18\.1", date: "2026-08-28"/);
+  assert.match(copy, /全站无障碍与弹窗视觉优化/);
+  assert.match(announcement, /version: "2\.18\.1"/);
+  assert.match(verifier, /2\.18\.1/);
+});
+
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
   const center = await read("app/components/SkinServiceCenter.tsx");
 

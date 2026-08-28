@@ -99,7 +99,6 @@ function MainSettingsLauncher() {
         type="button"
         onClick={openSettings}
         aria-label={tr("ariaOpenSettings")}
-        aria-controls="project-settings-dialog"
         aria-expanded={open}
         aria-haspopup="dialog"
         title={tr("ariaOpenSettings")}

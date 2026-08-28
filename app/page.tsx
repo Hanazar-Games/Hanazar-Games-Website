@@ -180,7 +180,6 @@ export default function HomePage() {
               onClick={() => window.dispatchEvent(new Event("hanazar:open-settings"))}
               style={{ "--button-index": heroLinks.length } as CSSProperties}
               aria-label={tr("ariaOpenSettings")}
-              aria-controls="project-settings-dialog"
               aria-haspopup="dialog"
             >
               {tr("navSettings")}
