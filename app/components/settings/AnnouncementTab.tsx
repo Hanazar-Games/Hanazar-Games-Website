@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.2",
+    date: "2026-08-29",
+    title: "Full-site QA and Review-batch Search",
+    items: [
+      "Completed deep UI, UX, motion, SFX, and BGM checks across all 13 routes at five viewport sizes, covering 65 responsive scenarios without broken images, runtime errors, or scrollable overflow.",
+      "Removed the inaccurate expanded state from the main settings dialog trigger, enlarged compact homepage and footer link targets, and verified focus containment and restoration.",
+      "Indexed all 207 skin-service review batches in global search so batch numbers such as 121, 204A, and 205 link directly to and expand the exact record.",
+      "Revalidated independent main-site and skin-service themes and languages, the first-visit community prompt, QR enlargement, low-volume SFX, opt-in BGM, and reduced-motion behavior.",
+      "Rebuilt and verified the GitHub Pages static export, base-path links, dependencies, TypeScript, and release consistency checks.",
+    ],
+  },
+  {
     version: "2.18.1",
     date: "2026-08-28",
     title: "Accessibility and Modal Polish",

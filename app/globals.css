@@ -856,6 +856,9 @@ select:focus-visible {
 
 .sectionTextLink {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   color: var(--accent);
   font-size: 0.84rem;
   letter-spacing: 0.08em;
@@ -1191,6 +1194,9 @@ select:focus-visible {
 }
 
 .footerColumn li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   color: #9d9d9d;
   font-size: 0.98rem;
   line-height: 1.5;
@@ -1219,6 +1225,9 @@ select:focus-visible {
 
 .footerSocials a,
 .footerMetaLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
   color: #a8a8a8;
   font-size: 0.96rem;
   transition: color 0.2s ease;

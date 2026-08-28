@@ -204,6 +204,14 @@ test("homepage tools cap each group at three cards and link to the archive", asy
   assert.match(css, /\.toolsGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
 });
 
+test("homepage text and footer links keep a usable pointer target", async () => {
+  const css = await read("app/globals.css");
+
+  assert.match(css, /\.sectionTextLink \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
+  assert.match(css, /\.footerColumn li a \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
+  assert.match(css, /\.footerSocials a,[\s\S]*?\.footerMetaLinks a \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
+});
+
 test("skin service hub exports six dedicated section routes", async () => {
   const sectionIds = ["communities", "questions", "feedback", "review-notices", "updates", "support"];
   const [center, route, rootPage, verifier, ...sectionPages] = await Promise.all([
@@ -268,6 +276,7 @@ test("settings dialog launchers avoid dangling control references", async () => 
   assert.match(launcher, /aria-haspopup="dialog"/);
   assert.doesNotMatch(home, /aria-controls="project-settings-dialog"/);
   assert.doesNotMatch(launcher, /aria-controls="project-settings-dialog"/);
+  assert.doesNotMatch(launcher, /aria-expanded=\{open\}/);
 });
 
 test("patch release metadata stays synchronized", async () => {
@@ -282,13 +291,13 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.1");
-  assert.equal(lockData.version, "2.18.1");
-  assert.equal(lockData.packages[""].version, "2.18.1");
-  assert.match(center, /version: "2\.18\.1", date: "2026-08-28"/);
-  assert.match(copy, /全站无障碍与弹窗视觉优化/);
-  assert.match(announcement, /version: "2\.18\.1"/);
-  assert.match(verifier, /2\.18\.1/);
+  assert.equal(packageData.version, "2.18.2");
+  assert.equal(lockData.version, "2.18.2");
+  assert.equal(lockData.packages[""].version, "2.18.2");
+  assert.match(center, /version: "2\.18\.2", date: "2026-08-29"/);
+  assert.match(copy, /全站深度检查与审核批次搜索优化/);
+  assert.match(announcement, /version: "2\.18\.2"/);
+  assert.match(verifier, /2\.18\.2/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
@@ -591,6 +600,15 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   assert.match(css, /\.skinReviewBatch\.isTest/);
   assert.match(css, /\.skinReviewCumulative/);
   assert.match(verifier, /skin-service\/review-account-qr\.svg/);
+});
+
+test("skin service global search links directly to every review batch", async () => {
+  const center = await read("app/components/SkinServiceCenter.tsx");
+
+  assert.match(center, /\.\.\.reviewBatches\.map\(\(batch\) => \(\{/);
+  assert.match(center, /targetId: reviewBatchId\(batch\)/);
+  assert.match(center, /id=\{reviewBatchId\(batch\)\}/);
+  assert.match(center, /parentElement\?\.closest<HTMLDetailsElement>\("details"\)/);
 });
 
 test("review batch summaries remain readable at 320px", async () => {

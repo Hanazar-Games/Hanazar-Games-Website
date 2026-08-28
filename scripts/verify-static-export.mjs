@@ -207,6 +207,9 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.18.2",
+    "全站深度检查与审核批次搜索优化",
+    "207 条审核批次完整纳入全局搜索",
     "2.18.1",
     "全站无障碍与弹窗视觉优化",
     "GitHub Pages 静态导出",

@@ -113,6 +113,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.2", date: "2026-08-29", title: "update182Title", body: "update182Body" },
   { version: "2.18.1", date: "2026-08-28", title: "update181Title", body: "update181Body" },
   { version: "2.18.0", date: "2026-08-26", title: "update180Title", body: "update180Body" },
   { version: "2.17.5", date: "2026-08-24", title: "update175Title", body: "update175Body" },
@@ -311,6 +312,14 @@ function scrollBehavior(reduceAnimations: boolean): ScrollBehavior {
   return reduceAnimations || window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ? "auto"
     : "smooth";
+}
+
+function reviewBatchName(batch: { number: number; variant?: "A" | "B" | "C" }) {
+  return `${batch.number}${batch.variant ?? ""}`;
+}
+
+function reviewBatchId(batch: { number: number; variant?: "A" | "B" | "C" }) {
+  return `review-batch-${reviewBatchName(batch)}`;
 }
 
 export default function SkinServiceCenter({
@@ -618,6 +627,11 @@ export default function SkinServiceCenter({
 
   const revealTarget = useCallback((targetId: string, behavior = scrollBehavior(reduceAnimations)) => {
     const target = document.getElementById(targetId);
+    let parentDetails = target?.parentElement?.closest<HTMLDetailsElement>("details");
+    while (parentDetails) {
+      parentDetails.open = true;
+      parentDetails = parentDetails.parentElement?.closest<HTMLDetailsElement>("details") ?? null;
+    }
     if (target instanceof HTMLDetailsElement) target.open = true;
     target?.scrollIntoView({ behavior, block: "start" });
     if (target instanceof HTMLDetailsElement) target.querySelector("summary")?.focus({ preventScroll: true });
@@ -701,6 +715,22 @@ export default function SkinServiceCenter({
         section: "review-notices" as const,
         targetId: "official-account-notice",
       },
+      ...reviewBatches.map((batch) => ({
+        title: skinText(language, "reviewBatchName", { batch: reviewBatchName(batch) }),
+        text: [
+          skinText(language, batch.status === "reviewing"
+            ? "reviewStatusReviewing"
+            : batch.purpose === "system-test" ? "reviewStatusTestCompleted" : "reviewStatusCompleted"),
+          batch.componentCount === null
+            ? skinText(language, "reviewComponentsPending")
+            : skinText(language, "reviewComponentsCount", { count: batch.componentCount }),
+          skinText(language, "reviewCumulativeColumn"),
+          skinText(language, "reviewComponentsCount", { count: batch.cumulativeComponentCount.toLocaleString(language) }),
+        ].join(" · "),
+        href: `/skin-service/review-notices#${reviewBatchId(batch)}`,
+        section: "review-notices" as const,
+        targetId: reviewBatchId(batch),
+      })),
       ...serviceUpdates.map((update) => ({
         title: `${update.version} · ${update.title}`,
         text: update.body,
@@ -1234,7 +1264,7 @@ export default function SkinServiceCenter({
                 {reviewBatches.map((batch) => {
                   const reviewing = batch.status === "reviewing";
                   const systemTest = batch.purpose === "system-test";
-                  const batchName = `${batch.number}${batch.variant ?? ""}`;
+                  const batchName = reviewBatchName(batch);
                   const componentCount = batch.componentCount === null
                     ? skinText(language, "reviewComponentsPending")
                     : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
@@ -1242,7 +1272,7 @@ export default function SkinServiceCenter({
                     count: batch.cumulativeComponentCount.toLocaleString(language),
                   });
                   return (
-                    <details className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`} key={batchName}>
+                    <details id={reviewBatchId(batch)} className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`} key={batchName}>
                       <summary>
                         <strong>{skinText(language, "reviewBatchName", { batch: batchName })}</strong>
                         <span className="skinReviewStatus">{skinText(language, reviewing
