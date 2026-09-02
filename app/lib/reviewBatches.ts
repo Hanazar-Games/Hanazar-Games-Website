@@ -5,9 +5,10 @@ export interface ReviewBatch {
   status: "completed" | "reviewing";
   componentCount: number | null;
   cumulativeComponentCount: number;
+  cumulativeComponentCountPending: boolean;
 }
 
-type ReviewBatchInput = Omit<ReviewBatch, "cumulativeComponentCount">;
+type ReviewBatchInput = Omit<ReviewBatch, "cumulativeComponentCount" | "cumulativeComponentCountPending">;
 
 const HISTORICAL_BATCHES = 201;
 const HISTORICAL_COMPONENTS = 10_000;
@@ -55,10 +56,21 @@ const ascendingBatches: ReviewBatchInput[] = [
   { number: 204, variant: "B", purpose: "system-test", status: "completed", componentCount: 0 },
   { number: 204, variant: "C", purpose: "system-test", status: "completed", componentCount: 0 },
   { number: 205, status: "completed", componentCount: 81 },
+  { number: 206, status: "completed", componentCount: 37 },
+  { number: 207, status: "completed", componentCount: null },
+  { number: 208, status: "completed", componentCount: null },
+  { number: 209, status: "completed", componentCount: null },
+  { number: 210, status: "completed", componentCount: null },
+  { number: 211, status: "reviewing", componentCount: null },
+  { number: 212, status: "reviewing", componentCount: null },
+  { number: 213, status: "reviewing", componentCount: null },
+  { number: 214, status: "reviewing", componentCount: null },
 ];
 
 let cumulativeComponentCount = 0;
+let cumulativeComponentCountPending = false;
 export const reviewBatches: ReviewBatch[] = ascendingBatches.map((batch) => {
   cumulativeComponentCount += batch.componentCount ?? 0;
-  return { ...batch, cumulativeComponentCount };
+  cumulativeComponentCountPending ||= batch.status === "completed" && batch.componentCount === null;
+  return { ...batch, cumulativeComponentCount, cumulativeComponentCountPending };
 }).reverse();

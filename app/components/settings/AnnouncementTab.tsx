@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.3",
+    date: "2026-09-02",
+    title: "Review Batches 207–214 and Skin-service UI Refinement",
+    items: [
+      "Marked Batches 207 through 210 as passed with component counts pending confirmation and moved Batches 211 through 214 into review.",
+      "Kept the known cumulative count honest at 10,376+ until the four missing batch totals are supplied instead of inventing component data.",
+      "Added an animated current-batch strip with direct links to each active record and clarified completed, pending-count, and reviewing states.",
+      "Removed the expired seven-day new-member pause from the live review page while retaining it in historical announcements.",
+      "Revalidated responsive layouts through 320 px, reduced-motion behavior, global search, and GitHub Pages static deployment.",
+    ],
+  },
+  {
     version: "2.18.2",
     date: "2026-08-29",
     title: "Full-site QA and Review-batch Search",

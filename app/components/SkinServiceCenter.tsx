@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
-import { reviewBatches } from "../lib/reviewBatches";
+import { reviewBatches, type ReviewBatch } from "../lib/reviewBatches";
 import {
   skinServiceLanguage,
   skinText,
@@ -50,6 +50,9 @@ const COMMUNITY_PROMPT_STORAGE_KEY = "hanazar.skin-service-community-prompt.v1";
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 const COMPLETED_REVIEW_BATCHES = reviewBatches.filter((batch) => batch.status === "completed");
 const REVIEWING_REVIEW_BATCHES = reviewBatches.filter((batch) => batch.status === "reviewing");
+const COMPLETED_REVIEW_BATCHES_WITH_PENDING_COUNTS = COMPLETED_REVIEW_BATCHES.filter(
+  (batch) => batch.componentCount === null,
+);
 const COMPLETED_REVIEW_COMPONENTS = COMPLETED_REVIEW_BATCHES.reduce(
   (total, batch) => total + (batch.componentCount ?? 0),
   0,
@@ -113,6 +116,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.3", date: "2026-09-02", title: "update183Title", body: "update183Body" },
   { version: "2.18.2", date: "2026-08-29", title: "update182Title", body: "update182Body" },
   { version: "2.18.1", date: "2026-08-28", title: "update181Title", body: "update181Body" },
   { version: "2.18.0", date: "2026-08-26", title: "update180Title", body: "update180Body" },
@@ -320,6 +324,14 @@ function reviewBatchName(batch: { number: number; variant?: "A" | "B" | "C" }) {
 
 function reviewBatchId(batch: { number: number; variant?: "A" | "B" | "C" }) {
   return `review-batch-${reviewBatchName(batch)}`;
+}
+
+function reviewCumulativeCount(batch: ReviewBatch, language: SkinServiceLanguage) {
+  return skinText(language, batch.cumulativeComponentCountPending
+    ? "reviewCumulativePending"
+    : "reviewComponentsCount", {
+    count: batch.cumulativeComponentCount.toLocaleString(language),
+  });
 }
 
 export default function SkinServiceCenter({
@@ -702,13 +714,6 @@ export default function SkinServiceCenter({
         targetId: `feedback-${item.id}`,
       })),
       {
-        title: skinText(language, "servicePauseTitle"),
-        text: skinText(language, "servicePauseBody"),
-        href: "/skin-service/review-notices#service-pause-notice",
-        section: "review-notices" as const,
-        targetId: "service-pause-notice",
-      },
-      {
         title: skinText(language, "wechatOfficialReserved"),
         text: skinText(language, "wechatOfficialBody"),
         href: "/skin-service/review-notices#official-account-notice",
@@ -725,7 +730,7 @@ export default function SkinServiceCenter({
             ? skinText(language, "reviewComponentsPending")
             : skinText(language, "reviewComponentsCount", { count: batch.componentCount }),
           skinText(language, "reviewCumulativeColumn"),
-          skinText(language, "reviewComponentsCount", { count: batch.cumulativeComponentCount.toLocaleString(language) }),
+          reviewCumulativeCount(batch, language),
         ].join(" · "),
         href: `/skin-service/review-notices#${reviewBatchId(batch)}`,
         section: "review-notices" as const,
@@ -1200,15 +1205,6 @@ export default function SkinServiceCenter({
             title={skinText(language, "noticesTitle")}
             description={skinText(language, "noticesDescription")}
           />
-          <aside className="skinServiceStatusNotice" id="service-pause-notice" tabIndex={-1} aria-labelledby="service-pause-title">
-            <span className="skinServiceStatusNoticeIcon" aria-hidden="true"><SectionIcon name="notices" /></span>
-            <div>
-              <span>{skinText(language, "servicePauseLabel")}</span>
-              <strong id="service-pause-title">{skinText(language, "servicePauseTitle")}</strong>
-              <p>{skinText(language, "servicePauseBody")}</p>
-            </div>
-            <span className="skinServiceStatusBadge">{skinText(language, "servicePauseStatus")}</span>
-          </aside>
           <div className="skinReviewAccount" id="official-account-notice" tabIndex={-1}>
             <div className="skinReviewAccountCopy">
               <span>{skinText(language, "noticesTitle")}</span>
@@ -1242,16 +1238,31 @@ export default function SkinServiceCenter({
                 <p>{skinText(language, "reviewTrackerSummary", {
                   batches: COMPLETED_REVIEW_BATCHES.length,
                   count: COMPLETED_REVIEW_COMPONENTS.toLocaleString(language),
+                  pending: COMPLETED_REVIEW_BATCHES_WITH_PENDING_COUNTS.length,
+                  reviewing: REVIEWING_REVIEW_BATCHES.length,
                 })}</p>
               </div>
               <span className={`skinReviewCurrentStatus${REVIEWING_REVIEW_BATCHES.length > 0 ? " isReviewing" : ""}`}>
-                {skinText(language, REVIEWING_REVIEW_BATCHES.length > 0 ? "reviewStatusReviewing" : "reviewStatusAllCompleted")}
+                {skinText(language, REVIEWING_REVIEW_BATCHES.length > 0
+                  ? "reviewStatusReviewingCount"
+                  : "reviewStatusAllCompleted", { count: REVIEWING_REVIEW_BATCHES.length })}
               </span>
             </header>
 
+            {REVIEWING_REVIEW_BATCHES.length > 0 && (
+              <nav className="skinReviewCurrentBatches" aria-label={skinText(language, "reviewCurrentBatchesLabel")}>
+                {REVIEWING_REVIEW_BATCHES.map((batch) => (
+                  <a href={`#${reviewBatchId(batch)}`} key={reviewBatchName(batch)}>
+                    <strong>{skinText(language, "reviewBatchName", { batch: reviewBatchName(batch) })}</strong>
+                    <small>{skinText(language, "reviewStatusReviewing")}</small>
+                  </a>
+                ))}
+              </nav>
+            )}
+
             <details className="skinReviewArchive">
               <summary>
-                <span><strong>{skinText(language, "reviewArchiveTitle")}</strong><small>{skinText(language, "reviewArchiveHint")}</small></span>
+                <span><strong>{skinText(language, "reviewArchiveTitle", { batches: reviewBatches.length })}</strong><small>{skinText(language, "reviewArchiveHint")}</small></span>
                 <span aria-hidden="true">⌄</span>
               </summary>
               <div className="skinReviewColumns" aria-hidden="true">
@@ -1268,9 +1279,7 @@ export default function SkinServiceCenter({
                   const componentCount = batch.componentCount === null
                     ? skinText(language, "reviewComponentsPending")
                     : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
-                  const cumulativeComponentCount = skinText(language, "reviewComponentsCount", {
-                    count: batch.cumulativeComponentCount.toLocaleString(language),
-                  });
+                  const cumulativeComponentCount = reviewCumulativeCount(batch, language);
                   return (
                     <details id={reviewBatchId(batch)} className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`} key={batchName}>
                       <summary>
@@ -1290,7 +1299,11 @@ export default function SkinServiceCenter({
                       </summary>
                       <p>{skinText(language, systemTest
                         ? "reviewBatchTestDetail"
-                        : reviewing ? "reviewBatchReviewingDetail" : "reviewBatchCompletedDetail", {
+                        : reviewing
+                          ? "reviewBatchReviewingDetail"
+                          : batch.componentCount === null
+                            ? "reviewBatchCompletedPendingDetail"
+                            : "reviewBatchCompletedDetail", {
                         count: batch.componentCount ?? 0,
                       })}</p>
                     </details>

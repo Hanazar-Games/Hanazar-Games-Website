@@ -365,7 +365,6 @@ body[data-disable-decorations="true"] .skinServiceHero::before {
 body[data-disable-decorations="true"] .skinServiceIndexLink::before,
 body[data-disable-decorations="true"] .skinServiceDocumentSection::after,
 body[data-disable-decorations="true"] .skinCommunityUnavailable::after,
-body[data-disable-decorations="true"] .skinServiceStatusNotice::after,
 body[data-disable-decorations="true"] .skinServiceUpdateList article:first-child::after,
 body[data-disable-decorations="true"] .skinServiceHero::before {
   display: none;
@@ -392,6 +391,7 @@ body[data-disable-ui-fade="true"] .skinCommunityCardContent,
 body[data-disable-ui-fade="true"] .skinArticleGrid article,
 body[data-disable-ui-fade="true"] .skinFeedbackList article,
 body[data-disable-ui-fade="true"] .skinReviewQrButton,
+body[data-disable-ui-fade="true"] .skinReviewCurrentBatches a,
 body[data-disable-ui-fade="true"] .skinServiceUpdateList article,
 body[data-disable-ui-fade="true"] .skinServiceSectionIcon svg,
 body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroEyebrow,
@@ -422,6 +422,7 @@ body[data-disable-btn-hover="true"] .skinCommunityCard a:hover,
 body[data-disable-btn-hover="true"] .skinFeedbackForm button:hover,
 body[data-disable-btn-hover="true"] .skinFeedbackReplyNotice > a:hover,
 body[data-disable-btn-hover="true"] .skinReviewQrButton:hover,
+body[data-disable-btn-hover="true"] .skinReviewCurrentBatches a:hover,
 body[data-disable-btn-hover="true"] .skinServiceSupportLink:hover,
 body[data-disable-btn-hover="true"] .skinServiceSupportLink:hover span,
 body[data-disable-btn-hover="true"] .skinCommunityUnavailable > a:hover span,
@@ -3564,12 +3565,12 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   animation: skinCardEnter calc(0.56s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.skinServiceHubGrid .skinServiceIndexLink:nth-child(1) { animation-delay: 0.18s; }
-.skinServiceHubGrid .skinServiceIndexLink:nth-child(2) { animation-delay: 0.24s; }
-.skinServiceHubGrid .skinServiceIndexLink:nth-child(3) { animation-delay: 0.3s; }
-.skinServiceHubGrid .skinServiceIndexLink:nth-child(4) { animation-delay: 0.36s; }
-.skinServiceHubGrid .skinServiceIndexLink:nth-child(5) { animation-delay: 0.42s; }
-.skinServiceHubGrid .skinServiceIndexLink:nth-child(6) { animation-delay: 0.48s; }
+.skinServiceHubGrid .skinServiceIndexLink:nth-child(1) { animation-delay: calc(0.18s * var(--anim-speed, 1)); }
+.skinServiceHubGrid .skinServiceIndexLink:nth-child(2) { animation-delay: calc(0.24s * var(--anim-speed, 1)); }
+.skinServiceHubGrid .skinServiceIndexLink:nth-child(3) { animation-delay: calc(0.3s * var(--anim-speed, 1)); }
+.skinServiceHubGrid .skinServiceIndexLink:nth-child(4) { animation-delay: calc(0.36s * var(--anim-speed, 1)); }
+.skinServiceHubGrid .skinServiceIndexLink:nth-child(5) { animation-delay: calc(0.42s * var(--anim-speed, 1)); }
+.skinServiceHubGrid .skinServiceIndexLink:nth-child(6) { animation-delay: calc(0.48s * var(--anim-speed, 1)); }
 
 .skinServiceHubGrid .skinServiceIndexIcon {
   grid-row: 1 / 3;
@@ -3599,12 +3600,12 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.skinServiceSectionNav .skinServiceIndexLink:nth-child(1) { animation-delay: 0.22s; }
-.skinServiceSectionNav .skinServiceIndexLink:nth-child(2) { animation-delay: 0.26s; }
-.skinServiceSectionNav .skinServiceIndexLink:nth-child(3) { animation-delay: 0.3s; }
-.skinServiceSectionNav .skinServiceIndexLink:nth-child(4) { animation-delay: 0.34s; }
-.skinServiceSectionNav .skinServiceIndexLink:nth-child(5) { animation-delay: 0.38s; }
-.skinServiceSectionNav .skinServiceIndexLink:nth-child(6) { animation-delay: 0.42s; }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(1) { animation-delay: calc(0.22s * var(--anim-speed, 1)); }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(2) { animation-delay: calc(0.26s * var(--anim-speed, 1)); }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(3) { animation-delay: calc(0.3s * var(--anim-speed, 1)); }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(4) { animation-delay: calc(0.34s * var(--anim-speed, 1)); }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(5) { animation-delay: calc(0.38s * var(--anim-speed, 1)); }
+.skinServiceSectionNav .skinServiceIndexLink:nth-child(6) { animation-delay: calc(0.42s * var(--anim-speed, 1)); }
 
 .skinServiceSectionNav .skinServiceIndexIcon {
   width: 34px;
@@ -3702,6 +3703,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     0 0 0 28px color-mix(in srgb, var(--skin-tone) 5%, transparent),
     0 0 0 58px color-mix(in srgb, var(--skin-tone) 3%, transparent);
   pointer-events: none;
+  animation: skinSectionOrbit calc(14s * var(--anim-speed, 1)) ease-in-out infinite;
 }
 
 .skinServiceDocumentSection > * {
@@ -3711,12 +3713,12 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.skinServiceDocumentSection > :nth-child(1) { animation-delay: 0.08s; }
-.skinServiceDocumentSection > :nth-child(2) { animation-delay: 0.14s; }
-.skinServiceDocumentSection > :nth-child(3) { animation-delay: 0.2s; }
-.skinServiceDocumentSection > :nth-child(4) { animation-delay: 0.26s; }
-.skinServiceDocumentSection > :nth-child(5) { animation-delay: 0.32s; }
-.skinServiceDocumentSection > :nth-child(n + 6) { animation-delay: 0.38s; }
+.skinServiceDocumentSection > :nth-child(1) { animation-delay: calc(0.08s * var(--anim-speed, 1)); }
+.skinServiceDocumentSection > :nth-child(2) { animation-delay: calc(0.14s * var(--anim-speed, 1)); }
+.skinServiceDocumentSection > :nth-child(3) { animation-delay: calc(0.2s * var(--anim-speed, 1)); }
+.skinServiceDocumentSection > :nth-child(4) { animation-delay: calc(0.26s * var(--anim-speed, 1)); }
+.skinServiceDocumentSection > :nth-child(5) { animation-delay: calc(0.32s * var(--anim-speed, 1)); }
+.skinServiceDocumentSection > :nth-child(n + 6) { animation-delay: calc(0.38s * var(--anim-speed, 1)); }
 
 .skinServiceSectionHeader {
   display: flex;
@@ -3969,10 +3971,10 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
-.skinCommunityCard:nth-child(1) { animation-delay: 0.12s; }
-.skinCommunityCard:nth-child(2) { animation-delay: 0.17s; }
-.skinCommunityCard:nth-child(3) { animation-delay: 0.22s; }
-.skinCommunityCard:nth-child(4) { animation-delay: 0.27s; }
+.skinCommunityCard:nth-child(1) { animation-delay: calc(0.12s * var(--anim-speed, 1)); }
+.skinCommunityCard:nth-child(2) { animation-delay: calc(0.17s * var(--anim-speed, 1)); }
+.skinCommunityCard:nth-child(3) { animation-delay: calc(0.22s * var(--anim-speed, 1)); }
+.skinCommunityCard:nth-child(4) { animation-delay: calc(0.27s * var(--anim-speed, 1)); }
 
 .skinCommunityCard:hover {
   border-color: var(--skin-tone);
@@ -4148,7 +4150,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.skinArticleGrid article:nth-child(2n) { animation-delay: 0.06s; }
+.skinArticleGrid article:nth-child(2n) { animation-delay: calc(0.06s * var(--anim-speed, 1)); }
 
 .skinArticleGrid article:hover {
   border-color: var(--skin-tone);
@@ -4417,99 +4419,6 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     var(--skin-card);
 }
 
-.skinServiceStatusNotice {
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 18px;
-  padding: clamp(20px, 4vw, 28px);
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 18px;
-  scroll-margin-top: 24px;
-  border: 1px solid color-mix(in srgb, var(--skin-tone) 58%, var(--skin-border));
-  border-radius: 20px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--skin-tone) 16%, transparent), transparent 64%),
-    var(--skin-card);
-  box-shadow: inset 3px 0 0 var(--skin-tone);
-}
-
-.skinServiceStatusNotice::after {
-  content: "";
-  position: absolute;
-  inset: -70% auto -70% -24%;
-  width: 14%;
-  transform: skewX(-18deg);
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--skin-tone) 18%, transparent), transparent);
-  pointer-events: none;
-  animation: skinStatusSweep calc(5.8s * var(--anim-speed, 1)) ease-in-out infinite;
-}
-
-.skinServiceStatusNotice > * {
-  position: relative;
-  z-index: 1;
-}
-
-.skinServiceStatusNoticeIcon {
-  width: 46px;
-  height: 46px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--skin-tone);
-  border-radius: 14px;
-  background: var(--skin-tone-soft);
-  color: var(--skin-tone);
-}
-
-.skinServiceStatusNoticeIcon svg {
-  width: 24px;
-  height: 24px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.7;
-}
-
-.skinServiceStatusNotice > div {
-  min-width: 0;
-  display: grid;
-  gap: 8px;
-}
-
-.skinServiceStatusNotice > div > span {
-  color: var(--skin-tone);
-  font-size: 0.74rem;
-  font-weight: 650;
-  letter-spacing: 0.1em;
-}
-
-.skinServiceStatusNotice strong {
-  font-size: clamp(1.15rem, 2.5vw, 1.5rem);
-  font-weight: 590;
-}
-
-.skinServiceStatusNotice p {
-  margin: 0;
-  color: var(--skin-muted);
-  line-height: 1.75;
-}
-
-.skinServiceStatusBadge {
-  min-height: 32px;
-  padding: 7px 12px;
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--skin-tone);
-  border-radius: 999px;
-  background: var(--skin-tone-soft);
-  color: var(--skin-tone);
-  font-size: 0.76rem;
-  font-weight: 650;
-  white-space: nowrap;
-}
-
 .skinReviewAccountCopy {
   min-width: 0;
   display: grid;
@@ -4608,6 +4517,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 }
 
 .skinReviewCurrentStatus.isReviewing::before,
+.skinReviewCurrentBatches a::before,
 .skinReviewBatch.isReviewing .skinReviewStatus::before {
   content: "";
   width: 7px;
@@ -4617,6 +4527,72 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   background: currentColor;
   box-shadow: 0 0 0 5px var(--skin-tone-soft);
   animation: skinStatusPulse calc(1.8s * var(--anim-speed, 1)) ease-in-out infinite;
+}
+
+.skinReviewCurrentBatches {
+  padding: 14px clamp(16px, 3vw, 28px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  border-bottom: 1px solid var(--skin-border);
+  background: color-mix(in srgb, var(--skin-tone) 5%, var(--skin-input));
+}
+
+.skinReviewCurrentBatches a {
+  min-width: 0;
+  min-height: 58px;
+  padding: 11px 13px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  align-items: center;
+  gap: 3px 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
+  border-radius: 13px;
+  background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
+  color: var(--skin-text);
+  opacity: 0;
+  animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+.skinReviewCurrentBatches a:nth-child(2) { animation-delay: calc(0.05s * var(--anim-speed, 1)); }
+.skinReviewCurrentBatches a:nth-child(3) { animation-delay: calc(0.1s * var(--anim-speed, 1)); }
+.skinReviewCurrentBatches a:nth-child(4) { animation-delay: calc(0.15s * var(--anim-speed, 1)); }
+
+.skinReviewCurrentBatches a::before {
+  content: "";
+  grid-row: 1 / 3;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--skin-tone);
+  box-shadow: 0 0 0 5px var(--skin-tone-soft);
+}
+
+.skinReviewCurrentBatches strong,
+.skinReviewCurrentBatches small {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skinReviewCurrentBatches strong {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.skinReviewCurrentBatches small {
+  color: var(--skin-tone);
+  font-size: 0.72rem;
+}
+
+.skinReviewCurrentBatches a:hover {
+  border-color: var(--skin-tone);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--skin-tone) 13%, transparent);
+  transform: translateY(-2px);
 }
 
 .skinReviewArchive > summary,
@@ -4816,8 +4792,8 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   animation: skinUpdateRail calc(4.8s * var(--anim-speed, 1)) ease-in-out infinite;
 }
 
-.skinServiceUpdateList article:nth-child(2) { animation-delay: 0.05s; }
-.skinServiceUpdateList article:nth-child(3) { animation-delay: 0.1s; }
+.skinServiceUpdateList article:nth-child(2) { animation-delay: calc(0.05s * var(--anim-speed, 1)); }
+.skinServiceUpdateList article:nth-child(3) { animation-delay: calc(0.1s * var(--anim-speed, 1)); }
 
 .skinServiceUpdateMeta {
   display: flex;
@@ -4940,10 +4916,9 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   to { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
 }
 
-@keyframes skinStatusSweep {
-  0%, 28% { left: -24%; opacity: 0; }
-  40% { opacity: 1; }
-  62%, 100% { left: 118%; opacity: 0; }
+@keyframes skinSectionOrbit {
+  0%, 100% { opacity: 0.72; transform: translate3d(0, 0, 0) scale(0.96); }
+  50% { opacity: 1; transform: translate3d(-14px, 12px, 0) scale(1.04); }
 }
 
 @keyframes skinUpdateRail {
@@ -5114,6 +5089,10 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   .skinFeedbackLayout {
     grid-template-columns: 1fr;
   }
+
+  .skinReviewCurrentBatches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 480px) {
@@ -5175,16 +5154,6 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
   .skinReviewAccount {
     grid-template-columns: 1fr;
-  }
-
-  .skinServiceStatusNotice {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 14px;
-  }
-
-  .skinServiceStatusBadge {
-    grid-column: 2;
-    width: fit-content;
   }
 
   .skinReviewQrButton {
