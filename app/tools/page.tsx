@@ -37,7 +37,14 @@ export default function ToolsPage() {
                 <span className="toolsGroupLabel">{tr(group.label)}</span>
                 <h2>{tr(group.title)}</h2>
               </div>
-              <span className="toolsGroupCount">{String(group.tools.length).padStart(2, "0")}</span>
+              <div className="toolsGroupMeta">
+                {group.moreHref && (
+                  <Link className="sectionTextLink" href={group.moreHref}>
+                    {tr("pluginsBrowseAll")} <span aria-hidden="true">→</span>
+                  </Link>
+                )}
+                <span className="toolsGroupCount">{String(group.tools.length).padStart(2, "0")}</span>
+              </div>
             </div>
 
             <div className={`toolsGrid${group.tools.length === 1 ? " toolsGridSingle" : ""}`}>

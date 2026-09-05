@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title description">
+  <title id="title">Hanazar’s Note</title>
+  <desc id="description">A private notebook and bookmark on a violet workspace.</desc>
+  <defs>
+    <linearGradient id="bg" x1="92" y1="36" x2="1194" y2="688" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#25234d"/>
+      <stop offset="0.5" stop-color="#4c48a9"/>
+      <stop offset="1" stop-color="#19172f"/>
+    </linearGradient>
+    <linearGradient id="cover" x1="402" y1="154" x2="878" y2="574" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7774f5"/>
+      <stop offset="1" stop-color="#4644bd"/>
+    </linearGradient>
+    <linearGradient id="bookmark" x1="772" y1="214" x2="772" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffc178"/>
+      <stop offset="1" stop-color="#f18b53"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="30" stdDeviation="32" flood-color="#100d2f" flood-opacity=".5"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="720" rx="44" fill="url(#bg)"/>
+  <circle cx="1086" cy="150" r="260" fill="#a4a2ff" opacity=".09"/>
+  <circle cx="150" cy="668" r="250" fill="#fb9f63" opacity=".08"/>
+  <path d="M90 518c130-78 234-96 348-70M866 148c118 12 206 52 304 136" fill="none" stroke="#cfceff" stroke-width="3" stroke-linecap="round" opacity=".16"/>
+  <g filter="url(#shadow)">
+    <rect x="344" y="112" width="592" height="496" rx="124" fill="url(#cover)" stroke="#d2d0ff" stroke-opacity=".24" stroke-width="3"/>
+    <rect x="456" y="202" width="368" height="330" rx="42" fill="#f8f8ff"/>
+    <path d="M513 202v330" stroke="#d9daf2" stroke-width="13"/>
+    <path d="M578 292h174M578 354h130M578 416h158" stroke="#716fe1" stroke-width="18" stroke-linecap="round"/>
+    <path d="M729 202h86v181l-43-31-43 31V202Z" fill="url(#bookmark)"/>
+    <rect x="584" y="466" width="116" height="16" rx="8" fill="#ffae67" opacity=".86"/>
+  </g>
+  <g fill="#ebeaff" opacity=".7">
+    <circle cx="232" cy="182" r="7"/>
+    <circle cx="1060" cy="472" r="9"/>
+    <circle cx="1004" cy="536" r="4"/>
+  </g>
+</svg>

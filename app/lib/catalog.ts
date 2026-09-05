@@ -14,6 +14,7 @@ export interface ToolGroup {
   title: string;
   label: string;
   tools: ToolEntry[];
+  moreHref?: string;
 }
 
 export const games: GameEntry[] = [
@@ -168,6 +169,33 @@ export const games: GameEntry[] = [
 
 export const homepageGames = games.slice(0, 4);
 
+export const browserPlugins: ToolEntry[] = [
+  {
+    title: "pluginTextReaderTitle",
+    description: "pluginTextReaderDesc",
+    tag: "pluginTagAccessibility",
+    cta: "pluginOpenStore",
+    href: "https://microsoftedge.microsoft.com/addons/search/TextReader",
+    image: "/plugins/text-reader.svg",
+  },
+  {
+    title: "pluginHanazarNoteTitle",
+    description: "pluginHanazarNoteDesc",
+    tag: "pluginTagNotes",
+    cta: "pluginOpenStore",
+    href: "https://microsoftedge.microsoft.com/addons/search/Hanazar%27s%20Note",
+    image: "/plugins/hanazar-note.svg",
+  },
+  {
+    title: "pluginWebFileHunterTitle",
+    description: "pluginWebFileHunterDesc",
+    tag: "pluginTagDiscovery",
+    cta: "pluginOpenStore",
+    href: "https://microsoftedge.microsoft.com/addons/search/WebFile%20Hunter",
+    image: "/plugins/webfile-hunter.svg",
+  },
+];
+
 export const toolGroups: ToolGroup[] = [
   {
     title: "toolsMacTitle",
@@ -220,6 +248,12 @@ export const toolGroups: ToolGroup[] = [
         image: "/tools/hanazar-transfer.jpg",
       },
     ],
+  },
+  {
+    title: "browserPluginsTitle",
+    label: "browserPluginsLabel",
+    tools: browserPlugins,
+    moreHref: "/plugins",
   },
   {
     title: "toolsIosTitle",

@@ -819,6 +819,18 @@ select:focus-visible {
   letter-spacing: 0.2em;
 }
 
+.toolsGroupMeta {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.toolsGroupMeta .sectionTextLink {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
 .toolsGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2872,6 +2884,33 @@ body[data-theme="light"] .shareLogRail span {
   font-size: clamp(1.45rem, 2.2vw, 2rem);
   font-weight: 500;
   letter-spacing: 0.01em;
+}
+
+.pluginsHero {
+  background:
+    radial-gradient(circle at 26% 18%, rgba(98, 137, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 76% 42%, rgba(101, 216, 230, 0.09), transparent 30%),
+    linear-gradient(180deg, #080d18 0%, #050505 100%);
+}
+
+.pluginCard {
+  border-color: rgba(142, 174, 255, 0.16);
+}
+
+.pluginCard:hover {
+  border-color: rgba(142, 174, 255, 0.32);
+}
+
+@media (max-width: 520px) {
+  .pluginsHero .gamesHeroTitle {
+    max-width: 9ch;
+    margin-inline: auto;
+    font-size: clamp(2.35rem, 11vw, 3rem);
+  }
+
+  .pluginsHero .gamesHeroSubtitle {
+    max-width: 30ch;
+  }
 }
 
 /* Skin Service Documentation */
@@ -5039,6 +5078,13 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   .toolsGroupHeading {
     min-height: 72px;
     padding-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .toolsGroupMeta {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
   }
 
   .gameCard {

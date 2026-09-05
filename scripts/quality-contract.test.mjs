@@ -148,8 +148,8 @@ test("subpage hero titles balance narrow-screen line breaks", async () => {
   assert.match(layout, /data-scroll-behavior="smooth"/);
 });
 
-test("catalog exposes featured games, AIGC projects, and the complete tool taxonomy", async () => {
-  const { aigcExperiments, games, homepageGames, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
+test("catalog exposes featured games, AIGC projects, tools, and browser plugins", async () => {
+  const { aigcExperiments, browserPlugins, games, homepageGames, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
   const claudeOpus5Project = {
     href: "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
     image: "/aigc/claude-opus5-starfall.jpg",
@@ -166,10 +166,19 @@ test("catalog exposes featured games, AIGC projects, and the complete tool taxon
   )));
   assert.equal(homepageGames.some((game) => game.href === "https://hanazar-games.github.io/Go/"), false);
 
-  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 3, 1, 1]);
+  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 3, 3, 1, 1]);
   assert.ok(homepageToolGroups.every((group) => group.tools.length <= 3));
   assert.ok(homepageToolGroups[1].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"));
-  assert.equal(toolGroups[3].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"), false);
+  assert.equal(toolGroups[2].title, "browserPluginsTitle");
+  assert.equal(toolGroups[2].moreHref, "/plugins");
+  assert.deepEqual(toolGroups[2].tools, browserPlugins);
+  assert.deepEqual(browserPlugins.map(({ title, image }) => ({ title, image })), [
+    { title: "pluginTextReaderTitle", image: "/plugins/text-reader.svg" },
+    { title: "pluginHanazarNoteTitle", image: "/plugins/hanazar-note.svg" },
+    { title: "pluginWebFileHunterTitle", image: "/plugins/webfile-hunter.svg" },
+  ]);
+  assert.ok(browserPlugins.every(({ href }) => href.startsWith("https://microsoftedge.microsoft.com/addons/search/")));
+  assert.equal(toolGroups[4].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"), false);
   const tools = toolGroups.flatMap((group) => group.tools);
   assert.equal(tools.some(({ href }) => href.includes("Mirako-Official")), false);
   for (const expected of [
@@ -206,7 +215,35 @@ test("homepage tools cap each group at three cards and link to the archive", asy
 
   assert.match(home, /homepageToolGroups\.map/);
   assert.match(home, /href="tools\/"/);
+  assert.match(home, /group\.moreHref/);
+  assert.match(home, /pluginsBrowseAll/);
   assert.match(css, /\.toolsGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
+});
+
+test("browser plugins have a dedicated GamesHub-style archive", async () => {
+  const [page, home, tools, copy, css, verifier] = await Promise.all([
+    read("app/plugins/page.tsx"),
+    read("app/page.tsx"),
+    read("app/tools/page.tsx"),
+    read("app/lib/i18n.ts"),
+    read("app/globals.css"),
+    read("scripts/verify-static-export.mjs"),
+  ]);
+
+  assert.match(page, /browserPlugins\.map/);
+  assert.match(page, /className="pageShell gamesShell pluginsShell"/);
+  assert.match(page, /className="gamesGrid pluginsGrid"/);
+  assert.match(page, /rel="noopener noreferrer"/);
+  assert.match(home, /href=\{group\.moreHref\}/);
+  assert.match(tools, /href=\{group\.moreHref\}/);
+  assert.match(copy, /TextReader/);
+  assert.match(copy, /Hanazar’s Note/);
+  assert.match(copy, /WebFile Hunter/);
+  assert.match(css, /@media \(max-width: 520px\)[\s\S]*?\.pluginsHero \.gamesHeroTitle \{[\s\S]*?max-width: 9ch;/);
+  assert.match(verifier, /plugins\/index\.html/);
+  for (const image of ["text-reader.svg", "hanazar-note.svg", "webfile-hunter.svg"]) {
+    assert.match(verifier, new RegExp(`plugins/${image.replace(".", "\\.")}`));
+  }
 });
 
 test("homepage text and footer links keep a usable pointer target", async () => {
@@ -522,7 +559,7 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes completed batches through 210 and reviewing batches through 214", async () => {
+test("review tracker exposes completed batches through 213 and reviewing batches through 218", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
@@ -532,20 +569,24 @@ test("review tracker exposes completed batches through 210 and reviewing batches
     batch.number === number && batch.variant === variant
   ));
 
-  assert.equal(reviewBatches.length, 216);
-  assert.deepEqual(reviewBatches.slice(0, 8).map(({ number, status }) => [number, status]), [
+  assert.equal(reviewBatches.length, 220);
+  assert.deepEqual(reviewBatches.slice(0, 12).map(({ number, status }) => [number, status]), [
+    [218, "reviewing"],
+    [217, "reviewing"],
+    [216, "reviewing"],
+    [215, "reviewing"],
     [214, "reviewing"],
-    [213, "reviewing"],
-    [212, "reviewing"],
-    [211, "reviewing"],
+    [213, "completed"],
+    [212, "completed"],
+    [211, "completed"],
     [210, "completed"],
     [209, "completed"],
     [208, "completed"],
     [207, "completed"],
   ]);
-  assert.equal(completed.length, 212);
-  assert.equal(reviewing.length, 4);
-  assert.equal(completedWithPendingCounts.length, 4);
+  assert.equal(completed.length, 215);
+  assert.equal(reviewing.length, 5);
+  assert.equal(completedWithPendingCounts.length, 7);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
   assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_376);
   assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
@@ -584,7 +625,13 @@ test("review tracker exposes completed batches through 210 and reviewing batches
   assert.equal(findBatch(209)?.componentCount, null);
   assert.equal(findBatch(210)?.status, "completed");
   assert.equal(findBatch(210)?.componentCount, null);
-  for (const number of [211, 212, 213, 214]) {
+  for (const number of [211, 212, 213]) {
+    assert.equal(findBatch(number)?.status, "completed");
+    assert.equal(findBatch(number)?.componentCount, null);
+    assert.equal(findBatch(number)?.cumulativeComponentCount, 10_376);
+    assert.equal(findBatch(number)?.cumulativeComponentCountPending, true);
+  }
+  for (const number of [214, 215, 216, 217, 218]) {
     assert.equal(findBatch(number)?.status, "reviewing");
     assert.equal(findBatch(number)?.componentCount, null);
     assert.equal(findBatch(number)?.cumulativeComponentCount, 10_376);
@@ -608,6 +655,8 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   assert.match(center, /reviewArchiveTitle[\s\S]*?batches: reviewBatches\.length/);
   assert.match(center, /REVIEWING_REVIEW_BATCHES\.map/);
   assert.match(center, /className="skinReviewCurrentBatches"/);
+  assert.match(verifier, /展开查看全部 220 个批次/);
+  assert.match(verifier, /第 218 批次/);
   assert.match(center, /batch\.cumulativeComponentCountPending/);
   assert.match(center, /reviewBatchCompletedPendingDetail/);
   assert.match(center, /skinReviewArchive/);

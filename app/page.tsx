@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useTranslation } from "./hooks/useTranslation";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
 import { aigcExperiments, homepageGames, homepageToolGroups } from "./lib/catalog";
@@ -316,7 +317,14 @@ export default function HomePage() {
                   <span className="toolsGroupLabel">{tr(group.label)}</span>
                   <h3>{tr(group.title)}</h3>
                 </div>
-                <span className="toolsGroupCount">{String(group.tools.length).padStart(2, "0")}</span>
+                <div className="toolsGroupMeta">
+                  {group.moreHref && (
+                    <Link className="sectionTextLink" href={group.moreHref}>
+                      {tr("pluginsBrowseAll")} <span aria-hidden="true">→</span>
+                    </Link>
+                  )}
+                  <span className="toolsGroupCount">{String(group.tools.length).padStart(2, "0")}</span>
+                </div>
               </div>
 
               <div className={`toolsGrid${

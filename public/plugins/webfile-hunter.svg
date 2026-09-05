@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title description">
+  <title id="title">WebFile Hunter</title>
+  <desc id="description">A document under a search lens with connected web resources.</desc>
+  <defs>
+    <linearGradient id="bg" x1="86" y1="50" x2="1190" y2="670" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#05212d"/>
+      <stop offset="0.52" stop-color="#08708a"/>
+      <stop offset="1" stop-color="#041820"/>
+    </linearGradient>
+    <linearGradient id="tile" x1="398" y1="150" x2="870" y2="576" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#159fc1"/>
+      <stop offset="1" stop-color="#076077"/>
+    </linearGradient>
+    <linearGradient id="lens" x1="720" y1="326" x2="936" y2="534" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffd979"/>
+      <stop offset="1" stop-color="#f49b41"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="30" stdDeviation="32" flood-color="#001015" flood-opacity=".56"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="720" rx="44" fill="url(#bg)"/>
+  <circle cx="1120" cy="112" r="250" fill="#53dcff" opacity=".09"/>
+  <circle cx="110" cy="634" r="228" fill="#63ffc7" opacity=".07"/>
+  <g fill="none" stroke="#a4edff" stroke-width="3" opacity=".22">
+    <path d="M154 272h166l68 82M960 246h148M928 480h190l54-72"/>
+    <circle cx="148" cy="272" r="12"/>
+    <circle cx="1114" cy="246" r="12"/>
+    <circle cx="1175" cy="402" r="12"/>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="336" y="106" width="608" height="506" rx="120" fill="url(#tile)" stroke="#b6f2ff" stroke-opacity=".22" stroke-width="3"/>
+    <path d="M472 200h248l100 100v224H472V200Z" fill="#f3fbff"/>
+    <path d="M720 200v100h100" fill="#cbeef7"/>
+    <path d="M530 330h188M530 388h156M530 446h104" stroke="#2c8ca5" stroke-width="18" stroke-linecap="round"/>
+    <circle cx="804" cy="430" r="100" fill="#0b647a" stroke="url(#lens)" stroke-width="25"/>
+    <circle cx="804" cy="430" r="62" fill="#8bedff" opacity=".27"/>
+    <path d="m874 500 78 78" stroke="url(#lens)" stroke-width="32" stroke-linecap="round"/>
+  </g>
+  <g fill="#b9f5ff" opacity=".72">
+    <circle cx="240" cy="500" r="7"/>
+    <circle cx="1046" cy="562" r="6"/>
+    <circle cx="1086" cy="526" r="4"/>
+  </g>
+</svg>
