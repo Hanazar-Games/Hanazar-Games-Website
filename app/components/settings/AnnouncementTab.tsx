@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.5",
+    date: "2026-09-07",
+    title: "Review Batch Counts and Resource Audit",
+    items: [
+      "Recorded exact component counts for Batches 207 through 214: 29, 50, 58, 60, 47, 5, 2, and 2.",
+      "Raised the known cumulative total to 10,629 components; Batch 215 remains published with its count pending, so the tracker displays 10,629+.",
+      "Kept Batches 216 through 221 under review and preserved all 223 batch records.",
+      "Audited all 33 catalog images and logos plus the homepage backdrop and official-account QR code, and added full catalog-asset coverage to GitHub Pages export verification.",
+    ],
+  },
+  {
     version: "2.18.4",
     date: "2026-09-07",
     title: "Review Batches 214–221 and Tracker Polish",

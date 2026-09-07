@@ -22,7 +22,13 @@ const chatServiceUrl = httpsUrl(configuredChatService);
 if (configuredChatService && !chatServiceUrl) {
   throw new Error("NEXT_PUBLIC_CHAT_SERVICE_URL must be an absolute HTTPS URL without credentials, query, or fragment");
 }
-const requiredFiles = [
+const catalogSource = readFileSync("app/lib/catalog.ts", "utf8");
+const catalogAssets = [...new Set(
+  [...catalogSource.matchAll(/\bimage:\s*"\/([^"]+)"/g)].map((match) => match[1]),
+)];
+if (catalogAssets.length !== 33) throw new Error(`Expected 33 catalog assets, found ${catalogAssets.length}`);
+
+const requiredFiles = [...new Set([
   "index.html",
   "404.html",
   "IntroPic.webp",
@@ -39,21 +45,9 @@ const requiredFiles = [
   "skin-service/support/index.html",
   "tools/index.html",
   "plugins/index.html",
-  "games/guandan.jpg",
-  "games/liars-bar.jpg",
-  "games/coreball.jpg",
-  "games/go.jpg",
-  "products/lc300a.jpg",
-  "tools/hept.jpg",
-  "tools/listener.jpg",
-  "tools/hanazar-transfer.jpg",
-  "plugins/text-reader.svg",
-  "plugins/hanazar-note.svg",
-  "plugins/webfile-hunter.svg",
-  "aigc/gpt-56-sol-ultra.jpg",
-  "aigc/claude-opus5-starfall.jpg",
   "skin-service/review-account-qr.svg",
-];
+  ...catalogAssets,
+])];
 const forbiddenFiles = [
   "IntroPic.jpg",
   "HanazarIntroAnimation.mp4",
@@ -216,7 +210,14 @@ const requiredContent = {
     "90 个",
     "81 个",
     "37 个",
-    "10,376+ 个",
+    "29 个",
+    "50 个",
+    "58 个",
+    "60 个",
+    "47 个",
+    "5 个",
+    "2 个",
+    "10,629+ 个",
     "已出",
     "审核中",
     "待确认",
@@ -225,6 +226,12 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.18.5",
+    "审核批次 207–214 数量补全与资源核验",
+    "第 207 至 214 批次组件数量：29、50、58、60、47、5、2、2",
+    "已知累计更新为 10,629 个",
+    "第 215 批次已出但数量待确认",
+    "第 216 至 221 批次继续审核中",
     "2.18.4",
     "审核批次 214–221 与表格体验修正",
     "第 214、215 批次已出",

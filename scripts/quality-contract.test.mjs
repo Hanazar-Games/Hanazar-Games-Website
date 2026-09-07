@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
@@ -190,6 +190,27 @@ test("catalog exposes featured games, AIGC projects, tools, and browser plugins"
   }
 });
 
+test("every catalog image and direct page asset exists in the public tree", async () => {
+  const { aigcExperiments, browserPlugins, games, toolGroups } = await import("../app/lib/catalog.ts");
+  const entries = [
+    ...games,
+    ...aigcExperiments,
+    ...browserPlugins,
+    ...toolGroups.flatMap((group) => group.tools),
+  ];
+  const catalogImages = [...new Set(entries.map(({ image }) => image))];
+  const assets = [...catalogImages, "/IntroPic.webp", "/skin-service/review-account-qr.svg"];
+
+  assert.equal(catalogImages.length, 33);
+  assert.equal(assets.length, 35);
+  for (const asset of assets) {
+    assert.match(asset, /^\/[a-zA-Z0-9][a-zA-Z0-9/._-]+$/);
+    const info = await stat(new URL(`public${asset}`, root));
+    assert.ok(info.isFile(), `${asset} must be a file`);
+    assert.ok(info.size > 0, `${asset} must not be empty`);
+  }
+});
+
 test("four-card homepage and AIGC collections use balanced responsive grids", async () => {
   const [home, aigc, css] = await Promise.all([
     read("app/page.tsx"),
@@ -241,9 +262,9 @@ test("browser plugins have a dedicated GamesHub-style archive", async () => {
   assert.match(copy, /WebFile Hunter/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*?\.pluginsHero \.gamesHeroTitle \{[\s\S]*?max-width: 9ch;/);
   assert.match(verifier, /plugins\/index\.html/);
-  for (const image of ["text-reader.svg", "hanazar-note.svg", "webfile-hunter.svg"]) {
-    assert.match(verifier, new RegExp(`plugins/${image.replace(".", "\\.")}`));
-  }
+  assert.match(verifier, /const catalogAssets =/);
+  assert.match(verifier, /catalogAssets\.length !== 33/);
+  assert.match(verifier, /\.\.\.catalogAssets/);
 });
 
 test("browser plugin artwork uses transparent logo marks and dedicated card stages", async () => {
@@ -354,13 +375,13 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.4");
-  assert.equal(lockData.version, "2.18.4");
-  assert.equal(lockData.packages[""].version, "2.18.4");
-  assert.match(center, /version: "2\.18\.4", date: "2026-09-07"/);
-  assert.match(copy, /第 214、215 批次已出/);
-  assert.match(announcement, /version: "2\.18\.4"/);
-  assert.match(verifier, /2\.18\.4/);
+  assert.equal(packageData.version, "2.18.5");
+  assert.equal(lockData.version, "2.18.5");
+  assert.equal(lockData.packages[""].version, "2.18.5");
+  assert.match(center, /version: "2\.18\.5", date: "2026-09-07"/);
+  assert.match(copy, /第 207 至 214 批次组件数量：29、50、58、60、47、5、2、2/);
+  assert.match(announcement, /version: "2\.18\.5"/);
+  assert.match(verifier, /2\.18\.5/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
@@ -610,9 +631,9 @@ test("review tracker exposes completed batches through 215 and reviewing batches
   ]);
   assert.equal(completed.length, 217);
   assert.equal(reviewing.length, 6);
-  assert.equal(completedWithPendingCounts.length, 9);
+  assert.equal(completedWithPendingCounts.length, 1);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
-  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_376);
+  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_629);
   assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 201)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 202)?.componentCount, 71);
@@ -638,27 +659,29 @@ test("review tracker exposes completed batches through 215 and reviewing batches
   assert.equal(findBatch(206)?.status, "completed");
   assert.equal(findBatch(206)?.componentCount, 37);
   assert.equal(findBatch(206)?.cumulativeComponentCount, 10_376);
-  assert.equal(findBatch(207)?.status, "completed");
-  assert.equal(findBatch(207)?.componentCount, null);
-  assert.equal(findBatch(207)?.cumulativeComponentCount, 10_376);
-  assert.equal(findBatch(207)?.cumulativeComponentCountPending, true);
-  assert.equal(findBatch(208)?.status, "completed");
-  assert.equal(findBatch(208)?.componentCount, null);
-  assert.equal(findBatch(208)?.cumulativeComponentCount, 10_376);
-  assert.equal(findBatch(209)?.status, "completed");
-  assert.equal(findBatch(209)?.componentCount, null);
-  assert.equal(findBatch(210)?.status, "completed");
-  assert.equal(findBatch(210)?.componentCount, null);
-  for (const number of [211, 212, 213, 214, 215]) {
+  for (const [number, componentCount, cumulativeComponentCount] of [
+    [207, 29, 10_405],
+    [208, 50, 10_455],
+    [209, 58, 10_513],
+    [210, 60, 10_573],
+    [211, 47, 10_620],
+    [212, 5, 10_625],
+    [213, 2, 10_627],
+    [214, 2, 10_629],
+  ]) {
     assert.equal(findBatch(number)?.status, "completed");
-    assert.equal(findBatch(number)?.componentCount, null);
-    assert.equal(findBatch(number)?.cumulativeComponentCount, 10_376);
-    assert.equal(findBatch(number)?.cumulativeComponentCountPending, true);
+    assert.equal(findBatch(number)?.componentCount, componentCount);
+    assert.equal(findBatch(number)?.cumulativeComponentCount, cumulativeComponentCount);
+    assert.equal(findBatch(number)?.cumulativeComponentCountPending, false);
   }
+  assert.equal(findBatch(215)?.status, "completed");
+  assert.equal(findBatch(215)?.componentCount, null);
+  assert.equal(findBatch(215)?.cumulativeComponentCount, 10_629);
+  assert.equal(findBatch(215)?.cumulativeComponentCountPending, true);
   for (const number of [216, 217, 218, 219, 220, 221]) {
     assert.equal(findBatch(number)?.status, "reviewing");
     assert.equal(findBatch(number)?.componentCount, null);
-    assert.equal(findBatch(number)?.cumulativeComponentCount, 10_376);
+    assert.equal(findBatch(number)?.cumulativeComponentCount, 10_629);
     assert.equal(findBatch(number)?.cumulativeComponentCountPending, true);
   }
   assert.equal(findBatch(206)?.cumulativeComponentCountPending, false);
