@@ -408,6 +408,9 @@ body[data-disable-btn-hover="true"] .heroNavButton:hover,
 body[data-disable-btn-hover="true"] .settingsFloatingButton:hover,
 body[data-disable-btn-hover="true"] .moduleButton:hover,
 body[data-disable-btn-hover="true"] .gameCardButton:hover,
+body[data-disable-btn-hover="true"] .gameCard:hover,
+body[data-disable-btn-hover="true"] .pluginCard:hover .gameCardImage,
+body[data-disable-btn-hover="true"] .pluginCard:hover .gameCardImageWrap::after,
 body[data-disable-btn-hover="true"] .settingsBtn:hover,
 body[data-disable-btn-hover="true"] .settingsTabBtn:hover,
 body[data-disable-btn-hover="true"] .seg-btn:hover,
@@ -2894,11 +2897,119 @@ body[data-theme="light"] .shareLogRail span {
 }
 
 .pluginCard {
-  border-color: rgba(142, 174, 255, 0.16);
+  --plugin-rgb: 104, 169, 255;
+  border-color: rgba(var(--plugin-rgb), 0.22);
+  background:
+    linear-gradient(180deg, rgba(var(--plugin-rgb), 0.06), transparent 42%),
+    rgba(12, 15, 22, 0.98);
 }
 
-.pluginCard:hover {
-  border-color: rgba(142, 174, 255, 0.32);
+.pluginCard:nth-child(3n + 2) {
+  --plugin-rgb: 157, 132, 255;
+}
+
+.pluginCard:nth-child(3n) {
+  --plugin-rgb: 54, 211, 196;
+}
+
+.pluginCard .gameCardImageWrap {
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(var(--plugin-rgb), 0.2), transparent 38%),
+    linear-gradient(145deg, rgba(var(--plugin-rgb), 0.12), rgba(6, 10, 18, 0.96) 64%);
+}
+
+.pluginCard .gameCardImageWrap::before,
+.pluginCard .gameCardImageWrap::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.pluginCard .gameCardImageWrap::before {
+  z-index: 0;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(var(--plugin-rgb), 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--plugin-rgb), 0.08) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.92), transparent 92%);
+  opacity: 0.7;
+}
+
+.pluginCard .gameCardImageWrap::after {
+  z-index: 1;
+  width: 42%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(var(--plugin-rgb), 0.32);
+  border-radius: 50%;
+  background: rgba(var(--plugin-rgb), 0.1);
+  box-shadow:
+    0 0 0 24px rgba(var(--plugin-rgb), 0.035),
+    0 0 64px rgba(var(--plugin-rgb), 0.2);
+  transition: transform calc(0.5s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pluginCard .gameCardImage {
+  position: relative;
+  z-index: 2;
+  width: clamp(116px, 44%, 172px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.32));
+  transform: scale(0.96);
+  transition:
+    filter calc(0.42s * var(--anim-speed, 1)) ease,
+    transform calc(0.5s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pluginCard .gameCardTag {
+  border-color: rgba(var(--plugin-rgb), 0.28);
+  background: rgba(var(--plugin-rgb), 0.08);
+  color: rgba(var(--plugin-rgb), 0.94);
+}
+
+.pluginCard:hover,
+.pluginCard:focus-within {
+  border-color: rgba(var(--plugin-rgb), 0.48);
+}
+
+.pluginCard:hover .gameCardImage {
+  filter: drop-shadow(0 20px 28px rgba(var(--plugin-rgb), 0.22));
+  transform: translateY(-4px) scale(1.045);
+}
+
+.pluginCard:hover .gameCardImageWrap::after {
+  transform: scale(1.12);
+}
+
+.pluginCard .gameCardButton:hover {
+  border-color: rgba(var(--plugin-rgb), 0.46);
+  background: rgba(var(--plugin-rgb), 0.1);
+}
+
+body[data-theme="light"] .pluginCard {
+  border-color: rgba(var(--plugin-rgb), 0.24);
+  background:
+    linear-gradient(180deg, rgba(var(--plugin-rgb), 0.08), transparent 42%),
+    rgba(255, 255, 255, 0.98);
+}
+
+body[data-theme="light"] .pluginCard .gameCardImageWrap {
+  background:
+    radial-gradient(circle at 50% 52%, rgba(var(--plugin-rgb), 0.2), transparent 40%),
+    linear-gradient(145deg, rgba(var(--plugin-rgb), 0.14), rgba(244, 248, 255, 0.98) 68%);
+}
+
+body[data-theme="light"] .pluginCard .gameCardImageWrap::before {
+  opacity: 0.5;
+}
+
+body[data-disable-decorations="true"] .pluginCard .gameCardImageWrap::before {
+  display: none;
 }
 
 @media (max-width: 520px) {
@@ -4571,7 +4682,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinReviewCurrentBatches {
   padding: 14px clamp(16px, 3vw, 28px);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   border-bottom: 1px solid var(--skin-border);
   background: color-mix(in srgb, var(--skin-tone) 5%, var(--skin-input));
@@ -4599,6 +4710,8 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinReviewCurrentBatches a:nth-child(2) { animation-delay: calc(0.05s * var(--anim-speed, 1)); }
 .skinReviewCurrentBatches a:nth-child(3) { animation-delay: calc(0.1s * var(--anim-speed, 1)); }
 .skinReviewCurrentBatches a:nth-child(4) { animation-delay: calc(0.15s * var(--anim-speed, 1)); }
+.skinReviewCurrentBatches a:nth-child(5) { animation-delay: calc(0.2s * var(--anim-speed, 1)); }
+.skinReviewCurrentBatches a:nth-child(6) { animation-delay: calc(0.25s * var(--anim-speed, 1)); }
 
 .skinReviewCurrentBatches a::before {
   content: "";
@@ -4712,6 +4825,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 }
 
 .skinReviewBatch {
+  scroll-margin-block: 10px;
   border: 1px solid transparent;
   border-radius: 12px;
   background: var(--skin-card);
@@ -4725,6 +4839,13 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinReviewBatch:hover,
 .skinReviewBatch[open] {
   border-color: color-mix(in srgb, var(--skin-tone) 42%, var(--skin-border));
+}
+
+.skinReviewBatch:target {
+  border-color: var(--skin-tone);
+  box-shadow:
+    inset 3px 0 var(--skin-tone),
+    0 0 0 3px var(--skin-tone-soft);
 }
 
 .skinReviewBatch.isReviewing {

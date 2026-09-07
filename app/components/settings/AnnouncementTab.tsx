@@ -4,6 +4,18 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.4",
+    date: "2026-09-07",
+    title: "Review Batches 214–221 and Tracker Polish",
+    items: [
+      "Marked Batches 214 and 215 as published with counts pending, and added Batches 219 through 221 under review alongside Batches 216 through 218.",
+      "Updated the archive to 223 records while preserving the honest known cumulative total of 10,376+ until missing batch counts are supplied.",
+      "Refined the six-item current-batch grid, highlighted linked records, and fixed hydration mismatches when browsers auto-expand directly linked batches.",
+      "Replaced the three browser-plugin covers with transparent vector logos and unified their card presentation across Home, Tools, and Browser Plugins.",
+      "Revalidated responsive layouts, accessibility settings, low-volume SFX, opt-in BGM, TypeScript, tests, and the GitHub Pages static export.",
+    ],
+  },
+  {
     version: "2.18.3",
     date: "2026-09-02",
     title: "Review Batches 207–214 and Skin-service UI Refinement",

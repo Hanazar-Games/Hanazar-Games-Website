@@ -1,41 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
   <title id="title">TextReader</title>
-  <desc id="description">An open book with flowing audio waves on a blue background.</desc>
+  <desc id="description">An open book with a speaker and flowing audio waves.</desc>
   <defs>
-    <linearGradient id="bg" x1="86" y1="40" x2="1178" y2="688" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#17233b"/>
-      <stop offset="0.52" stop-color="#223b63"/>
-      <stop offset="1" stop-color="#101827"/>
+    <linearGradient id="book" x1="72" y1="129" x2="367" y2="403" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9ce9ff"/>
+      <stop offset="1" stop-color="#6e8cff"/>
     </linearGradient>
-    <linearGradient id="panel" x1="400" y1="180" x2="872" y2="568" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#30486d"/>
-      <stop offset="1" stop-color="#18243a"/>
+    <linearGradient id="page" x1="112" y1="167" x2="331" y2="383" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dfeaff"/>
     </linearGradient>
-    <linearGradient id="wave" x1="772" y1="270" x2="1000" y2="456" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#8ee5ff"/>
-      <stop offset="1" stop-color="#7aa2ff"/>
-    </linearGradient>
-    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="28" stdDeviation="30" flood-color="#050b17" flood-opacity=".52"/>
+    <filter id="shadow" x="-20%" y="-20%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#17366f" flood-opacity=".3"/>
     </filter>
   </defs>
-  <rect width="1280" height="720" rx="44" fill="url(#bg)"/>
-  <circle cx="1080" cy="78" r="230" fill="#6ea8ff" opacity=".09"/>
-  <circle cx="132" cy="650" r="250" fill="#76e6ff" opacity=".07"/>
-  <path d="M100 134h310M916 588h264" stroke="#a9c8ff" stroke-width="2" stroke-linecap="round" opacity=".18"/>
   <g filter="url(#shadow)">
-    <rect x="330" y="116" width="620" height="488" rx="116" fill="url(#panel)" stroke="#aac8ff" stroke-opacity=".18" stroke-width="3"/>
-    <path d="M465 242c72-22 136-3 175 34v236c-43-35-104-48-175-25V242Z" fill="#f4f7ff"/>
-    <path d="M815 242c-72-22-136-3-175 34v236c43-35 104-48 175-25V242Z" fill="#dce7ff"/>
-    <path d="M640 276v236" stroke="#879dc4" stroke-width="5"/>
-    <path d="M500 300h90M500 348h102M500 396h76M690 300h70M690 348h88M690 396h61" stroke="#7387ab" stroke-width="13" stroke-linecap="round" opacity=".72"/>
-    <path d="M831 309v116" stroke="#f4f7ff" stroke-width="17" stroke-linecap="round"/>
-    <path d="m846 344 49-38v122l-49-38" fill="#f4f7ff"/>
-    <path d="M923 330c24 24 24 72 0 96M957 302c42 42 42 110 0 152" fill="none" stroke="url(#wave)" stroke-width="14" stroke-linecap="round"/>
-  </g>
-  <g fill="#c5dcff" opacity=".72">
-    <circle cx="215" cy="264" r="8"/>
-    <circle cx="1084" cy="480" r="7"/>
-    <circle cx="1038" cy="526" r="4"/>
+    <path d="M61 151c0-19 17-33 36-29 63 11 111 37 145 76v226c-34-33-83-54-151-61-17-2-30-16-30-33V151Z" fill="url(#book)"/>
+    <path d="M242 198c34-39 82-65 145-76 19-4 36 10 36 29v179c0 17-13 31-30 33-68 7-117 28-151 61V198Z" fill="url(#book)"/>
+    <path d="M91 166c58 10 100 34 130 69v148c-31-25-73-41-130-48V166Z" fill="url(#page)"/>
+    <path d="M393 166c-58 10-100 34-130 69v148c31-25 73-41 130-48V166Z" fill="url(#page)"/>
+    <path d="M242 211v213" fill="none" stroke="#5477c7" stroke-width="10" stroke-linecap="round"/>
+    <path d="M120 235h62M120 274h76M120 313h50" fill="none" stroke="#7795d0" stroke-width="12" stroke-linecap="round" opacity=".75"/>
+    <path d="M290 251h36l42-32v108l-42-32h-36v-44Z" fill="#315fbf"/>
+    <path d="M389 243c18 17 18 43 0 60M416 219c32 30 32 78 0 108" fill="none" stroke="#4ccdf0" stroke-width="13" stroke-linecap="round"/>
   </g>
 </svg>

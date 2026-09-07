@@ -41,8 +41,8 @@ export default function PluginsPage() {
                 src={assetPath(plugin.image)}
                 alt={tr(plugin.title)}
                 className="gameCardImage"
-                width={1280}
-                height={720}
+                width={512}
+                height={512}
                 loading="eager"
                 sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
               />

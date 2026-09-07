@@ -64,11 +64,14 @@ const ascendingBatches: ReviewBatchInput[] = [
   { number: 211, status: "completed", componentCount: null },
   { number: 212, status: "completed", componentCount: null },
   { number: 213, status: "completed", componentCount: null },
-  { number: 214, status: "reviewing", componentCount: null },
-  { number: 215, status: "reviewing", componentCount: null },
+  { number: 214, status: "completed", componentCount: null },
+  { number: 215, status: "completed", componentCount: null },
   { number: 216, status: "reviewing", componentCount: null },
   { number: 217, status: "reviewing", componentCount: null },
   { number: 218, status: "reviewing", componentCount: null },
+  { number: 219, status: "reviewing", componentCount: null },
+  { number: 220, status: "reviewing", componentCount: null },
+  { number: 221, status: "reviewing", componentCount: null },
 ];
 
 let cumulativeComponentCount = 0;

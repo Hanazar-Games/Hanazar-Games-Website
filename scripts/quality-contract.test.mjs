@@ -246,6 +246,27 @@ test("browser plugins have a dedicated GamesHub-style archive", async () => {
   }
 });
 
+test("browser plugin artwork uses transparent logo marks and dedicated card stages", async () => {
+  const [home, tools, css, ...logos] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/tools/page.tsx"),
+    read("app/globals.css"),
+    ...["text-reader.svg", "hanazar-note.svg", "webfile-hunter.svg"].map((image) => (
+      read(`public/plugins/${image}`)
+    )),
+  ]);
+
+  for (const logo of logos) {
+    assert.match(logo, /viewBox="0 0 512 512"/);
+    assert.doesNotMatch(logo, /<rect[^>]+width="1280"[^>]+height="720"/);
+  }
+  assert.match(home, /group\.title === "browserPluginsTitle" \? " pluginCard" : ""/);
+  assert.match(tools, /group\.title === "browserPluginsTitle" \? " pluginCard" : ""/);
+  assert.match(css, /\.pluginCard \.gameCardImageWrap \{[\s\S]*?place-items: center;/);
+  assert.match(css, /\.pluginCard \.gameCardImage \{[\s\S]*?object-fit: contain;/);
+  assert.match(css, /body\[data-disable-btn-hover="true"\] \.pluginCard:hover \.gameCardImage/);
+});
+
 test("homepage text and footer links keep a usable pointer target", async () => {
   const css = await read("app/globals.css");
 
@@ -333,13 +354,13 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.3");
-  assert.equal(lockData.version, "2.18.3");
-  assert.equal(lockData.packages[""].version, "2.18.3");
-  assert.match(center, /version: "2\.18\.3", date: "2026-09-02"/);
-  assert.match(copy, /第 207 至 210 批次已通过/);
-  assert.match(announcement, /version: "2\.18\.3"/);
-  assert.match(verifier, /2\.18\.3/);
+  assert.equal(packageData.version, "2.18.4");
+  assert.equal(lockData.version, "2.18.4");
+  assert.equal(lockData.packages[""].version, "2.18.4");
+  assert.match(center, /version: "2\.18\.4", date: "2026-09-07"/);
+  assert.match(copy, /第 214、215 批次已出/);
+  assert.match(announcement, /version: "2\.18\.4"/);
+  assert.match(verifier, /2\.18\.4/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
@@ -559,7 +580,7 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes completed batches through 213 and reviewing batches through 218", async () => {
+test("review tracker exposes completed batches through 215 and reviewing batches through 221", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
@@ -569,13 +590,16 @@ test("review tracker exposes completed batches through 213 and reviewing batches
     batch.number === number && batch.variant === variant
   ));
 
-  assert.equal(reviewBatches.length, 220);
-  assert.deepEqual(reviewBatches.slice(0, 12).map(({ number, status }) => [number, status]), [
+  assert.equal(reviewBatches.length, 223);
+  assert.deepEqual(reviewBatches.slice(0, 15).map(({ number, status }) => [number, status]), [
+    [221, "reviewing"],
+    [220, "reviewing"],
+    [219, "reviewing"],
     [218, "reviewing"],
     [217, "reviewing"],
     [216, "reviewing"],
-    [215, "reviewing"],
-    [214, "reviewing"],
+    [215, "completed"],
+    [214, "completed"],
     [213, "completed"],
     [212, "completed"],
     [211, "completed"],
@@ -584,9 +608,9 @@ test("review tracker exposes completed batches through 213 and reviewing batches
     [208, "completed"],
     [207, "completed"],
   ]);
-  assert.equal(completed.length, 215);
-  assert.equal(reviewing.length, 5);
-  assert.equal(completedWithPendingCounts.length, 7);
+  assert.equal(completed.length, 217);
+  assert.equal(reviewing.length, 6);
+  assert.equal(completedWithPendingCounts.length, 9);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
   assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_376);
   assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
@@ -625,13 +649,13 @@ test("review tracker exposes completed batches through 213 and reviewing batches
   assert.equal(findBatch(209)?.componentCount, null);
   assert.equal(findBatch(210)?.status, "completed");
   assert.equal(findBatch(210)?.componentCount, null);
-  for (const number of [211, 212, 213]) {
+  for (const number of [211, 212, 213, 214, 215]) {
     assert.equal(findBatch(number)?.status, "completed");
     assert.equal(findBatch(number)?.componentCount, null);
     assert.equal(findBatch(number)?.cumulativeComponentCount, 10_376);
     assert.equal(findBatch(number)?.cumulativeComponentCountPending, true);
   }
-  for (const number of [214, 215, 216, 217, 218]) {
+  for (const number of [216, 217, 218, 219, 220, 221]) {
     assert.equal(findBatch(number)?.status, "reviewing");
     assert.equal(findBatch(number)?.componentCount, null);
     assert.equal(findBatch(number)?.cumulativeComponentCount, 10_376);
@@ -655,12 +679,12 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   assert.match(center, /reviewArchiveTitle[\s\S]*?batches: reviewBatches\.length/);
   assert.match(center, /REVIEWING_REVIEW_BATCHES\.map/);
   assert.match(center, /className="skinReviewCurrentBatches"/);
-  assert.match(verifier, /展开查看全部 220 个批次/);
-  assert.match(verifier, /第 218 批次/);
+  assert.match(verifier, /展开查看全部 223 个批次/);
+  assert.match(verifier, /第 221 批次/);
   assert.match(center, /batch\.cumulativeComponentCountPending/);
   assert.match(center, /reviewBatchCompletedPendingDetail/);
-  assert.match(center, /skinReviewArchive/);
-  assert.match(center, /skinReviewBatch/);
+  assert.match(center, /<details className="skinReviewArchive" suppressHydrationWarning>/);
+  assert.match(center, /className=\{`skinReviewBatch[\s\S]*?suppressHydrationWarning/);
   assert.match(center, /reviewCumulativeColumn/);
   assert.match(center, /batch\.cumulativeComponentCount/);
   assert.match(center, /batch\.purpose === "system-test"/);
@@ -692,6 +716,8 @@ test("review batch summaries remain readable at 320px", async () => {
   assert.match(center, /className="skinReviewMetric skinReviewComponents"/);
   assert.match(center, /className="skinReviewMetric skinReviewCumulative"/);
   assert.match(css, /\.skinReviewMetric > small \{\s*display: none;/);
+  assert.match(css, /\.skinReviewCurrentBatches \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.skinReviewBatch:target \{/);
   assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewColumns \{\s*display: none;/);
   assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewBatch > summary \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto 14px;/);
 });

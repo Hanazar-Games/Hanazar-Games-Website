@@ -116,6 +116,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.4", date: "2026-09-07", title: "update184Title", body: "update184Body" },
   { version: "2.18.3", date: "2026-09-02", title: "update183Title", body: "update183Body" },
   { version: "2.18.2", date: "2026-08-29", title: "update182Title", body: "update182Body" },
   { version: "2.18.1", date: "2026-08-28", title: "update181Title", body: "update181Body" },
@@ -1260,7 +1261,7 @@ export default function SkinServiceCenter({
               </nav>
             )}
 
-            <details className="skinReviewArchive">
+            <details className="skinReviewArchive" suppressHydrationWarning>
               <summary>
                 <span><strong>{skinText(language, "reviewArchiveTitle", { batches: reviewBatches.length })}</strong><small>{skinText(language, "reviewArchiveHint")}</small></span>
                 <span aria-hidden="true">⌄</span>
@@ -1281,7 +1282,12 @@ export default function SkinServiceCenter({
                     : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
                   const cumulativeComponentCount = reviewCumulativeCount(batch, language);
                   return (
-                    <details id={reviewBatchId(batch)} className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`} key={batchName}>
+                    <details
+                      id={reviewBatchId(batch)}
+                      className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`}
+                      key={batchName}
+                      suppressHydrationWarning
+                    >
                       <summary>
                         <strong>{skinText(language, "reviewBatchName", { batch: batchName })}</strong>
                         <span className="skinReviewStatus">{skinText(language, reviewing

@@ -51,7 +51,9 @@ export default function ToolsPage() {
               {group.tools.map((tool, index) => (
                 <article
                   key={tool.title}
-                  className={`gameCard toolCard${group.tools.length === 1 ? " toolCardWide" : ""} ${
+                  className={`gameCard toolCard${group.tools.length === 1 ? " toolCardWide" : ""}${
+                    group.title === "browserPluginsTitle" ? " pluginCard" : ""
+                  } ${
                     index % 3 === 0
                       ? "revealLeft"
                       : index % 3 === 1
