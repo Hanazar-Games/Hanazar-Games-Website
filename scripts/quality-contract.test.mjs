@@ -375,13 +375,13 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.5");
-  assert.equal(lockData.version, "2.18.5");
-  assert.equal(lockData.packages[""].version, "2.18.5");
-  assert.match(center, /version: "2\.18\.5", date: "2026-09-07"/);
-  assert.match(copy, /第 207 至 214 批次组件数量：29、50、58、60、47、5、2、2/);
-  assert.match(announcement, /version: "2\.18\.5"/);
-  assert.match(verifier, /2\.18\.5/);
+  assert.equal(packageData.version, "2.18.6");
+  assert.equal(lockData.version, "2.18.6");
+  assert.equal(lockData.packages[""].version, "2.18.6");
+  assert.match(center, /version: "2\.18\.6", date: "2026-09-09"/);
+  assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
+  assert.match(announcement, /version: "2\.18\.6"/);
+  assert.match(verifier, /2\.18\.6/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
@@ -601,7 +601,7 @@ test("skin documentation is categorized and the public wall supports cursor pagi
   assert.match(limiter, /Rate limit state is invalid/);
 });
 
-test("review tracker exposes completed batches through 215 and reviewing batches through 221", async () => {
+test("review tracker exposes completed batches through 216 and reviewing batches through 221", async () => {
   const { reviewBatches } = await import("../app/lib/reviewBatches.ts");
   const completed = reviewBatches.filter((batch) => batch.status === "completed");
   const reviewing = reviewBatches.filter((batch) => batch.status === "reviewing");
@@ -618,7 +618,7 @@ test("review tracker exposes completed batches through 215 and reviewing batches
     [219, "reviewing"],
     [218, "reviewing"],
     [217, "reviewing"],
-    [216, "reviewing"],
+    [216, "completed"],
     [215, "completed"],
     [214, "completed"],
     [213, "completed"],
@@ -629,11 +629,11 @@ test("review tracker exposes completed batches through 215 and reviewing batches
     [208, "completed"],
     [207, "completed"],
   ]);
-  assert.equal(completed.length, 217);
-  assert.equal(reviewing.length, 6);
-  assert.equal(completedWithPendingCounts.length, 1);
+  assert.equal(completed.length, 218);
+  assert.equal(reviewing.length, 5);
+  assert.equal(completedWithPendingCounts.length, 0);
   assert.equal(historical.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_000);
-  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_629);
+  assert.equal(completed.reduce((total, batch) => total + (batch.componentCount ?? 0), 0), 10_672);
   assert.equal(completed.find((batch) => batch.number === 121)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 201)?.componentCount, 0);
   assert.equal(completed.find((batch) => batch.number === 202)?.componentCount, 71);
@@ -675,14 +675,18 @@ test("review tracker exposes completed batches through 215 and reviewing batches
     assert.equal(findBatch(number)?.cumulativeComponentCountPending, false);
   }
   assert.equal(findBatch(215)?.status, "completed");
-  assert.equal(findBatch(215)?.componentCount, null);
-  assert.equal(findBatch(215)?.cumulativeComponentCount, 10_629);
-  assert.equal(findBatch(215)?.cumulativeComponentCountPending, true);
-  for (const number of [216, 217, 218, 219, 220, 221]) {
+  assert.equal(findBatch(215)?.componentCount, 19);
+  assert.equal(findBatch(215)?.cumulativeComponentCount, 10_648);
+  assert.equal(findBatch(215)?.cumulativeComponentCountPending, false);
+  assert.equal(findBatch(216)?.status, "completed");
+  assert.equal(findBatch(216)?.componentCount, 24);
+  assert.equal(findBatch(216)?.cumulativeComponentCount, 10_672);
+  assert.equal(findBatch(216)?.cumulativeComponentCountPending, false);
+  for (const number of [217, 218, 219, 220, 221]) {
     assert.equal(findBatch(number)?.status, "reviewing");
     assert.equal(findBatch(number)?.componentCount, null);
-    assert.equal(findBatch(number)?.cumulativeComponentCount, 10_629);
-    assert.equal(findBatch(number)?.cumulativeComponentCountPending, true);
+    assert.equal(findBatch(number)?.cumulativeComponentCount, 10_672);
+    assert.equal(findBatch(number)?.cumulativeComponentCountPending, false);
   }
   assert.equal(findBatch(206)?.cumulativeComponentCountPending, false);
   const ascending = [...reviewBatches].reverse();
@@ -739,7 +743,10 @@ test("review batch summaries remain readable at 320px", async () => {
   assert.match(center, /className="skinReviewMetric skinReviewComponents"/);
   assert.match(center, /className="skinReviewMetric skinReviewCumulative"/);
   assert.match(css, /\.skinReviewMetric > small \{\s*display: none;/);
-  assert.match(css, /\.skinReviewCurrentBatches \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.skinReviewCurrentBatches \{[\s\S]*?grid-template-columns: repeat\(6, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.skinReviewCurrentBatches a \{[\s\S]*?grid-column: span 2;/);
+  assert.match(css, /\.skinReviewCurrentBatches a:nth-last-child\(2\):nth-child\(3n \+ 1\)/);
+  assert.match(css, /@media \(max-width: 800px\) \{[\s\S]*?\.skinReviewCurrentBatches a:last-child:nth-child\(odd\) \{[\s\S]*?justify-self: center;/);
   assert.match(css, /\.skinReviewBatch:target \{/);
   assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewColumns \{\s*display: none;/);
   assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewBatch > summary \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto 14px;/);

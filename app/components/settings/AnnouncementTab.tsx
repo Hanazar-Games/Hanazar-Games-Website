@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.6",
+    date: "2026-09-09",
+    title: "Review Batches 215–216 and Tracker Balance",
+    items: [
+      "Published Batch 215 with 19 components and Batch 216 with 24 components, raising the completed total to 10,672.",
+      "Kept Batches 217 through 221 under review and removed the completed-count uncertainty from the cumulative total.",
+      "Centered incomplete rows in the current-review grid across desktop and mobile layouts so five active batches remain visually balanced.",
+      "Rechecked responsive UI, interaction states, reduced-motion behavior, low-volume SFX, opt-in BGM, and the GitHub Pages export.",
+    ],
+  },
+  {
     version: "2.18.5",
     date: "2026-09-07",
     title: "Review Batch Counts and Resource Audit",
