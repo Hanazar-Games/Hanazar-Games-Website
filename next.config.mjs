@@ -4,6 +4,7 @@ const basePath = isGitHubPages ? `/${repositoryName}` : "";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  agentRules: false,
   ...(isGitHubPages
     ? {
         output: "export",

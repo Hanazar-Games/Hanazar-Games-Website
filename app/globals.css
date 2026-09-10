@@ -710,8 +710,8 @@ body:has(.gamesShell) .settingsFloatingButton {
   cursor: pointer;
   opacity: 0;
   transform: translateY(12px);
-  animation: fadeInBody 1s ease forwards;
-  animation-delay: calc((0.62s + (var(--button-index) * 0.08s)) * var(--anim-speed, 1));
+  animation: fadeInBody calc(0.5s * var(--anim-speed, 1)) ease forwards;
+  animation-delay: calc((0.24s + (var(--button-index) * 0.02s)) * var(--anim-speed, 1));
   transition:
     border-color 0.25s ease,
     background 0.25s ease,

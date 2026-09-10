@@ -139,6 +139,20 @@ test("homepage hero uses a right-sized modern image for static hosting", async (
   assert.doesNotMatch(home, /IntroPic\.jpg/);
 });
 
+test("homepage navigation enters promptly and follows animation speed", async () => {
+  const css = await read("app/globals.css");
+
+  assert.match(css, /\.heroNavButton \{[\s\S]*?animation: fadeInBody calc\(0\.5s \* var\(--anim-speed, 1\)\) ease forwards;/);
+  assert.match(css, /animation-delay: calc\(\(0\.24s \+ \(var\(--button-index\) \* 0\.02s\)\) \* var\(--anim-speed, 1\)\);/);
+  assert.doesNotMatch(css, /\.heroNavButton \{[\s\S]*?animation: fadeInBody 1s ease forwards;/);
+});
+
+test("Next.js development does not generate agent instruction files", async () => {
+  const config = await read("next.config.mjs");
+
+  assert.match(config, /agentRules:\s*false/);
+});
+
 test("subpage hero titles balance narrow-screen line breaks", async () => {
   const [css, layout] = await Promise.all([
     read("app/globals.css"),
@@ -375,13 +389,14 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.6");
-  assert.equal(lockData.version, "2.18.6");
-  assert.equal(lockData.packages[""].version, "2.18.6");
-  assert.match(center, /version: "2\.18\.6", date: "2026-09-09"/);
+  assert.equal(packageData.version, "2.18.7");
+  assert.equal(lockData.version, "2.18.7");
+  assert.equal(lockData.packages[""].version, "2.18.7");
+  assert.match(center, /version: "2\.18\.7", date: "2026-09-11"/);
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
-  assert.match(announcement, /version: "2\.18\.6"/);
-  assert.match(verifier, /2\.18\.6/);
+  assert.match(copy, /依赖安全升级与全站交互复查/);
+  assert.match(announcement, /version: "2\.18\.7"/);
+  assert.match(verifier, /2\.18\.7/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

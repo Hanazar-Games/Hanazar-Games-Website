@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.7",
+    date: "2026-09-11",
+    title: "Full-site QA, Dependency Security, and Navigation Motion",
+    items: [
+      "Upgraded Next.js and its image pipeline dependencies to patched releases, clearing the critical, high, and moderate production dependency advisories.",
+      "Shortened the homepage navigation entrance so every primary destination is visible within the opening beat, and made its duration follow the configured animation speed.",
+      "Rechecked all 14 routes at desktop, tablet, mobile, and 320 px widths with no broken images, runtime exceptions, duplicate identifiers, or scrollable overflow.",
+      "Verified dialog focus containment, the first-visit community prompt, collapsed group entries, reduced-motion behavior, low-volume SFX, opt-in BGM, and the GitHub Pages export.",
+    ],
+  },
+  {
     version: "2.18.6",
     date: "2026-09-09",
     title: "Review Batches 215–216 and Tracker Balance",
