@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { useTranslation } from "../hooks/useTranslation";
+import { BUFFER_LOW_WATER, CHUNK_SIZE, sendPeerFile } from "../lib/peerFileTransfer";
 
 type ConnectionStatus =
   | "idle"
@@ -61,9 +62,6 @@ const PAIRING_PREFIX = "HZP1.";
 const MAX_PAIRING_CODE_LENGTH = 1_000_000;
 const MAX_MESSAGE_LENGTH = 4_000;
 const MAX_FILE_SIZE = 50 * 1024 * 1024;
-const CHUNK_SIZE = 64 * 1024;
-const BUFFER_HIGH_WATER = 1024 * 1024;
-const BUFFER_LOW_WATER = 256 * 1024;
 const MAX_MESSAGES = 200;
 const MAX_TRANSFERS = 20;
 
@@ -160,30 +158,6 @@ function waitForIceGathering(peer: RTCPeerConnection) {
   });
 }
 
-function waitForChannelBuffer(channel: RTCDataChannel) {
-  if (channel.readyState !== "open") return Promise.reject(new Error("channel closed"));
-  if (channel.bufferedAmount <= BUFFER_HIGH_WATER) return Promise.resolve();
-  return new Promise<void>((resolve, reject) => {
-    let settled = false;
-    const finish = (error?: Error) => {
-      if (settled) return;
-      settled = true;
-      window.clearTimeout(timeout);
-      channel.removeEventListener("bufferedamountlow", handleLow);
-      channel.removeEventListener("close", handleClose);
-      channel.removeEventListener("error", handleClose);
-      if (error) reject(error);
-      else resolve();
-    };
-    const handleLow = () => finish();
-    const handleClose = () => finish(new Error("channel closed"));
-    const timeout = window.setTimeout(() => finish(new Error("channel stalled")), 15_000);
-    channel.addEventListener("bufferedamountlow", handleLow);
-    channel.addEventListener("close", handleClose);
-    channel.addEventListener("error", handleClose);
-  });
-}
-
 function formatBytes(value: number) {
   if (value < 1024) return `${value} B`;
   if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
@@ -196,6 +170,7 @@ export default function PeerTransferApp() {
   const peerRef = useRef<RTCPeerConnection | null>(null);
   const channelRef = useRef<RTCDataChannel | null>(null);
   const incomingFileRef = useRef<IncomingFile | null>(null);
+  const outgoingFileRef = useRef<AbortController | null>(null);
   const objectUrlsRef = useRef(new Set<string>());
   const transfersRef = useRef<TransferRecord[]>([]);
   const displayNameRef = useRef("");
@@ -251,6 +226,8 @@ export default function PeerTransferApp() {
   }, []);
 
   const failActiveTransfers = useCallback(() => {
+    outgoingFileRef.current?.abort();
+    outgoingFileRef.current = null;
     const current = transfersRef.current;
     const next = current.map((item) => (
       item.status === "sending" || item.status === "receiving"
@@ -390,14 +367,14 @@ export default function PeerTransferApp() {
       objectUrlsRef.current.add(url);
       updateTransfer(file.id, { progress: 100, status: "ready", url });
       setActivityNotice(trRef.current("peerFileReceived"));
+      try {
+        sendWire({ kind: "file-received", id: file.wireId });
+      } catch {
+        // The file remains downloadable if its receipt cannot reach the sender.
+      }
       return;
     }
-
-    if (payload.kind === "file-reject" && typeof payload.id === "string") {
-      updateTransfer(payload.id, { status: "failed" });
-      setActivityNotice(trRef.current("peerFileRejected"));
-    }
-  }, [appendMessage, appendTransfer, rejectIncomingFile, updateTransfer]);
+  }, [appendMessage, appendTransfer, rejectIncomingFile, sendWire, updateTransfer]);
 
   const attachChannel = useCallback((channel: RTCDataChannel) => {
     if (channelRef.current && channelRef.current !== channel) channelRef.current.close();
@@ -411,6 +388,7 @@ export default function PeerTransferApp() {
       channel.send(JSON.stringify({ kind: "hello", name: displayNameRef.current }));
     };
     channel.onmessage = (event) => {
+      if (channelRef.current !== channel) return;
       if (typeof event.data === "string" || event.data instanceof ArrayBuffer) {
         handleIncomingData(event.data);
       }
@@ -457,7 +435,10 @@ export default function PeerTransferApp() {
       ],
     });
     peerRef.current = peer;
-    peer.ondatachannel = (event) => attachChannel(event.channel);
+    peer.ondatachannel = (event) => {
+      if (peerRef.current !== peer) { event.channel.close(); return; }
+      attachChannel(event.channel);
+    };
     peer.onconnectionstatechange = () => {
       if (peerRef.current !== peer) return;
       if (peer.connectionState === "failed") {
@@ -495,8 +476,9 @@ export default function PeerTransferApp() {
     setRemoteCode("");
     setPairingNotice("");
     setStatus("gathering");
+    let peer: RTCPeerConnection | null = null;
     try {
-      const peer = createPeer();
+      peer = createPeer();
       const channel = peer.createDataChannel("hanazar-peer", { ordered: true });
       attachChannel(channel);
       await peer.setLocalDescription(await peer.createOffer());
@@ -506,6 +488,7 @@ export default function PeerTransferApp() {
       setStatus("waiting");
       setPairingNotice(tr("peerOfferReady"));
     } catch {
+      if (peerRef.current !== peer) return;
       closePeer();
       setStatus("failed");
       setPairingNotice(tr("peerConnectionError"));
@@ -522,12 +505,14 @@ export default function PeerTransferApp() {
       return;
     }
 
+    let peer = peerRef.current;
     try {
       if (payload.type === "offer") {
         closePeer();
+        peer = null;
         setPairingCode("");
         setStatus("gathering");
-        const peer = createPeer();
+        peer = createPeer();
         await peer.setRemoteDescription({ type: "offer", sdp: payload.sdp });
         await peer.setLocalDescription(await peer.createAnswer());
         await waitForIceGathering(peer);
@@ -539,16 +524,18 @@ export default function PeerTransferApp() {
         return;
       }
 
-      const peer = peerRef.current;
       if (!peer || peer.signalingState !== "have-local-offer") {
         setPairingNotice(tr("peerAnswerNeedsOffer"));
         return;
       }
       setStatus("connecting");
       await peer.setRemoteDescription({ type: "answer", sdp: payload.sdp });
+      if (peerRef.current !== peer) return;
       setRemoteCode("");
       setPairingNotice(tr("peerConnectingNotice"));
     } catch {
+      if (peerRef.current !== peer) return;
+      closePeer();
       setStatus("failed");
       setPairingNotice(tr("peerConnectionError"));
     }
@@ -604,7 +591,7 @@ export default function PeerTransferApp() {
   const sendFile = async () => {
     const file = selectedFile;
     const channel = channelRef.current;
-    if (!file || !channel || channel.readyState !== "open" || isSendingFile) return;
+    if (!file || !channel || channel.readyState !== "open" || outgoingFileRef.current) return;
     if (file.size > MAX_FILE_SIZE) {
       setActivityNotice(tr("peerFileTooLarge"));
       return;
@@ -612,42 +599,32 @@ export default function PeerTransferApp() {
 
     const id = createId();
     const name = cleanFileName(file.name);
+    const controller = new AbortController();
+    outgoingFileRef.current = controller;
     setIsSendingFile(true);
     setActivityNotice("");
     appendTransfer({ id, direction: "outgoing", name, size: file.size, progress: 0, status: "sending" });
     try {
-      sendWire({
-        kind: "file-start",
+      await sendPeerFile(channel, file, {
         id,
         name,
-        size: file.size,
-        mime: file.type || "application/octet-stream",
+        signal: controller.signal,
+        onProgress: (progress) => updateTransfer(id, { progress }),
       });
-      let sent = 0;
-      let lastProgress = 0;
-      while (sent < file.size) {
-        await waitForChannelBuffer(channel);
-        const buffer = await file.slice(sent, sent + CHUNK_SIZE).arrayBuffer();
-        if (channel.readyState !== "open") throw new Error("channel closed");
-        channel.send(buffer);
-        sent += buffer.byteLength;
-        const progress = file.size === 0 ? 100 : Math.round((sent / file.size) * 100);
-        if (progress - lastProgress >= 2 || progress === 100) {
-          lastProgress = progress;
-          updateTransfer(id, { progress });
-        }
-      }
-      await waitForChannelBuffer(channel);
-      sendWire({ kind: "file-end", id });
+      if (outgoingFileRef.current !== controller) return;
       updateTransfer(id, { progress: 100, status: "ready" });
       setActivityNotice(tr("peerFileSent"));
       setSelectedFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-    } catch {
+    } catch (error) {
+      if (outgoingFileRef.current !== controller) return;
       updateTransfer(id, { status: "failed" });
-      setActivityNotice(tr("peerFileSendFailed"));
+      setActivityNotice(tr(error instanceof Error && error.message === "file rejected" ? "peerFileRejected" : "peerFileSendFailed"));
     } finally {
-      setIsSendingFile(false);
+      if (outgoingFileRef.current === controller) {
+        outgoingFileRef.current = null;
+        setIsSendingFile(false);
+      }
     }
   };
 

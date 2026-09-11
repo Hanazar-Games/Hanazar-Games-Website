@@ -298,6 +298,7 @@ export default function AudioEngine() {
       "button:not(:disabled), a[href], summary:not(:disabled), input[type='checkbox']:not(:disabled), .colorPreset, .languageItem";
 
     const handlePointerDown = async (event: PointerEvent) => {
+      if (event.button !== 0 || !event.isPrimary) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       const current = settingsRef.current;
@@ -306,12 +307,16 @@ export default function AudioEngine() {
       const isAudioControl = Boolean(target.closest("[data-audio-unlock], [data-sfx-preview]"));
       if (!wantsSfx && !wantsBgm && !isAudioControl) return;
       await unlock();
-      if (
-        !target.closest("[data-sfx-preview]") &&
-        target.closest(interactiveSelector)
-      ) {
-        playSfx(getSfxKind(target));
-      }
+    };
+
+    const handleClick = async (event: MouseEvent) => {
+      const target = event.target;
+      if (event.button !== 0 || !(target instanceof Element)) return;
+      if (!target.closest(interactiveSelector) || target.closest("[data-sfx-preview], [aria-disabled='true']")) return;
+      const current = settingsRef.current;
+      if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
+      await unlock();
+      playSfx(getSfxKind(target));
     };
 
     const handleKeyDown = async (event: KeyboardEvent) => {
@@ -345,12 +350,6 @@ export default function AudioEngine() {
       const isAudioControl = Boolean(target.closest("[data-audio-unlock], [data-sfx-preview]"));
       if (!wantsSfx && !wantsBgm && !isAudioControl) return;
       await unlock();
-      if (
-        !target.closest("[data-sfx-preview]") &&
-        interactive
-      ) {
-        playSfx(getSfxKind(target));
-      }
     };
 
     const handlePreview = async (event: Event) => {
@@ -364,6 +363,7 @@ export default function AudioEngine() {
     const handleContextState = () => syncAmbient();
 
     window.addEventListener("pointerdown", handlePointerDown, { capture: true });
+    window.addEventListener("click", handleClick, { capture: true });
     window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("hanazar:sfx-preview", handlePreview);
     window.addEventListener("hanazar:bgm-state-request", handleStateRequest);
@@ -371,6 +371,7 @@ export default function AudioEngine() {
     document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       window.removeEventListener("pointerdown", handlePointerDown, { capture: true });
+      window.removeEventListener("click", handleClick, { capture: true });
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("hanazar:sfx-preview", handlePreview);
       window.removeEventListener("hanazar:bgm-state-request", handleStateRequest);

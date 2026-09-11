@@ -389,14 +389,14 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.7");
-  assert.equal(lockData.version, "2.18.7");
-  assert.equal(lockData.packages[""].version, "2.18.7");
-  assert.match(center, /version: "2\.18\.7", date: "2026-09-11"/);
+  assert.equal(packageData.version, "2.18.8");
+  assert.equal(lockData.version, "2.18.8");
+  assert.equal(lockData.packages[""].version, "2.18.8");
+  assert.match(center, /version: "2\.18\.8", date: "2026-09-11"/);
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
-  assert.match(copy, /依赖安全升级与全站交互复查/);
-  assert.match(announcement, /version: "2\.18\.7"/);
-  assert.match(verifier, /2\.18\.7/);
+  assert.match(copy, /传输反馈、键盘焦点与音效修复/);
+  assert.match(announcement, /version: "2\.18\.8"/);
+  assert.match(verifier, /2\.18\.8/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

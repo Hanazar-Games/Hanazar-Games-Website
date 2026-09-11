@@ -227,6 +227,9 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.18.8",
+    "传输反馈、键盘焦点与音效修复",
+    "文件传输收到拒绝后会立即停止",
     "2.18.7",
     "依赖安全升级与全站交互复查",
     "升级 Next.js 与图片处理依赖",

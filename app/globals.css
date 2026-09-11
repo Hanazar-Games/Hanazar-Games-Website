@@ -2141,6 +2141,8 @@ select:focus-visible {
 }
 
 .shareFileInput:focus-visible + .shareFileButton,
+.shareField textarea:focus-visible,
+.shareCustomExpiration input:focus-visible,
 .shareFileButton:focus-visible,
 .shareQuietButton:focus-visible,
 .sharePrimaryButton:focus-visible,
@@ -2534,6 +2536,25 @@ body[data-theme="light"] .shareStateCard {
 
 body[data-theme="light"] .shareLogRail span {
   background: #fff;
+}
+
+body[data-theme="light"] .sharePresetRow button.active,
+body[data-theme="light"] .shareServiceState-ready,
+body[data-theme="light"] .shareLogTitle span.active,
+body[data-theme="light"] .shareResultHeading > span,
+body[data-theme="light"] .shareCountdown strong {
+  color: #24563e;
+}
+
+body[data-theme="light"] .shareServiceState-offline,
+body[data-theme="light"] .shareFieldError,
+body[data-theme="light"] .shareInlineWarning,
+body[data-theme="light"] .shareStateCard-expired,
+body[data-theme="light"] .shareStateCard-not_found,
+body[data-theme="light"] .shareStateCard-missing_key,
+body[data-theme="light"] .shareStateCard-corrupt,
+body[data-theme="light"] .shareStateCard-failed {
+  color: #8b3030;
 }
 
 @media (max-width: 760px) {

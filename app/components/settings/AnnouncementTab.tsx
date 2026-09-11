@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.8",
+    date: "2026-09-11",
+    title: "Reliable Transfer Feedback, Keyboard Focus, and Audio Controls",
+    items: [
+      "File transfers now stop on rejection and report completion only after the receiving device confirms delivery. Resetting a connection cancels pending sends and prevents stale pairing failures from closing a new connection.",
+      "Restored visible keyboard focus to encrypted-share inputs and improved light-theme contrast for selected expiry options, status badges, countdowns, and error messages.",
+      "Interaction sounds now follow completed clicks and keyboard activation, keeping right clicks, middle clicks, and canceled pointer presses silent.",
+      "Aligned the English and Japanese review guidance with the published official account and batch tracker.",
+    ],
+  },
+  {
     version: "2.18.7",
     date: "2026-09-11",
     title: "Full-site QA, Dependency Security, and Navigation Motion",
