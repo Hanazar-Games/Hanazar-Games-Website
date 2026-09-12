@@ -389,14 +389,14 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.8");
-  assert.equal(lockData.version, "2.18.8");
-  assert.equal(lockData.packages[""].version, "2.18.8");
-  assert.match(center, /version: "2\.18\.8", date: "2026-09-11"/);
+  assert.equal(packageData.version, "2.18.9");
+  assert.equal(lockData.version, "2.18.9");
+  assert.equal(lockData.packages[""].version, "2.18.9");
+  assert.match(center, /version: "2\.18\.9", date: "2026-09-12"/);
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
-  assert.match(copy, /传输反馈、键盘焦点与音效修复/);
-  assert.match(announcement, /version: "2\.18\.8"/);
-  assert.match(verifier, /2\.18\.8/);
+  assert.match(copy, /近期审核结果直览与表格修复/);
+  assert.match(announcement, /version: "2\.18\.9"/);
+  assert.match(verifier, /2\.18\.9/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
@@ -718,10 +718,10 @@ test("review notices publish the Qianchuan Bit account and collapsible batch arc
   ]);
 
   assert.match(center, /reviewBatches\.map/);
-  assert.match(center, /reviewArchiveTitle[\s\S]*?batches: reviewBatches\.length/);
+  assert.match(center, /reviewArchiveTitle[\s\S]*?batches: ARCHIVED_REVIEW_BATCHES\.length/);
   assert.match(center, /REVIEWING_REVIEW_BATCHES\.map/);
   assert.match(center, /className="skinReviewCurrentBatches"/);
-  assert.match(verifier, /展开查看全部 223 个批次/);
+  assert.match(verifier, /展开查看历史 208 个批次/);
   assert.match(verifier, /第 221 批次/);
   assert.match(center, /batch\.cumulativeComponentCountPending/);
   assert.match(center, /reviewBatchCompletedPendingDetail/);
@@ -763,8 +763,8 @@ test("review batch summaries remain readable at 320px", async () => {
   assert.match(css, /\.skinReviewCurrentBatches a:nth-last-child\(2\):nth-child\(3n \+ 1\)/);
   assert.match(css, /@media \(max-width: 800px\) \{[\s\S]*?\.skinReviewCurrentBatches a:last-child:nth-child\(odd\) \{[\s\S]*?justify-self: center;/);
   assert.match(css, /\.skinReviewBatch:target \{/);
-  assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewColumns \{\s*display: none;/);
-  assert.match(css, /@media \(max-width: 480px\) \{[\s\S]*?\.skinReviewBatch > summary \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto 14px;/);
+  assert.match(css, /@media \(max-width: 700px\) \{[\s\S]*?\.skinReviewColumns \{\s*display: none;/);
+  assert.match(css, /@media \(max-width: 700px\) \{[\s\S]*?\.skinReviewBatch > summary \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto 14px;/);
 });
 
 test("invalid share expiry has visible, associated feedback", async () => {

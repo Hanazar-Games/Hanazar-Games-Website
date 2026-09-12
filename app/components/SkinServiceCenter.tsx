@@ -57,6 +57,8 @@ const COMPLETED_REVIEW_COMPONENTS = COMPLETED_REVIEW_BATCHES.reduce(
   (total, batch) => total + (batch.componentCount ?? 0),
   0,
 );
+const RECENT_REVIEW_BATCHES = reviewBatches.slice(0, 15);
+const ARCHIVED_REVIEW_BATCHES = reviewBatches.slice(15);
 
 const sectionDefinitions: Array<{
   id: SkinServiceSection;
@@ -116,6 +118,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.9", date: "2026-09-12", title: "update189Title", body: "update189Body" },
   { version: "2.18.8", date: "2026-09-11", title: "update188Title", body: "update188Body" },
   { version: "2.18.7", date: "2026-09-11", title: "update187Title", body: "update187Body" },
   { version: "2.18.6", date: "2026-09-09", title: "update186Title", body: "update186Body" },
@@ -337,6 +340,57 @@ function reviewCumulativeCount(batch: ReviewBatch, language: SkinServiceLanguage
     : "reviewComponentsCount", {
     count: batch.cumulativeComponentCount.toLocaleString(language),
   });
+}
+
+function ReviewBatchList({ batches, language, recent = false }: {
+  batches: ReviewBatch[];
+  language: SkinServiceLanguage;
+  recent?: boolean;
+}) {
+  return <>
+    <div className="skinReviewColumns" aria-hidden="true">
+      <span>{skinText(language, "reviewBatchColumn")}</span>
+      <span>{skinText(language, "reviewStatusColumn")}</span>
+      <span>{skinText(language, "reviewComponentsColumn")}</span>
+      <span>{skinText(language, "reviewCumulativeColumn")}</span>
+    </div>
+    <div className={`skinReviewBatchList${recent ? " isRecent" : ""}`}>
+      {batches.map((batch) => {
+        const reviewing = batch.status === "reviewing";
+        const systemTest = batch.purpose === "system-test";
+        return <details
+          id={reviewBatchId(batch)}
+          className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`}
+          key={reviewBatchName(batch)}
+          suppressHydrationWarning
+        >
+          <summary>
+            <strong>{skinText(language, "reviewBatchName", { batch: reviewBatchName(batch) })}</strong>
+            <span className="skinReviewStatus">{skinText(language, reviewing
+              ? "reviewStatusReviewing"
+              : systemTest ? "reviewStatusTestCompleted" : "reviewStatusCompleted")}</span>
+            <span className="skinReviewMetric skinReviewComponents">
+              <small>{skinText(language, "reviewComponentsColumn")}</small>
+              <span>{batch.componentCount === null
+                ? skinText(language, reviewing ? "reviewComponentsReviewing" : "reviewComponentsPending")
+                : skinText(language, "reviewComponentsCount", { count: batch.componentCount })}</span>
+            </span>
+            <span className="skinReviewMetric skinReviewCumulative">
+              <small>{skinText(language, "reviewCumulativeColumn")}</small>
+              <span>{reviewCumulativeCount(batch, language)}</span>
+            </span>
+            <span className="skinReviewBatchChevron" aria-hidden="true">⌄</span>
+          </summary>
+          <p>{skinText(language, systemTest
+            ? "reviewBatchTestDetail"
+            : reviewing ? "reviewBatchReviewingDetail"
+              : batch.componentCount === null ? "reviewBatchCompletedPendingDetail" : "reviewBatchCompletedDetail", {
+            count: batch.componentCount ?? 0,
+          })}</p>
+        </details>;
+      })}
+    </div>
+  </>;
 }
 
 export default function SkinServiceCenter({
@@ -657,7 +711,12 @@ export default function SkinServiceCenter({
 
   useEffect(() => {
     const revealHash = () => {
-      const targetId = decodeURIComponent(window.location.hash.slice(1));
+      let targetId: string;
+      try {
+        targetId = decodeURIComponent(window.location.hash.slice(1));
+      } catch {
+        return;
+      }
       if (targetId) window.requestAnimationFrame(() => revealTarget(targetId, "auto"));
     };
     revealHash();
@@ -732,7 +791,7 @@ export default function SkinServiceCenter({
             ? "reviewStatusReviewing"
             : batch.purpose === "system-test" ? "reviewStatusTestCompleted" : "reviewStatusCompleted"),
           batch.componentCount === null
-            ? skinText(language, "reviewComponentsPending")
+            ? skinText(language, batch.status === "reviewing" ? "reviewComponentsReviewing" : "reviewComponentsPending")
             : skinText(language, "reviewComponentsCount", { count: batch.componentCount }),
           skinText(language, "reviewCumulativeColumn"),
           reviewCumulativeCount(batch, language),
@@ -1240,7 +1299,8 @@ export default function SkinServiceCenter({
               <div>
                 <span>{skinText(language, "reviewTrackerLabel")}</span>
                 <h3>{skinText(language, "reviewTrackerTitle")}</h3>
-                <p>{skinText(language, "reviewTrackerSummary", {
+                <p>{skinText(language, COMPLETED_REVIEW_BATCHES_WITH_PENDING_COUNTS.length > 0
+                  ? "reviewTrackerSummary" : "reviewTrackerExactSummary", {
                   batches: COMPLETED_REVIEW_BATCHES.length,
                   count: COMPLETED_REVIEW_COMPONENTS.toLocaleString(language),
                   pending: COMPLETED_REVIEW_BATCHES_WITH_PENDING_COUNTS.length,
@@ -1265,61 +1325,15 @@ export default function SkinServiceCenter({
               </nav>
             )}
 
+            <h4 className="skinReviewRecentTitle">{skinText(language, "reviewRecentTitle", { batches: RECENT_REVIEW_BATCHES.length })}</h4>
+            <ReviewBatchList batches={RECENT_REVIEW_BATCHES} language={language} recent />
+
             <details className="skinReviewArchive" suppressHydrationWarning>
               <summary>
-                <span><strong>{skinText(language, "reviewArchiveTitle", { batches: reviewBatches.length })}</strong><small>{skinText(language, "reviewArchiveHint")}</small></span>
+                <span><strong>{skinText(language, "reviewArchiveTitle", { batches: ARCHIVED_REVIEW_BATCHES.length })}</strong><small>{skinText(language, "reviewArchiveHint")}</small></span>
                 <span aria-hidden="true">⌄</span>
               </summary>
-              <div className="skinReviewColumns" aria-hidden="true">
-                <span>{skinText(language, "reviewBatchColumn")}</span>
-                <span>{skinText(language, "reviewStatusColumn")}</span>
-                <span>{skinText(language, "reviewComponentsColumn")}</span>
-                <span>{skinText(language, "reviewCumulativeColumn")}</span>
-              </div>
-              <div className="skinReviewBatchList">
-                {reviewBatches.map((batch) => {
-                  const reviewing = batch.status === "reviewing";
-                  const systemTest = batch.purpose === "system-test";
-                  const batchName = reviewBatchName(batch);
-                  const componentCount = batch.componentCount === null
-                    ? skinText(language, "reviewComponentsPending")
-                    : skinText(language, "reviewComponentsCount", { count: batch.componentCount });
-                  const cumulativeComponentCount = reviewCumulativeCount(batch, language);
-                  return (
-                    <details
-                      id={reviewBatchId(batch)}
-                      className={`skinReviewBatch${reviewing ? " isReviewing" : ""}${systemTest ? " isTest" : ""}`}
-                      key={batchName}
-                      suppressHydrationWarning
-                    >
-                      <summary>
-                        <strong>{skinText(language, "reviewBatchName", { batch: batchName })}</strong>
-                        <span className="skinReviewStatus">{skinText(language, reviewing
-                          ? "reviewStatusReviewing"
-                          : systemTest ? "reviewStatusTestCompleted" : "reviewStatusCompleted")}</span>
-                        <span className="skinReviewMetric skinReviewComponents">
-                          <small>{skinText(language, "reviewComponentsColumn")}</small>
-                          <span>{componentCount}</span>
-                        </span>
-                        <span className="skinReviewMetric skinReviewCumulative">
-                          <small>{skinText(language, "reviewCumulativeColumn")}</small>
-                          <span>{cumulativeComponentCount}</span>
-                        </span>
-                        <span className="skinReviewBatchChevron" aria-hidden="true">⌄</span>
-                      </summary>
-                      <p>{skinText(language, systemTest
-                        ? "reviewBatchTestDetail"
-                        : reviewing
-                          ? "reviewBatchReviewingDetail"
-                          : batch.componentCount === null
-                            ? "reviewBatchCompletedPendingDetail"
-                            : "reviewBatchCompletedDetail", {
-                        count: batch.componentCount ?? 0,
-                      })}</p>
-                    </details>
-                  );
-                })}
-              </div>
+              <ReviewBatchList batches={ARCHIVED_REVIEW_BATCHES} language={language} />
             </details>
           </div>
         </section>}

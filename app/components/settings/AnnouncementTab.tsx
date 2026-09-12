@@ -4,6 +4,17 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.9",
+    date: "2026-09-12",
+    title: "Visible Review Results and Responsive Batch Records",
+    items: [
+      "Show the latest 15 review batches immediately, with 208 older records in a separate collapsed archive. Batches 207–216 are published; Batch 215 contains 19 components and Batch 216 contains 24. Batches 217–221 remain under review.",
+      "Clarified the exact cumulative total of 10,672 components across both editions and distinguished unreleased counts from completed results.",
+      "Fixed clipped columns on medium-width phones and kept batch details, search links, and historical records accessible across Chinese, English, and Japanese.",
+      "Malformed section links no longer interrupt the service center. Existing project artwork, keyboard interactions, low-volume SFX, and opt-in BGM were rechecked.",
+    ],
+  },
+  {
     version: "2.18.8",
     date: "2026-09-11",
     title: "Reliable Transfer Feedback, Keyboard Focus, and Audio Controls",

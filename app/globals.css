@@ -4854,6 +4854,24 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   animation: skinDetailsOpen calc(0.3s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+.skinReviewRecentTitle {
+  margin: 0;
+  padding: 16px 20px;
+  color: var(--skin-text);
+  font-size: 0.94rem;
+  font-weight: 580;
+}
+
+.skinReviewBatchList.isRecent {
+  max-height: none;
+  overflow: visible;
+  scrollbar-gutter: auto;
+}
+
+.skinReviewArchive {
+  border-top: 1px solid var(--skin-border);
+}
+
 .skinReviewBatch {
   scroll-margin-block: 10px;
   border: 1px solid transparent;
@@ -5374,6 +5392,25 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     flex-direction: column;
   }
 
+  .skinFeedbackReplyNotice {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .skinFeedbackReplyNotice > a {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .skinServiceSearchField {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 700px) {
   .skinReviewColumns {
     display: none;
   }
@@ -5405,6 +5442,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
   .skinReviewMetric > small {
     display: block;
+    white-space: normal;
     color: var(--skin-muted);
     font-size: 0.58rem;
     font-weight: 520;
@@ -5432,22 +5470,9 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     font-size: 0.68rem;
   }
 
-  .skinFeedbackReplyNotice {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-    padding: 16px;
-    gap: 12px;
-  }
+}
 
-  .skinFeedbackReplyNotice > a {
-    grid-column: 1 / -1;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .skinServiceSearchField {
-    align-items: stretch;
-  }
+@media (max-width: 480px) {
 
   .skinServiceSearchResults,
   .skinCommunityGrid,
