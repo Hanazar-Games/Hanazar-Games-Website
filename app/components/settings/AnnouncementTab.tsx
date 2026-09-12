@@ -4,6 +4,16 @@ import { useTranslation } from "../../hooks/useTranslation";
 
 const changelog = [
   {
+    version: "2.18.10",
+    date: "2026-09-12",
+    title: "Search-link Navigation Fix and Site Recheck",
+    items: [
+      "Skin-service search results now preserve native new-tab and new-window navigation for modified clicks, without clearing the original search query.",
+      "Plain search clicks still reveal matching batches and articles. Rechecked responsive settings, independent service preferences, localized review records, artwork, SFX, and opt-in BGM.",
+      "Review data is unchanged: Batch 215 contains 19 components, Batch 216 contains 24, and the cumulative total across both editions is 10,672. Batches 217–221 remain under review.",
+    ],
+  },
+  {
     version: "2.18.9",
     date: "2026-09-12",
     title: "Visible Review Results and Responsive Batch Records",

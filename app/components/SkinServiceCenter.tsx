@@ -118,6 +118,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.18.10", date: "2026-09-12", title: "update1810Title", body: "update1810Body" },
   { version: "2.18.9", date: "2026-09-12", title: "update189Title", body: "update189Body" },
   { version: "2.18.8", date: "2026-09-11", title: "update188Title", body: "update188Body" },
   { version: "2.18.7", date: "2026-09-11", title: "update187Title", body: "update187Body" },
@@ -1057,6 +1058,7 @@ export default function SkinServiceCenter({
                 key={`${result.href}-${index}`}
                 href={result.href}
                 onClick={(event) => {
+                  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
                   setQuery("");
                   setActiveArticleCategory("all");
                   if (result.section !== activeSection) return;

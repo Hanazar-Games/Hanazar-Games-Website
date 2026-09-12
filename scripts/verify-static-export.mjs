@@ -229,6 +229,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.18.10",
+    "搜索链接交互修复与整体复查",
     "2.18.9",
     "近期审核结果直览与表格修复",
     "2.18.8",
