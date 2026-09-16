@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslation } from "./hooks/useTranslation";
 import { useRevealOnScroll } from "./hooks/useRevealOnScroll";
-import { aigcExperiments, homepageGames, homepageToolGroups } from "./lib/catalog";
+import { homepageAigcExperiments, homepageGames, homepageToolGroups } from "./lib/catalog";
 import { assetPath } from "./lib/paths";
 
 const githubUrl = "https://github.com/hzagaming";
@@ -206,9 +206,9 @@ export default function HomePage() {
           {homepageGames.map((game, index) => (
             <article
               key={game.title}
-              className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}
+              className={`gameCard ${index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"}`}
               data-reveal
-              style={{ "--reveal-delay": `${(index % 2) * 0.06}s` } as CSSProperties}
+              style={{ "--reveal-delay": `${index * 0.06}s` } as CSSProperties}
             >
               <div className="gameCardImageWrap">
                 <Image
@@ -217,7 +217,7 @@ export default function HomePage() {
                   className="gameCardImage"
                   width={1280}
                   height={720}
-                  sizes="(max-width: 800px) 100vw, 50vw"
+                  sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
                 />
               </div>
               <div className="gameCardBody">
@@ -254,12 +254,12 @@ export default function HomePage() {
         </div>
 
         <div className="gamesGrid homepageAigcGrid">
-          {aigcExperiments.map((experiment, index) => (
+          {homepageAigcExperiments.map((experiment, index) => (
             <article
               key={experiment.title}
-              className={`gameCard ${index % 2 === 0 ? "revealLeft" : "revealRight"}`}
+              className={`gameCard ${index === 0 ? "revealLeft" : index === 1 ? "revealFade" : "revealRight"}`}
               data-reveal
-              style={{ "--reveal-delay": `${(index % 2) * 0.06}s` } as CSSProperties}
+              style={{ "--reveal-delay": `${index * 0.06}s` } as CSSProperties}
             >
               <div className="gameCardImageWrap">
                 <Image
@@ -268,7 +268,7 @@ export default function HomePage() {
                   className="gameCardImage"
                   width={1280}
                   height={720}
-                  sizes="(max-width: 800px) 100vw, 50vw"
+                  sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
                 />
               </div>
               <div className="gameCardBody">
@@ -320,24 +320,18 @@ export default function HomePage() {
                 <div className="toolsGroupMeta">
                   {group.moreHref && (
                     <Link className="sectionTextLink" href={group.moreHref}>
-                      {tr("pluginsBrowseAll")} <span aria-hidden="true">→</span>
+                      {tr(group.title === "browserPluginsTitle" ? "pluginsBrowseAll" : "webToolsBrowseAll")} <span aria-hidden="true">→</span>
                     </Link>
                   )}
                   <span className="toolsGroupCount">{String(group.tools.length).padStart(2, "0")}</span>
                 </div>
               </div>
 
-              <div className={`toolsGrid${
-                  group.tools.length === 1
-                    ? " toolsGridSingle"
-                    : group.tools.length === 2
-                        ? " toolsGridMac"
-                        : ""
-              }`}>
+              <div className="toolsGrid">
                 {group.tools.map((tool, index) => (
                   <article
                     key={tool.title}
-                    className={`gameCard toolCard${group.tools.length === 1 ? " toolCardWide" : ""}${
+                    className={`gameCard toolCard${
                       group.title === "browserPluginsTitle" ? " pluginCard" : ""
                     } ${
                       index % 3 === 0
@@ -358,27 +352,27 @@ export default function HomePage() {
                         className="gameCardImage"
                         width={1280}
                         height={720}
-                        sizes={group.tools.length === 1
-                          ? "(max-width: 980px) 100vw, 54vw"
-                          : group.tools.length % 2 === 0
-                            ? "(max-width: 800px) 100vw, 50vw"
-                            : "(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"}
+                        sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
                       />
                     </div>
                     <div className="gameCardBody">
                       <span className="gameCardTag">{tr(tool.tag)}</span>
                       <h4>{tr(tool.title)}</h4>
                       <p>{tr(tool.description)}</p>
-                      <a
-                        className="gameCardButton"
-                        href={tool.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${tr(tool.cta)}: ${tr(tool.title)}`}
-                      >
-                        {tr(tool.cta)}
-                        <span className="gameCardArrow" aria-hidden="true">↗</span>
-                      </a>
+                      {tool.href ? (
+                        <a
+                          className="gameCardButton"
+                          href={tool.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${tr(tool.cta)}: ${tr(tool.title)}`}
+                        >
+                          {tr(tool.cta)}
+                          <span className="gameCardArrow" aria-hidden="true">↗</span>
+                        </a>
+                      ) : (
+                        <span className="gameCardStatus">{tr(tool.cta)}</span>
+                      )}
                     </div>
                   </article>
                 ))}
@@ -395,11 +389,14 @@ export default function HomePage() {
         </div>
 
         <a className="skinServiceFeature reveal revealFade" href="skin-service/" data-reveal>
-          <span className="skinServiceFeatureLabel">{tr("skinServiceEyebrow")}</span>
-          <h3>{tr("skinServiceTitle")}</h3>
-          <span className="skinServiceFeatureCta">
-            {tr("skinServiceOpen")} <span aria-hidden="true">→</span>
-          </span>
+          <div className="skinServiceFeatureBody">
+            <span className="skinServiceFeatureLabel">{tr("skinServiceEyebrow")}</span>
+            <h3>{tr("skinServiceTitle")}</h3>
+            <span className="skinServiceFeatureCta">
+              {tr("skinServiceOpen")} <span aria-hidden="true">→</span>
+            </span>
+          </div>
+          <Image src={assetPath("/skin-service/cover.svg")} alt="" className="skinServiceFeatureImage" width={1280} height={720} sizes="(max-width: 800px) 100vw, 50vw" />
         </a>
       </section>
 

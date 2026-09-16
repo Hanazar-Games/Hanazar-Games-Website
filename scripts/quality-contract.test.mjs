@@ -163,14 +163,15 @@ test("subpage hero titles balance narrow-screen line breaks", async () => {
 });
 
 test("catalog exposes featured games, AIGC projects, tools, and browser plugins", async () => {
-  const { aigcExperiments, browserPlugins, games, homepageGames, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
+  const { aigcExperiments, browserPlugins, games, homepageGames, homepageAigcExperiments, homepageToolGroups, toolGroups } = await import("../app/lib/catalog.ts");
   const claudeOpus5Project = {
     href: "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
     image: "/aigc/claude-opus5-starfall.jpg",
   };
 
-  assert.deepEqual(homepageGames, games.slice(0, 4));
-  for (const collection of [games, homepageGames, aigcExperiments]) {
+  assert.deepEqual(homepageGames, games.slice(0, 3));
+  assert.deepEqual(homepageAigcExperiments, aigcExperiments.slice(0, 3));
+  for (const collection of [games, aigcExperiments]) {
     assert.ok(collection.some(({ href, image }) => (
       href === claudeOpus5Project.href && image === claudeOpus5Project.image
     )));
@@ -180,7 +181,7 @@ test("catalog exposes featured games, AIGC projects, tools, and browser plugins"
   )));
   assert.equal(homepageGames.some((game) => game.href === "https://hanazar-games.github.io/Go/"), false);
 
-  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 3, 3, 1, 1]);
+  assert.deepEqual(toolGroups.map((group) => group.tools.length), [2, 4, 4, 3]);
   assert.ok(homepageToolGroups.every((group) => group.tools.length <= 3));
   assert.ok(homepageToolGroups[1].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"));
   assert.equal(toolGroups[2].title, "browserPluginsTitle");
@@ -190,11 +191,22 @@ test("catalog exposes featured games, AIGC projects, tools, and browser plugins"
     { title: "pluginTextReaderTitle", image: "/plugins/text-reader.svg" },
     { title: "pluginHanazarNoteTitle", image: "/plugins/hanazar-note.svg" },
     { title: "pluginWebFileHunterTitle", image: "/plugins/webfile-hunter.svg" },
+    { title: "pluginHanazarPenTitle", image: "/plugins/hanazar-pen.svg" },
   ]);
-  assert.ok(browserPlugins.every(({ href }) => href.startsWith("https://microsoftedge.microsoft.com/addons/search/")));
-  assert.equal(toolGroups[4].tools.some((tool) => tool.href === "https://hzagaming.github.io/LIstener"), false);
+  assert.deepEqual(browserPlugins.map(({ href }) => href), [
+    "https://microsoftedge.microsoft.com/addons/detail/textreader/hmpnghjeoenkikigifpiomochegoddgh",
+    "https://microsoftedge.microsoft.com/addons/detail/hanazar%E2%80%99s-note/eijhnaganiocpdihfomecfehnbcmpkhi",
+    "https://microsoftedge.microsoft.com/addons/detail/webfile-hunter-web-file/jcphffanpalggokbmpicgfpfkdiioicm",
+    "https://microsoftedge.microsoft.com/addons/detail/hanazars-pen/chfhmfpgfmgehaeijjfhmokdmcegadna",
+  ]);
+  assert.deepEqual(homepageToolGroups[2].tools, browserPlugins.slice(0, 3));
+  assert.equal(homepageToolGroups[2].moreHref, "/plugins");
+  assert.equal(toolGroups[3].title, "toolsSystemsTitle");
+  assert.deepEqual(toolGroups[3].tools.map(tool => tool.title), ["toolHeptTitle", "productLc300aTitle", "productSwordosTitle"]);
+  assert.equal(toolGroups[3].tools[2].href, null);
+  assert.equal(toolGroups[3].tools[2].cta, "projectInDevelopment");
   const tools = toolGroups.flatMap((group) => group.tools);
-  assert.equal(tools.some(({ href }) => href.includes("Mirako-Official")), false);
+  assert.equal(tools.some(({ href }) => href?.includes("Mirako-Official")), false);
   for (const expected of [
     { href: "https://github.com/hzagaming/Hept/releases", image: "/tools/hept.jpg" },
     { href: "https://hzagaming.github.io/LIstener", image: "/tools/listener.jpg" },
@@ -213,10 +225,11 @@ test("every catalog image and direct page asset exists in the public tree", asyn
     ...toolGroups.flatMap((group) => group.tools),
   ];
   const catalogImages = [...new Set(entries.map(({ image }) => image))];
-  const assets = [...catalogImages, "/IntroPic.webp", "/skin-service/review-account-qr.svg"];
+  const { currentRelease } = await import("../app/lib/release.ts");
+  const assets = [...catalogImages, "/IntroPic.webp", "/skin-service/review-account-qr.svg", "/skin-service/cover.svg", currentRelease.image];
 
-  assert.equal(catalogImages.length, 33);
-  assert.equal(assets.length, 35);
+  assert.equal(catalogImages.length, 39);
+  assert.equal(assets.length, 43);
   for (const asset of assets) {
     assert.match(asset, /^\/[a-zA-Z0-9][a-zA-Z0-9/._-]+$/);
     const info = await stat(new URL(`public${asset}`, root));
@@ -225,21 +238,31 @@ test("every catalog image and direct page asset exists in the public tree", asyn
   }
 });
 
-test("four-card homepage and AIGC collections use balanced responsive grids", async () => {
+test("homepage previews use three-column grids and the full AIGC archive remains accessible", async () => {
   const [home, aigc, css] = await Promise.all([
     read("app/page.tsx"),
     read("app/aigc/page.tsx"),
     read("app/globals.css"),
   ]);
 
-  assert.match(css, /\.homepageGamesGrid,\s*\.homepageAigcGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.gamesGrid \{\s*display: grid;\s*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/);
   assert.match(css, /\.aigcGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
-  assert.ok(
-    css.lastIndexOf(".homepageGamesGrid,") > css.indexOf(".gamesGrid {\n  display: grid"),
-    "homepage grid override must follow the base grid",
-  );
-  assert.match(home, /sizes="\(max-width: 800px\) 100vw, 50vw"/);
+  assert.doesNotMatch(css, /\.homepageGamesGrid,\s*\.homepageAigcGrid/);
+  assert.match(home, /homepageAigcExperiments\.map/);
+  assert.match(home, /href="aigc\/"/);
+  assert.match(home, /sizes="\(max-width: 800px\) 100vw, \(max-width: 980px\) 50vw, 33vw"/);
   assert.match(aigc, /sizes="\(max-width: 800px\) 100vw, 50vw"/);
+});
+
+test("system projects avoid fake download links and skin service has a cover", async () => {
+  const [home, tools, css] = await Promise.all([read("app/page.tsx"), read("app/tools/page.tsx"), read("app/globals.css")]);
+  for (const page of [home, tools]) {
+    assert.match(page, /tool\.href \? \(/);
+    assert.match(page, /className="gameCardStatus"/);
+    assert.doesNotMatch(page, /toolsGridSingle|toolsGridMac|toolCardWide/);
+  }
+  assert.doesNotMatch(css, /toolsGridSingle|toolsGridMac|toolCardWide/);
+  assert.match(home, /assetPath\("\/skin-service\/cover\.svg"\)/);
 });
 
 test("homepage tools cap each group at three cards and link to the archive", async () => {
@@ -274,10 +297,13 @@ test("browser plugins have a dedicated GamesHub-style archive", async () => {
   assert.match(copy, /TextReader/);
   assert.match(copy, /Hanazar’s Note/);
   assert.match(copy, /WebFile Hunter/);
+  assert.match(copy, /Hanazar's Pen/);
+  assert.match(css, /\.pluginsGrid \{\s*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(page, /sizes="\(max-width: 800px\) 100vw, 50vw"/);
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*?\.pluginsHero \.gamesHeroTitle \{[\s\S]*?max-width: 9ch;/);
   assert.match(verifier, /plugins\/index\.html/);
   assert.match(verifier, /const catalogAssets =/);
-  assert.match(verifier, /catalogAssets\.length !== 33/);
+  assert.match(verifier, /catalogAssets\.length !== 39/);
   assert.match(verifier, /\.\.\.catalogAssets/);
 });
 
@@ -286,7 +312,7 @@ test("browser plugin artwork uses transparent logo marks and dedicated card stag
     read("app/page.tsx"),
     read("app/tools/page.tsx"),
     read("app/globals.css"),
-    ...["text-reader.svg", "hanazar-note.svg", "webfile-hunter.svg"].map((image) => (
+    ...["text-reader.svg", "hanazar-note.svg", "webfile-hunter.svg", "hanazar-pen.svg"].map((image) => (
       read(`public/plugins/${image}`)
     )),
   ]);
@@ -300,6 +326,17 @@ test("browser plugin artwork uses transparent logo marks and dedicated card stag
   assert.match(css, /\.pluginCard \.gameCardImageWrap \{[\s\S]*?place-items: center;/);
   assert.match(css, /\.pluginCard \.gameCardImage \{[\s\S]*?object-fit: contain;/);
   assert.match(css, /body\[data-disable-btn-hover="true"\] \.pluginCard:hover \.gameCardImage/);
+});
+
+test("Hanazar's Pen has localized descriptions and store actions", async () => {
+  const { getTranslation } = await import("../app/lib/i18n.ts");
+  for (const language of ["en", "zh-CN", "zh-TW", "ja", "ko"]) {
+    assert.equal(getTranslation(language, "pluginHanazarPenTitle"), "Hanazar's Pen");
+    for (const key of ["pluginHanazarPenDesc", "pluginTagHighlights", "pluginOpenStore"]) {
+      assert.notEqual(getTranslation(language, key), key);
+      assert.ok(getTranslation(language, key).trim());
+    }
+  }
 });
 
 test("homepage text and footer links keep a usable pointer target", async () => {
@@ -389,14 +426,16 @@ test("patch release metadata stays synchronized", async () => {
   const packageData = JSON.parse(packageText);
   const lockData = JSON.parse(lockText);
 
-  assert.equal(packageData.version, "2.18.10");
-  assert.equal(lockData.version, "2.18.10");
-  assert.equal(lockData.packages[""].version, "2.18.10");
-  assert.match(center, /version: "2\.18\.10", date: "2026-09-12"/);
+  const { currentRelease } = await import("../app/lib/release.ts");
+  assert.equal(packageData.version, "2.19.0");
+  assert.equal(lockData.version, currentRelease.version);
+  assert.equal(lockData.packages[""].version, currentRelease.version);
+  assert.equal(currentRelease.version, packageData.version);
+  assert.ok(center.includes(`version: "${currentRelease.version}", date: "${currentRelease.date}"`));
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
-  assert.match(copy, /搜索链接交互修复与整体复查/);
-  assert.match(announcement, /version: "2\.18\.10"/);
-  assert.match(verifier, /2\.18\.10/);
+  assert.match(copy, /主站项目扩展与版本更新提醒/);
+  assert.match(announcement, /\.\.\.currentRelease/);
+  assert.match(verifier, /2\.19\.0/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

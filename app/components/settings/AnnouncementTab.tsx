@@ -1,6 +1,9 @@
 "use client";
 
 import { useTranslation } from "../../hooks/useTranslation";
+import Image from "next/image";
+import { assetPath } from "../../lib/paths";
+import { currentRelease } from "../../lib/release";
 
 const changelog = [
   {
@@ -789,12 +792,18 @@ const changelog = [
 
 export default function AnnouncementTab() {
   const { tr } = useTranslation();
-  const [latest, ...history] = changelog;
+  const latest = {
+    ...currentRelease,
+    title: tr(currentRelease.titleKey),
+    items: currentRelease.itemKeys.map(tr),
+  };
+  const history = changelog;
 
   return (
     <div className="settingsTabContent">
       <div className="changelogList">
         <div className="changelogEntry changelogEntryLatest" key={latest.version}>
+          <Image src={assetPath(currentRelease.image)} alt={tr("releaseArtworkAlt")} width={1200} height={600} sizes="(max-width: 800px) 85vw, 620px" style={{ width: "100%", height: "auto", borderRadius: 14, marginBottom: 16 }} />
           <div className="changelogHeader">
             <span className="changelogVersion">{latest.version}</span>
             <span className="changelogDate">{latest.date}</span>

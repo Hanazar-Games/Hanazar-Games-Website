@@ -5,6 +5,7 @@ import HtmlLang from "./components/HtmlLang";
 import StyleApplier from "./components/StyleApplier";
 import AudioEngine from "./components/AudioEngine";
 import SettingsLauncher from "./components/SettingsLauncher";
+import ReleaseNotice from "./components/ReleaseNotice";
 
 export const metadata: Metadata = {
   title: "Hanazar Games",
@@ -25,6 +26,7 @@ export default function RootLayout({
           <AudioEngine />
           <SettingsLauncher />
           {children}
+          <ReleaseNotice />
         </SettingsProvider>
       </body>
     </html>

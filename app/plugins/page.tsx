@@ -8,7 +8,7 @@ import { useTranslation } from "../hooks/useTranslation";
 import { browserPlugins } from "../lib/catalog";
 import { assetPath } from "../lib/paths";
 
-const revealClasses = ["revealLeft", "revealFade", "revealRight"];
+const revealClasses = ["revealLeft", "revealRight"];
 
 export default function PluginsPage() {
   const { tr } = useTranslation();
@@ -34,7 +34,7 @@ export default function PluginsPage() {
             key={plugin.title}
             className={`gameCard pluginCard ${revealClasses[index % revealClasses.length]}`}
             data-reveal
-            style={{ "--reveal-delay": `${(index % 3) * 0.06}s` } as CSSProperties}
+            style={{ "--reveal-delay": `${(index % 2) * 0.06}s` } as CSSProperties}
           >
             <div className="gameCardImageWrap">
               <Image
@@ -44,7 +44,7 @@ export default function PluginsPage() {
                 width={512}
                 height={512}
                 loading="eager"
-                sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
+                sizes="(max-width: 800px) 100vw, 50vw"
               />
             </div>
             <div className="gameCardBody">

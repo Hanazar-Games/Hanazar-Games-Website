@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101d34"/><stop offset="1" stop-color="#090d18"/></linearGradient>
+    <linearGradient id="orb" x2="1" y2="1"><stop stop-color="#a6f5ea"/><stop offset=".55" stop-color="#689ce9"/><stop offset="1" stop-color="#7664c5"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#477fae" stop-opacity=".28"/><stop offset="1" stop-color="#477fae" stop-opacity="0"/></radialGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1280v720H0z"/>
+  <circle cx="938" cy="359" r="360" fill="url(#glow)"/>
+  <g stroke="#a1d7eb" fill="none">
+    <circle cx="929" cy="348" r="243" stroke-opacity=".18"/>
+    <ellipse cx="929" cy="348" rx="300" ry="107" transform="rotate(-32 929 348)" stroke-opacity=".35"/>
+    <path d="M77 537h1126M677 123v481M1203 123v481" stroke-opacity=".1"/>
+  </g>
+  <path d="m929 158 165 95v190l-165 95-165-95V253Z" fill="url(#orb)" opacity=".9"/>
+  <path d="m929 158 165 95-165 95-165-95Z" fill="#c1f3f4" opacity=".6"/>
+  <path d="m929 348 165-95v190l-165 95Z" fill="#405c9b" opacity=".7"/>
+  <path d="M929 348v190m0-190L764 253m165 95 165-95" fill="none" stroke="#ddffff" stroke-opacity=".8" stroke-width="2"/>
+  <circle cx="1121" cy="185" r="7" fill="#c5ffff"/>
+  <circle cx="699" cy="482" r="4" fill="#9abaff"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="76" y="111" fill="#9eb7d3" font-size="19" letter-spacing="5">HANAZAR GAMES / AIGC LAB</text>
+    <text x="68" y="322" fill="#f0f7ff" font-size="120" font-weight="750" letter-spacing="-5">GPT6</text>
+    <text x="76" y="397" fill="#9ee6e3" font-size="58" font-weight="600" letter-spacing="11">MAX</text>
+    <text x="76" y="461" fill="#a7bdd8" font-size="25" letter-spacing="4">TEST PROJECT / 01</text>
+    <text x="76" y="647" fill="#8199b6" font-size="20" letter-spacing="3">AN AIGC WEBGAME EXPERIMENT</text>
+  </g>
+</svg>

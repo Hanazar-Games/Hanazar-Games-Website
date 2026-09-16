@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#e6f4f7"/><stop offset="1" stop-color="#c7dfe9"/></linearGradient>
+    <linearGradient id="cube" x2="1" y2="1"><stop stop-color="#46aeb8"/><stop offset="1" stop-color="#25618c"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1280v720H0z"/>
+  <g fill="none" stroke="#366e8c" stroke-opacity=".08"><path d="M0 150h1280M0 300h1280M0 450h1280M0 600h1280M160 0v720M320 0v720M480 0v720M640 0v720M800 0v720M960 0v720M1120 0v720"/></g>
+  <rect x="716" y="151" width="444" height="400" rx="36" fill="#f4fbfc" stroke="#bad4df" stroke-width="2"/>
+  <g stroke="#b1cbd9" stroke-width="2"><path d="M748 208h380M748 491h380"/></g>
+  <g fill="#86aaba"><circle cx="752" cy="181" r="5"/><circle cx="773" cy="181" r="5"/><circle cx="794" cy="181" r="5"/></g>
+  <path d="m924 245 112 62v120l-112 62-112-62V307Z" fill="url(#cube)"/>
+  <g fill="none" stroke="#deffff" stroke-width="2.5" stroke-linejoin="round"><path d="m924 245 112 62-112 62-112-62 112-62v124m0 120V369m112-62v120l-112 62-112-62V307"/><path d="m812 427 112-61 112 61m-112-61V245" stroke-dasharray="6 9" opacity=".4"/></g>
+  <circle cx="1090" cy="508" r="56" fill="#318670" stroke="#e6f4f7" stroke-width="10"/>
+  <path d="m1067 507 17 18 31-36" stroke="white" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="76" y="111" fill="#547687" font-size="19" letter-spacing="5">WEB TOOLS / 3D MODELS</text>
+    <text x="76" y="258" fill="#456e7c" font-size="30" letter-spacing="2">OpenWorld</text>
+    <text x="68" y="369" fill="#133f54" font-size="110" font-weight="750" letter-spacing="-4">GLB</text>
+    <text x="73" y="456" fill="#246579" font-size="74" font-weight="600" letter-spacing="-3">Checker</text>
+    <text x="76" y="647" fill="#547687" font-size="20" letter-spacing="3">MODEL CHECKING IN YOUR BROWSER</text>
+  </g>
+</svg>

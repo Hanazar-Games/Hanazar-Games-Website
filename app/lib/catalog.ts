@@ -6,7 +6,8 @@ export interface GameEntry {
   image: string;
 }
 
-export interface ToolEntry extends GameEntry {
+export interface ToolEntry extends Omit<GameEntry, "href"> {
+  href: string | null;
   cta: string;
 }
 
@@ -17,7 +18,30 @@ export interface ToolGroup {
   moreHref?: string;
 }
 
+const gpt6Project: GameEntry = {
+  title: "aigcGpt6MaxTitle",
+  description: "aigcGpt6MaxDesc",
+  href: "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
+  tag: "aigcTagGpt6Max",
+  image: "/aigc/gpt6-max-test-project-1.svg",
+};
+
 export const games: GameEntry[] = [
+  {
+    title: "gameOpenWorldCraftTitle",
+    description: "gameOpenWorldCraftDesc",
+    href: "https://openworldcraft.com/",
+    tag: "gameTagWeb",
+    image: "/games/openworldcraft.svg",
+  },
+  gpt6Project,
+  {
+    title: "gameXhamTitle",
+    description: "gameXhamDesc",
+    href: "https://hanazar-games.github.io/xham/",
+    tag: "gameTagQuiz",
+    image: "/games/xham.svg",
+  },
   {
     title: "gameGuandanTitle",
     description: "gameGuandanDesc",
@@ -167,15 +191,15 @@ export const games: GameEntry[] = [
   },
 ];
 
-export const homepageGames = games.slice(0, 4);
+export const homepageGames = games.slice(0, 3);
 
-export const browserPlugins: ToolEntry[] = [
+export const browserPlugins = [
   {
     title: "pluginTextReaderTitle",
     description: "pluginTextReaderDesc",
     tag: "pluginTagAccessibility",
     cta: "pluginOpenStore",
-    href: "https://microsoftedge.microsoft.com/addons/search/TextReader",
+    href: "https://microsoftedge.microsoft.com/addons/detail/textreader/hmpnghjeoenkikigifpiomochegoddgh",
     image: "/plugins/text-reader.svg",
   },
   {
@@ -183,7 +207,7 @@ export const browserPlugins: ToolEntry[] = [
     description: "pluginHanazarNoteDesc",
     tag: "pluginTagNotes",
     cta: "pluginOpenStore",
-    href: "https://microsoftedge.microsoft.com/addons/search/Hanazar%27s%20Note",
+    href: "https://microsoftedge.microsoft.com/addons/detail/hanazar%E2%80%99s-note/eijhnaganiocpdihfomecfehnbcmpkhi",
     image: "/plugins/hanazar-note.svg",
   },
   {
@@ -191,10 +215,18 @@ export const browserPlugins: ToolEntry[] = [
     description: "pluginWebFileHunterDesc",
     tag: "pluginTagDiscovery",
     cta: "pluginOpenStore",
-    href: "https://microsoftedge.microsoft.com/addons/search/WebFile%20Hunter",
+    href: "https://microsoftedge.microsoft.com/addons/detail/webfile-hunter-web-file/jcphffanpalggokbmpicgfpfkdiioicm",
     image: "/plugins/webfile-hunter.svg",
   },
-];
+  {
+    title: "pluginHanazarPenTitle",
+    description: "pluginHanazarPenDesc",
+    tag: "pluginTagHighlights",
+    cta: "pluginOpenStore",
+    href: "https://microsoftedge.microsoft.com/addons/detail/hanazars-pen/chfhmfpgfmgehaeijjfhmokdmcegadna",
+    image: "/plugins/hanazar-pen.svg",
+  },
+] satisfies ToolEntry[];
 
 export const toolGroups: ToolGroup[] = [
   {
@@ -222,7 +254,16 @@ export const toolGroups: ToolGroup[] = [
   {
     title: "toolsWebTitle",
     label: "toolsWebLabel",
+    moreHref: "/tools#web-tools",
     tools: [
+      {
+        title: "toolGlbCheckerTitle",
+        description: "toolGlbCheckerDesc",
+        tag: "toolTag3d",
+        cta: "toolOpenButton",
+        href: "https://mirako-official.github.io/OpenWorld-GLB-Checker/",
+        image: "/tools/openworld-glb-checker.svg",
+      },
       {
         title: "toolOcMakerTitle",
         description: "toolOcMakerDesc",
@@ -256,8 +297,8 @@ export const toolGroups: ToolGroup[] = [
     moreHref: "/plugins",
   },
   {
-    title: "toolsIosTitle",
-    label: "toolsIosLabel",
+    title: "toolsSystemsTitle",
+    label: "toolsSystemsLabel",
     tools: [
       {
         title: "toolHeptTitle",
@@ -267,12 +308,6 @@ export const toolGroups: ToolGroup[] = [
         href: "https://github.com/hzagaming/Hept/releases",
         image: "/tools/hept.jpg",
       },
-    ],
-  },
-  {
-    title: "toolsOtherTitle",
-    label: "toolsOtherLabel",
-    tools: [
       {
         title: "productLc300aTitle",
         description: "productLc300aDesc",
@@ -280,6 +315,14 @@ export const toolGroups: ToolGroup[] = [
         cta: "ctaViewGithub",
         href: "https://github.com/hzagaming/LC300A",
         image: "/products/lc300a.jpg",
+      },
+      {
+        title: "productSwordosTitle",
+        description: "productSwordosDesc",
+        tag: "productTagOperatingSystem",
+        cta: "projectInDevelopment",
+        href: null,
+        image: "/products/swordos.svg",
       },
     ],
   },
@@ -291,6 +334,7 @@ export const homepageToolGroups: ToolGroup[] = toolGroups.map((group) => ({
 }));
 
 export const aigcExperiments: GameEntry[] = [
+  gpt6Project,
   {
     title: "aigcGpt56UltraTitle",
     description: "aigcGpt56UltraDesc",
@@ -320,3 +364,5 @@ export const aigcExperiments: GameEntry[] = [
     image: "/aigc/gpt-55-medium.jpg",
   },
 ];
+
+export const homepageAigcExperiments = aigcExperiments.slice(0, 3);

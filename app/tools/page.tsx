@@ -28,7 +28,7 @@ export default function ToolsPage() {
 
       <div className="toolsArchiveGroups">
         {toolGroups.map((group, groupIndex) => (
-          <section className="toolsGroup" key={group.title}>
+          <section className="toolsGroup" key={group.title} id={group.title === "toolsWebTitle" ? "web-tools" : undefined}>
             <div
               className={`toolsGroupHeading ${groupIndex % 2 === 0 ? "revealLeft" : "revealRight"}`}
               data-reveal
@@ -38,7 +38,7 @@ export default function ToolsPage() {
                 <h2>{tr(group.title)}</h2>
               </div>
               <div className="toolsGroupMeta">
-                {group.moreHref && (
+                {group.moreHref && !group.moreHref.startsWith("/tools") && (
                   <Link className="sectionTextLink" href={group.moreHref}>
                     {tr("pluginsBrowseAll")} <span aria-hidden="true">→</span>
                   </Link>
@@ -47,11 +47,11 @@ export default function ToolsPage() {
               </div>
             </div>
 
-            <div className={`toolsGrid${group.tools.length === 1 ? " toolsGridSingle" : ""}`}>
+            <div className="toolsGrid">
               {group.tools.map((tool, index) => (
                 <article
                   key={tool.title}
-                  className={`gameCard toolCard${group.tools.length === 1 ? " toolCardWide" : ""}${
+                  className={`gameCard toolCard${
                     group.title === "browserPluginsTitle" ? " pluginCard" : ""
                   } ${
                     index % 3 === 0
@@ -71,25 +71,27 @@ export default function ToolsPage() {
                       width={1280}
                       height={720}
                       loading={groupIndex === 0 && index < 2 ? "eager" : "lazy"}
-                      sizes={group.tools.length === 1
-                        ? "(max-width: 980px) 100vw, 54vw"
-                        : "(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"}
+                      sizes="(max-width: 800px) 100vw, (max-width: 980px) 50vw, 33vw"
                     />
                   </div>
                   <div className="gameCardBody">
                     <span className="gameCardTag">{tr(tool.tag)}</span>
                     <h3>{tr(tool.title)}</h3>
                     <p>{tr(tool.description)}</p>
-                    <a
-                      className="gameCardButton"
-                      href={tool.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${tr(tool.cta)}: ${tr(tool.title)}`}
-                    >
-                      {tr(tool.cta)}
-                      <span className="gameCardArrow" aria-hidden="true">↗</span>
-                    </a>
+                    {tool.href ? (
+                      <a
+                        className="gameCardButton"
+                        href={tool.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${tr(tool.cta)}: ${tr(tool.title)}`}
+                      >
+                        {tr(tool.cta)}
+                        <span className="gameCardArrow" aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span className="gameCardStatus">{tr(tool.cta)}</span>
+                    )}
                   </div>
                 </article>
               ))}

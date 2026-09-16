@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#30205e"/><stop offset="1" stop-color="#111a3a"/></linearGradient>
+    <linearGradient id="tile" x2="1" y2="1"><stop stop-color="#ad87ff"/><stop offset="1" stop-color="#6d4dc5"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1280v720H0z"/>
+  <g fill="none" stroke="#af99fd" stroke-opacity=".12"><circle cx="987" cy="347" r="280"/><circle cx="987" cy="347" r="368"/><path d="M0 590h1280M114 0v720"/></g>
+  <g transform="translate(865 147) rotate(12)">
+    <rect x="0" y="0" width="244" height="244" rx="52" fill="url(#tile)"/>
+    <path d="M85 84c0-51 85-52 85-5 0 36-41 29-41 67" stroke="#fff" stroke-width="20" stroke-linecap="round" fill="none"/>
+    <circle cx="129" cy="187" r="11" fill="#fff"/>
+  </g>
+  <g transform="translate(704 367) rotate(-10)">
+    <rect width="190" height="170" rx="36" fill="#54cfba"/>
+    <path d="m56 87 28 27 56-62" stroke="#123e3c" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+  <g transform="translate(986 465) rotate(8)">
+    <rect width="148" height="136" rx="30" fill="#fbc577"/>
+    <path d="m50 41 48 51m0-51L50 92" stroke="#614124" stroke-width="13" stroke-linecap="round"/>
+  </g>
+  <g fill="#b7a2fa"><path d="m768 172 7 17 17 7-17 7-7 17-7-17-17-7 17-7Z"/><circle cx="1135" cy="414" r="6"/><circle cx="667" cy="294" r="5"/></g>
+  <g font-family="system-ui, sans-serif">
+    <text x="76" y="111" fill="#c0afea" font-size="19" letter-spacing="5">HANAZAR GAMES / QUIZ</text>
+    <text x="66" y="372" fill="#faf5ff" font-size="146" font-weight="800" letter-spacing="-8">Xham!</text>
+    <text x="76" y="440" fill="#d0c2ec" font-size="26" letter-spacing="3">A QUESTION. A CHOICE.</text>
+    <text x="76" y="647" fill="#a89bc6" font-size="20" letter-spacing="3">READY FOR THE NEXT ROUND?</text>
+  </g>
+</svg>

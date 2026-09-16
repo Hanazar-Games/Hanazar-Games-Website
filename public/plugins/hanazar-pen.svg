@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
+  <title id="title">Hanazar's Pen</title>
+  <desc id="description">An ivory pen nib on a copper tile above a golden highlight.</desc>
+  <defs>
+    <linearGradient id="copper" x1="84" y1="68" x2="420" y2="449" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#dba46f"/>
+      <stop offset=".48" stop-color="#ad602e"/>
+      <stop offset="1" stop-color="#713719"/>
+    </linearGradient>
+    <linearGradient id="nib" x1="189" y1="180" x2="318" y2="353" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffdf7"/>
+      <stop offset="1" stop-color="#f5dfb8"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="15" stdDeviation="15" flood-color="#50280f" flood-opacity=".3"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <rect x="66" y="58" width="380" height="396" rx="88" fill="url(#copper)"/>
+    <path d="m146 354 37-135 100-87 97 97-87 100-135 37Z" fill="url(#nib)"/>
+    <path d="m307 108 97 97-23 25-99-99Z" fill="#f7ca8b"/>
+    <path d="m158 354 98-98" fill="none" stroke="#995023" stroke-width="13" stroke-linecap="round"/>
+    <circle cx="265" cy="247" r="20" fill="#995023"/>
+    <path d="M145 404h221" fill="none" stroke="#f7ca8b" stroke-width="18" stroke-linecap="round"/>
+  </g>
+</svg>

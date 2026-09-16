@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#111d37"/><stop offset="1" stop-color="#1d2444"/></linearGradient>
+    <linearGradient id="blade" x2="1" y2="1"><stop stop-color="#e8f7ff"/><stop offset="1" stop-color="#80abea"/></linearGradient>
+    <radialGradient id="aura"><stop stop-color="#759afc" stop-opacity=".3"/><stop offset="1" stop-color="#759afc" stop-opacity="0"/></radialGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1280v720H0z"/>
+  <circle cx="928" cy="345" r="340" fill="url(#aura)"/>
+  <g fill="none" stroke="#98b5ff" stroke-opacity=".2"><path d="m928 93 256 256-256 256-256-256Z"/><path d="m928 148 201 201-201 201-201-201Z"/><circle cx="928" cy="349" r="233" stroke-dasharray="2 12"/></g>
+  <g transform="translate(925 338) rotate(32)">
+    <path d="M0-202 39-135 29 69 0 94-29 69-39-135Z" fill="url(#blade)"/>
+    <path d="M0-202V94l29-25 10-204Z" fill="#9ab8ed"/>
+    <path d="m-91 75 25-14 66 20 66-20 25 14-12 25-79-4-79 4Z" fill="#a5b9eb"/>
+    <rect x="-15" y="96" width="30" height="89" rx="8" fill="#657bb2"/>
+    <path d="m-17 115 34 12m-34 10 34 12m-34 10 34 12" stroke="#b3cbf4" stroke-width="5"/>
+    <path d="m0 180 28 21-28 25-28-25Z" fill="#c2d9ff"/>
+  </g>
+  <g font-family="system-ui, sans-serif">
+    <text x="76" y="111" fill="#a7b6d8" font-size="19" letter-spacing="5">HANAZAR / OPERATING SYSTEMS</text>
+    <text x="68" y="355" fill="#f0f5ff" font-size="92" font-weight="700" letter-spacing="-4">SwordOS</text>
+    <path d="M76 406h70" stroke="#9bbdff" stroke-width="4"/>
+    <rect x="76" y="455" width="239" height="46" rx="23" fill="#a5c5ff" fill-opacity=".1" stroke="#8ba5d4" stroke-opacity=".35"/>
+    <circle cx="101" cy="478" r="5" fill="#a8c8ff"/>
+    <text x="118" y="484" fill="#bed3f8" font-size="16" letter-spacing="2">IN DEVELOPMENT</text>
+    <text x="76" y="647" fill="#8e9ebf" font-size="20" letter-spacing="3">A NEW SYSTEM TAKES SHAPE.</text>
+  </g>
+</svg>

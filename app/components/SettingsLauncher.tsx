@@ -26,7 +26,7 @@ function MainSettingsLauncher() {
   const { tr } = useTranslation();
 
   const openSettings = useCallback(() => {
-    if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+    if (document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) return;
     setOpen(true);
   }, []);
   const closeSettings = useCallback(() => setOpen(false), []);

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="sky" x2="1" y2="1"><stop stop-color="#142e33"/><stop offset="1" stop-color="#081b24"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#a8ffbd" stop-opacity=".2"/><stop offset="1" stop-color="#a8ffbd" stop-opacity="0"/></radialGradient>
+    <linearGradient id="grass" x2="0" y2="1"><stop stop-color="#c1f1a0"/><stop offset="1" stop-color="#4eae91"/></linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1280v720H0z"/>
+  <ellipse cx="835" cy="250" rx="460" ry="440" fill="url(#light)"/>
+  <g stroke="#b9ffe3" stroke-opacity=".07" fill="none">
+    <path d="m0 510 640-320 640 320M0 630l640-320 640 320M220 720l640-320 420 210M0 390l640 320 640-320M0 270l900 450M380 720l900-450"/>
+  </g>
+  <circle cx="918" cy="152" r="56" fill="#e1fac7"/>
+  <g fill="#d4f9df"><circle cx="738" cy="107" r="3"/><circle cx="1120" cy="274" r="3"/><circle cx="1049" cy="92" r="2"/></g>
+  <g transform="translate(700 207)">
+    <path d="m-150 182 250-126 250 126-250 126Z" fill="#94d997"/>
+    <path d="m-150 182 250 126v139l-250-126Z" fill="#29584c"/>
+    <path d="m100 308 250-126v139L100 447Z" fill="#17483f"/>
+    <path d="m-150 182 250 126v25l-250-126Z" fill="#68ac7e"/>
+    <path d="m100 308 250-126v25L100 333Z" fill="#409474"/>
+    <path d="m-40 155 115-58 115 58-115 58Z" fill="url(#grass)"/>
+    <path d="m-40 155 115 58v63L-40 218Z" fill="#5ea887"/>
+    <path d="m75 213 115-58v63L75 276Z" fill="#337c6b"/>
+    <path d="m110 28 76-38 76 38-76 38Z" fill="#a8e791"/>
+    <path d="m110 28 76 38v105l-76-38Z" fill="#589968"/>
+    <path d="m186 66 76-38v105l-76 38Z" fill="#2e7058"/>
+    <path d="m179 151 15 7v73l-15-7Z" fill="#bfbc85"/>
+  </g>
+  <g font-family="system-ui, sans-serif">
+    <text x="76" y="111" fill="#b3d6c6" font-size="19" letter-spacing="5">HANAZAR GAMES / WEB GAME</text>
+    <text x="72" y="291" fill="#f1f7e9" font-size="72" font-weight="750" letter-spacing="-3">OpenWorld</text>
+    <text x="72" y="370" fill="#a8dc9a" font-size="72" font-weight="750" letter-spacing="-3">Craft</text>
+    <path d="M76 425h72" stroke="#a8dc9a" stroke-width="4"/>
+    <text x="76" y="647" fill="#99b8ae" font-size="20" letter-spacing="3">OPEN. PLAY. EXPLORE.</text>
+  </g>
+</svg>

@@ -26,12 +26,16 @@ const catalogSource = readFileSync("app/lib/catalog.ts", "utf8");
 const catalogAssets = [...new Set(
   [...catalogSource.matchAll(/\bimage:\s*"\/([^"]+)"/g)].map((match) => match[1]),
 )];
-if (catalogAssets.length !== 33) throw new Error(`Expected 33 catalog assets, found ${catalogAssets.length}`);
+if (catalogAssets.length !== 39) throw new Error(`Expected 39 catalog assets, found ${catalogAssets.length}`);
+const releaseSource = readFileSync("app/lib/release.ts", "utf8");
+const releaseImage = releaseSource.match(/image: "\/([^"]+)"/)?.[1];
+if (!releaseImage) throw new Error("Missing release artwork");
 
 const requiredFiles = [...new Set([
   "index.html",
   "404.html",
   "IntroPic.webp",
+  releaseImage,
   "games/index.html",
   "aigc/index.html",
   "chat/index.html",
@@ -46,6 +50,7 @@ const requiredFiles = [...new Set([
   "tools/index.html",
   "plugins/index.html",
   "skin-service/review-account-qr.svg",
+  "skin-service/cover.svg",
   ...catalogAssets,
 ])];
 const forbiddenFiles = [
@@ -75,22 +80,36 @@ for (const file of requiredFiles.filter((file) => file.endsWith(".html"))) {
   if (html.includes('src="/_next/') || html.includes('href="/_next/')) {
     throw new Error(`Root-relative Next.js asset in ${file}`);
   }
+  if (html.includes("https://microsoftedge.microsoft.com/addons/search/")) {
+    throw new Error(`Obsolete plugin search link in ${file}`);
+  }
 }
+
+const pluginStoreUrls = [
+  "https://microsoftedge.microsoft.com/addons/detail/textreader/hmpnghjeoenkikigifpiomochegoddgh",
+  "https://microsoftedge.microsoft.com/addons/detail/hanazar%E2%80%99s-note/eijhnaganiocpdihfomecfehnbcmpkhi",
+  "https://microsoftedge.microsoft.com/addons/detail/webfile-hunter-web-file/jcphffanpalggokbmpicgfpfkdiioicm",
+  "https://microsoftedge.microsoft.com/addons/detail/hanazars-pen/chfhmfpgfmgehaeijjfhmokdmcegadna",
+];
 
 const requiredContent = {
   "index.html": [
+    "https://openworldcraft.com/",
+    "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
+    "https://hanazar-games.github.io/xham/",
+    "https://mirako-official.github.io/OpenWorld-GLB-Checker/",
+    "More Web Tools",
+    `src="${basePath}/${releaseImage}"`,
+    'class="releaseNotice"',
+    ...pluginStoreUrls.slice(0, 3),
     "href=\"skin-service/\"",
     "href=\"tools/\"",
     "Skin Publishing Service Center",
     "href=\"chat/\"",
     "href=\"transfer/\"",
     "href=\"#aigc\"",
-    "https://hanazar-games.github.io/Guandan-Webgame/",
-    "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
-    "https://hanazar-games.github.io/Kimi2.6-AIGC-Webgame-Project/",
-    "https://hanazar-games.github.io/GPT-AIGC-Webgame-Project",
     "https://github.com/hzagaming/LC300A",
     "https://github.com/hzagaming/Hept/releases",
     "https://hzagaming.github.io/LIstener",
@@ -98,10 +117,15 @@ const requiredContent = {
     "Web Tools",
     "Browser Plugins",
     "href=\"/Hanazar-Games-Website/plugins/\"",
-    "iOS Tools",
-    "Other Tools",
+    "iOS Tools &amp; Operating Systems",
+    "SwordOS",
+    "In development",
+    `src="${basePath}/skin-service/cover.svg"`,
   ],
   "games/index.html": [
+    "https://openworldcraft.com/",
+    "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
+    "https://hanazar-games.github.io/xham/",
     "https://hanazar-games.github.io/Guandan-Webgame/",
     "https://hanazar-games.github.io/Liars-Bar-webgame/",
     "GPT-5.6-sol-Ultra-AIGC-webgame",
@@ -114,6 +138,7 @@ const requiredContent = {
     "https://hanazar-games.github.io/Go/",
   ],
   "aigc/index.html": [
+    "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
     "GPT-5.6-sol-Ultra-AIGC-webgame",
     "https://hanazar-games.github.io/GPT-5.6-sol-Ultra-AIGC-webgame/",
     "https://hanazar-games.github.io/claude-opus5-aigc-webgame-project/",
@@ -229,6 +254,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.19.0",
+    "主站项目扩展与版本更新提醒",
     "2.18.10",
     "搜索链接交互修复与整体复查",
     "2.18.9",
@@ -312,13 +339,18 @@ const requiredContent = {
     "查看公众号二维码",
   ],
   "tools/index.html": [
+    'id="web-tools"',
+    "https://mirako-official.github.io/OpenWorld-GLB-Checker/",
+    ...pluginStoreUrls,
+    "Hanazar&#x27;s Pen",
     "Tools Archive",
     "Mac Tools",
     "Web Tools",
     "Browser Plugins",
     "href=\"/Hanazar-Games-Website/plugins/\"",
-    "iOS Tools",
-    "Other Tools",
+    "iOS Tools &amp; Operating Systems",
+    "SwordOS",
+    "In development",
     "https://hzagaming.github.io/LIstener",
     "https://github.com/hzagaming/Hept/releases",
     "https://hzagaming.github.io/HanazarTransfer/",
@@ -329,9 +361,8 @@ const requiredContent = {
     "TextReader",
     "Hanazar’s Note",
     "WebFile Hunter",
-    "https://microsoftedge.microsoft.com/addons/search/TextReader",
-    "https://microsoftedge.microsoft.com/addons/search/Hanazar%27s%20Note",
-    "https://microsoftedge.microsoft.com/addons/search/WebFile%20Hunter",
+    "Hanazar&#x27;s Pen",
+    ...pluginStoreUrls,
   ],
 };
 
@@ -386,8 +417,8 @@ for (const [file, values] of Object.entries(forbiddenContent)) {
 }
 
 const announcements = readFileSync("app/components/settings/AnnouncementTab.tsx", "utf8");
-const announcementVersion = announcements.match(/version: "([^"]+)"/)?.[1];
-if (announcementVersion !== packageVersion) {
+const announcementVersion = releaseSource.match(/version: "([^"]+)"/)?.[1];
+if (!announcements.includes("...currentRelease") || announcementVersion !== packageVersion) {
   throw new Error(`Latest announcement ${announcementVersion ?? "missing"} does not match package ${packageVersion}`);
 }
 
