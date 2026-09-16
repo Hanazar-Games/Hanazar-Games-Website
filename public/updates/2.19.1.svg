@@ -8,9 +8,9 @@
   <g font-family="system-ui, sans-serif">
     <text x="60" y="77" fill="#c0bce6" font-size="18" letter-spacing="5">HANAZAR GAMES</text>
     <rect x="849" y="44" width="151" height="44" rx="22" fill="#c1b1ff" fill-opacity=".12" stroke="#aea1e0" stroke-opacity=".5"/>
-    <text x="925" y="73" text-anchor="middle" fill="#e0d7ff" font-size="20" letter-spacing="2">v2.19.0</text>
-    <text x="55" y="184" fill="#f4f1ff" font-size="66" font-weight="750" letter-spacing="-2">New worlds.</text>
-    <text x="55" y="261" fill="#bcb0f6" font-size="66" font-weight="750" letter-spacing="-2">More to explore.</text>
+    <text x="925" y="73" text-anchor="middle" fill="#e0d7ff" font-size="20" letter-spacing="2">v2.19.1</text>
+    <text x="55" y="184" fill="#f4f1ff" font-size="66" font-weight="750" letter-spacing="-2">A new name.</text>
+    <text x="55" y="261" fill="#bcb0f6" font-size="66" font-weight="750" letter-spacing="-2">Same place to play.</text>
   </g>
   <g transform="translate(60 321)">
     <rect width="246" height="183" rx="24" fill="url(#tile)" stroke="#62618b" stroke-opacity=".5"/>
@@ -31,7 +31,7 @@
     <rect x="76" y="27" width="94" height="102" rx="24" fill="#ac8ce4"/>
     <path d="M108 59c0-22 33-23 33-3 0 14-16 14-16 30" fill="none" stroke="white" stroke-width="9" stroke-linecap="round"/>
     <circle cx="125" cy="107" r="5" fill="white"/>
-    <text x="123" y="160" text-anchor="middle" fill="#c7d5dd" font-family="system-ui, sans-serif" font-size="17">Xham!</text>
+    <text x="123" y="160" text-anchor="middle" fill="#c7d5dd" font-family="system-ui, sans-serif" font-size="17">Xham！2 Dimention！</text>
   </g>
   <g transform="translate(894 321)">
     <rect width="246" height="183" rx="24" fill="url(#tile)" stroke="#62618b" stroke-opacity=".5"/>

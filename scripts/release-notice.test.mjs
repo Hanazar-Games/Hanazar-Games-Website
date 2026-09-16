@@ -29,7 +29,7 @@ test("release acknowledgement persists by version without discarding other prefe
   const { currentRelease, hasSeenRelease, markReleaseSeen } = await import("../app/lib/release.ts");
   const entries = new Map([["hanazar-settings-v1", "existing-settings"]]);
   const storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
-  assert.equal(currentRelease.version, "2.19.0");
+  assert.equal(currentRelease.version, "2.19.1");
   assert.equal(hasSeenRelease(storage, currentRelease.version), false);
   markReleaseSeen(storage, currentRelease.version);
   assert.equal(hasSeenRelease(storage, currentRelease.version), true);
@@ -42,6 +42,45 @@ test("blocked browser storage cannot crash the release notice", async () => {
   const storage = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("quota exceeded"); } };
   assert.equal(hasSeenRelease(storage, "2.19.0"), false);
   assert.doesNotThrow(() => markReleaseSeen(storage, "2.19.0"));
+});
+
+test("Xham uses the requested English and Chinese names without changing its destination", async () => {
+  const { games, homepageGames } = await import("../app/lib/catalog.ts");
+  const { getTranslation } = await import("../app/lib/i18n.ts");
+  for (const collection of [games, homepageGames]) {
+    const entry = collection.find(game => game.title === "gameXhamTitle");
+    assert.ok(entry);
+    assert.equal(entry.href, "https://hanazar-games.github.io/xham/");
+    for (const [language, title] of [["en", "Xham！2 Dimention！"], ["zh-CN", "Hanazar二次元中心！"], ["zh-TW", "Hanazar二次元中心！"]]) {
+      assert.equal(getTranslation(language, entry.title), title);
+      assert.ok(getTranslation(language, entry.description).includes(title));
+    }
+  }
+});
+
+test("current artwork and release copy use the new Xham identity", async () => {
+  const { getTranslation } = await import("../app/lib/i18n.ts");
+  const cover = readFileSync(new URL("../public/games/xham.svg", import.meta.url), "utf8");
+  const poster = readFileSync(new URL(`../public${release.currentRelease.image}`, import.meta.url), "utf8");
+  assert.ok(cover.includes("2 Dimention！") && cover.includes("Hanazar二次元中心！"));
+  assert.ok(poster.includes("Xham！2 Dimention！"));
+  for (const [language, title] of [["en", "Xham！2 Dimention！"], ["zh-CN", "Hanazar二次元中心！"]]) {
+    const copy = release.currentRelease.itemKeys.map(key => getTranslation(language, key)).join(" ");
+    assert.ok(copy.includes(title));
+  }
+});
+
+test("supported languages resolve the new identity, release copy, and SFX preview label", async () => {
+  const { getTranslation, langNames } = await import("../app/lib/i18n.ts");
+  for (const language of Object.keys(langNames)) {
+    const title = language.startsWith("zh-") ? "Hanazar二次元中心！" : "Xham！2 Dimention！";
+    assert.equal(getTranslation(language, "gameXhamTitle"), title);
+    for (const key of ["gameXhamDesc", release.currentRelease.titleKey, ...release.currentRelease.itemKeys, "stPreviewSfx"]) {
+      assert.ok(getTranslation(language, key).trim());
+      assert.notEqual(getTranslation(language, key), key);
+    }
+    if (language !== "en") assert.notEqual(getTranslation(language, "stPreviewSfx"), "Preview SFX", language);
+  }
 });
 
 const require = createRequire(import.meta.url);

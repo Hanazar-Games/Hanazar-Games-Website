@@ -94,6 +94,7 @@ const pluginStoreUrls = [
 
 const requiredContent = {
   "index.html": [
+    "Xham！2 Dimention！",
     "https://openworldcraft.com/",
     "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
     "https://hanazar-games.github.io/xham/",
@@ -123,6 +124,7 @@ const requiredContent = {
     `src="${basePath}/skin-service/cover.svg"`,
   ],
   "games/index.html": [
+    "Xham！2 Dimention！",
     "https://openworldcraft.com/",
     "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
     "https://hanazar-games.github.io/xham/",
@@ -254,6 +256,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.19.1",
+    "二次元中心更名与界面优化",
     "2.19.0",
     "主站项目扩展与版本更新提醒",
     "2.18.10",

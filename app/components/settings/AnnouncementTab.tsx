@@ -797,7 +797,15 @@ export default function AnnouncementTab() {
     title: tr(currentRelease.titleKey),
     items: currentRelease.itemKeys.map(tr),
   };
-  const history = changelog;
+  const history = [
+    {
+      version: "2.19.0",
+      date: "2026-09-17",
+      title: tr("release219Title"),
+      items: ["release219Games", "release219Tools", "release219Plugins", "release219Layout"].map(tr),
+    },
+    ...changelog,
+  ];
 
   return (
     <div className="settingsTabContent">

@@ -342,7 +342,7 @@ test("Hanazar's Pen has localized descriptions and store actions", async () => {
 test("homepage text and footer links keep a usable pointer target", async () => {
   const css = await read("app/globals.css");
 
-  assert.match(css, /\.sectionTextLink \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
+  assert.match(css, /\.sectionTextLink \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 44px;/);
   assert.match(css, /\.footerColumn li a \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
   assert.match(css, /\.footerSocials a,[\s\S]*?\.footerMetaLinks a \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
 });
@@ -427,7 +427,7 @@ test("patch release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.19.0");
+  assert.equal(packageData.version, "2.19.1");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);
@@ -435,7 +435,7 @@ test("patch release metadata stays synchronized", async () => {
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
   assert.match(copy, /主站项目扩展与版本更新提醒/);
   assert.match(announcement, /\.\.\.currentRelease/);
-  assert.match(verifier, /2\.19\.0/);
+  assert.match(verifier, /2\.19\.1/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

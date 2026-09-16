@@ -323,6 +323,10 @@ export default function AudioEngine() {
       const modifier = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
       if (modifier && key === ",") {
+        if (event.repeat || !document.querySelector(".settingsFloatingButton")) return;
+        if (document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) return;
+        const current = settingsRef.current;
+        if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
         await unlock();
         playSfx("click");
         return;

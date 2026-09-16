@@ -34,6 +34,7 @@ function T(en: string, translations: Partial<Record<LangCode, string>>) {
 }
 
 const raw: Record<string, { en: string } & Partial<Record<LangCode, string>>> = {
+  release2191Audio: T("Localized the SFX preview button, silenced blocked settings shortcuts, and restored mute shortcuts when sliders or switches have focus.", { "zh-CN": "补全音效试听按钮翻译，修复无效设置快捷键的多余音效，并恢复滑块或开关获得焦点时的静音快捷键。", "zh-TW": "補全音效試聽按鈕翻譯，修復無效設定快捷鍵的多餘音效，並恢復滑桿或開關取得焦點時的靜音快捷鍵。", ja: "効果音の試聴ボタンを翻訳し、設定を開けないときの不要な効果音を抑制しました。スライダーやスイッチにフォーカスがある場合もミュート操作が使えます。", ko: "효과음 미리 듣기 버튼을 번역하고 차단된 설정 단축키의 불필요한 효과음을 방지했습니다. 슬라이더나 스위치에 포커스가 있어도 음소거 단축키가 작동합니다." }),
   toolsSystemsTitle: T("iOS Tools & Operating Systems", { "zh-CN": "iOS 工具与操作系统", "zh-TW": "iOS 工具與作業系統", ja: "iOS ツールと OS", ko: "iOS 도구 및 운영체제" }),
   toolsSystemsLabel: T("Apps & Systems", { "zh-CN": "应用与系统", "zh-TW": "應用與系統", ja: "アプリとシステム", ko: "앱 및 시스템" }),
   productSwordosTitle: T("SwordOS", { "zh-CN": "圣剑 OS · SwordOS", "zh-TW": "聖劍 OS · SwordOS", ja: "聖剣 OS · SwordOS" }),
@@ -42,8 +43,8 @@ const raw: Record<string, { en: string } & Partial<Record<LangCode, string>>> = 
   release219Layout: T("Homepage previews now show one row of three cards. Hept, LC300A, and SwordOS share a section; SwordOS is in development. The Skin Service Center has a new illustrated cover.", { "zh-CN": "主页预览改为一排三张卡片；Hept、落川操作系统与开发中的圣剑 OS 合并展示，代发皮肤服务中心新增封面。", "zh-TW": "首頁預覽改為一排三張卡片；Hept、落川作業系統與開發中的聖劍 OS 合併展示，代發皮膚服務中心新增封面。", ja: "ホームのプレビューを各3枚のカードに整理。Hept、LC300A、開発中の SwordOS を同じセクションにまとめ、スキンサービスに新しいカバーを追加しました。", ko: "홈 미리보기를 한 줄에 카드 3개로 정리했습니다. Hept, LC300A, 개발 중인 SwordOS를 함께 표시하고 스킨 서비스에 새 표지를 추가했습니다." }),
   gameOpenWorldCraftTitle: T("OpenWorldCraft", {}),
   gameOpenWorldCraftDesc: T("Open OpenWorldCraft directly in your browser and explore its web game experience.", { "zh-CN": "在浏览器中直接打开 OpenWorldCraft，体验这个网页游戏项目。", "zh-TW": "在瀏覽器中直接開啟 OpenWorldCraft，體驗這個網頁遊戲專案。", ja: "ブラウザから OpenWorldCraft を開き、ウェブゲームを体験できます。", ko: "브라우저에서 OpenWorldCraft를 바로 열어 웹 게임을 경험해 보세요." }),
-  gameXhamTitle: T("Xham!", {}),
-  gameXhamDesc: T("A Kahoot-style quiz game from Hanazar Games. Open Xham and jump into the quiz experience.", { "zh-CN": "Hanazar Games 的 Kahoot 风格答题游戏。打开 Xham，开始体验趣味问答。", "zh-TW": "Hanazar Games 的 Kahoot 風格答題遊戲。開啟 Xham，開始體驗趣味問答。", ja: "Hanazar Games の Kahoot 風クイズゲーム。Xham を開いてクイズを楽しめます。", ko: "Hanazar Games의 Kahoot 스타일 퀴즈 게임입니다. Xham을 열고 퀴즈를 즐겨보세요." }),
+  gameXhamTitle: T("Xham！2 Dimention！", { "zh-CN": "Hanazar二次元中心！", "zh-TW": "Hanazar二次元中心！" }),
+  gameXhamDesc: T("A Kahoot-style browser quiz from Hanazar Games. Enter Xham！2 Dimention！ and start playing.", { "zh-CN": "Hanazar二次元中心！——Hanazar Games 的 Kahoot 风格网页答题项目，直接打开即可体验。", "zh-TW": "Hanazar二次元中心！——Hanazar Games 的 Kahoot 風格網頁問答專案，直接開啟即可體驗。", ja: "Hanazar Games の Kahoot 風クイズゲーム。Xham！2 Dimention！を開いてクイズを楽しめます。", ko: "Hanazar Games의 Kahoot 스타일 퀴즈 게임입니다. Xham！2 Dimention！을 열고 퀴즈를 즐겨보세요." }),
   gameTagWeb: T("Web Game", { "zh-CN": "网页游戏", "zh-TW": "網頁遊戲", ja: "ウェブゲーム", ko: "웹 게임" }),
   gameTagQuiz: T("Quiz", { "zh-CN": "趣味答题", "zh-TW": "趣味問答", ja: "クイズ", ko: "퀴즈" }),
   aigcGpt6MaxTitle: T("GPT6-Max-Test-Project-1", {}),
@@ -54,12 +55,15 @@ const raw: Record<string, { en: string } & Partial<Record<LangCode, string>>> = 
   toolTag3d: T("3D Model Tools", { "zh-CN": "三维模型工具", "zh-TW": "三維模型工具", ja: "3D モデルツール", ko: "3D 모델 도구" }),
   webToolsBrowseAll: T("More Web Tools", { "zh-CN": "更多网页工具", "zh-TW": "更多網頁工具", ja: "その他のウェブツール", ko: "웹 도구 더 보기" }),
   releaseNew: T("What's new", { "zh-CN": "网站更新", "zh-TW": "網站更新", ja: "新着情報", ko: "새로운 소식" }),
+  release2191Title: T("A new name, a clearer experience", { "zh-CN": "二次元中心新名称与界面优化", "zh-TW": "二次元中心新名稱與介面優化", ja: "新しい名前と見やすい画面", ko: "새로운 이름, 더 명확한 화면" }),
+  release2191Name: T("Xham is now Xham！2 Dimention！, with the Chinese name Hanazar二次元中心！. Its web address stays the same.", { "zh-CN": "Xham 更名为“Hanazar二次元中心！”，英文名为“Xham！2 Dimention！”，访问地址不变。", "zh-TW": "Xham 更名為「Hanazar二次元中心！」，英文名為「Xham！2 Dimention！」，網址不變。", ja: "Xham は Xham！2 Dimention！に名称変更しました。中国語名は Hanazar二次元中心！です。URL は変わりません。", ko: "Xham의 새 이름은 Xham！2 Dimention！이며 중국어 이름은 Hanazar二次元中心！입니다. 웹 주소는 그대로입니다." }),
+  release2191Ui: T("Updated project artwork and localized labels, improved long-title wrapping, and enlarged More links for touch navigation. The desktop three-card previews are unchanged.", { "zh-CN": "同步项目封面与多语言名称，优化长标题换行，扩大“更多”入口的触控范围；桌面三卡片预览布局保持不变。", "zh-TW": "同步專案封面與多語言名稱，優化長標題換行，擴大「更多」入口的觸控範圍；桌面三卡片預覽版面保持不變。", ja: "画像と各言語の名称を更新し、長い見出しの折り返しと一覧リンクのタップ領域を改善しました。デスクトップの3枚カード表示は維持しています。", ko: "이미지와 언어별 이름을 맞추고 긴 제목의 줄바꿈과 더 보기 링크의 터치 영역을 개선했습니다. 데스크톱의 카드 3개 미리보기는 유지됩니다." }),
   release219Title: T("New worlds, new experiments", { "zh-CN": "新游戏、新实验、新工具", "zh-TW": "新遊戲、新實驗、新工具", ja: "新しいゲーム、実験、ツール", ko: "새로운 게임, 실험, 도구" }),
   release219Games: T("GamesHub adds OpenWorldCraft, GPT6-Max-Test-Project-1, and Xham! GPT6 Max also joins the AIGC Lab.", { "zh-CN": "GamesHub 新增 OpenWorldCraft、GPT6-Max-Test-Project-1 和 Xham！GPT6 Max 同时加入 AIGC 实验室。", "zh-TW": "GamesHub 新增 OpenWorldCraft、GPT6-Max-Test-Project-1 和 Xham！GPT6 Max 同時加入 AIGC 實驗室。", ja: "GamesHub に OpenWorldCraft、GPT6-Max-Test-Project-1、Xham! を追加。GPT6 Max は AIGC ラボにも登場します。", ko: "GamesHub에 OpenWorldCraft, GPT6-Max-Test-Project-1, Xham!이 추가됩니다. GPT6 Max는 AIGC Lab에서도 만나볼 수 있습니다." }),
   release219Tools: T("OpenWorld GLB Checker joins Web Tools. Use More Web Tools to browse the complete collection.", { "zh-CN": "Web Tools 新增 OpenWorld GLB Checker，通过“更多网页工具”查看完整列表。", "zh-TW": "Web Tools 新增 OpenWorld GLB Checker，透過「更多網頁工具」查看完整清單。", ja: "ウェブツールに OpenWorld GLB Checker を追加。一覧からすべてのツールを確認できます。", ko: "Web Tools에 OpenWorld GLB Checker가 추가됩니다. 더 보기에서 전체 도구를 확인하세요." }),
   release219Plugins: T("Browser Plugins now includes Hanazar's Pen and direct Edge Add-ons links for all four extensions.", { "zh-CN": "网页插件新增 Hanazar's Pen，4 款插件均直达 Edge 商店详情页。", "zh-TW": "網頁外掛新增 Hanazar's Pen，4 款外掛均直達 Edge 商店詳細頁面。", ja: "ブラウザ拡張に Hanazar's Pen を追加。4 つの拡張機能すべてが Edge アドオンの詳細ページに直接リンクします。", ko: "브라우저 확장에 Hanazar's Pen이 추가되며 4개 확장 모두 Edge 스토어 상세 페이지로 연결됩니다." }),
   releaseNoticeSummary: T("This update notice appears once per version in this browser when local storage is available.", { "zh-CN": "浏览器允许本地存储时，此更新提醒每个版本仅显示一次。", "zh-TW": "瀏覽器允許本機儲存時，此更新提醒每個版本僅顯示一次。", ja: "ローカル保存が有効な場合、この更新通知はバージョンごとに一度だけ表示されます。", ko: "로컬 저장소를 사용할 수 있으면 이 알림은 브라우저에서 버전마다 한 번 표시됩니다." }),
-  releaseArtworkAlt: T("Hanazar Games update: new games, AIGC experiments, and web tools", { "zh-CN": "Hanazar Games 更新：新游戏、AIGC 实验与网页工具", "zh-TW": "Hanazar Games 更新：新遊戲、AIGC 實驗與網頁工具", ja: "Hanazar Games 更新：新しいゲーム、AIGC 実験、ウェブツール", ko: "Hanazar Games 업데이트: 새 게임, AIGC 실험, 웹 도구" }),
+  releaseArtworkAlt: T("Hanazar Games update: Xham！2 Dimention！ and interface improvements", { "zh-CN": "Hanazar Games 更新：Hanazar二次元中心！与界面优化", "zh-TW": "Hanazar Games 更新：Hanazar二次元中心！與介面優化", ja: "Hanazar Games 更新：Xham！2 Dimention！と画面の改善", ko: "Hanazar Games 업데이트: Xham！2 Dimention！과 화면 개선" }),
   releaseExploreGames: T("Explore games", { "zh-CN": "查看游戏", "zh-TW": "查看遊戲", ja: "ゲームを見る", ko: "게임 보기" }),
   releaseExploreTools: T("Explore tools", { "zh-CN": "查看工具", "zh-TW": "查看工具", ja: "ツールを見る", ko: "도구 보기" }),
   releaseDismiss: T("Got it", { "zh-CN": "知道了", "zh-TW": "知道了", ja: "閉じる", ko: "확인" }),
@@ -531,7 +535,7 @@ raw.ariaSettingsCategories = T("Settings categories", { "zh-CN": "设置分类",
 raw.ariaHomepageSections = T("Homepage sections", { "zh-CN": "首页栏目", "zh-TW": "首頁欄目", ja: "ホームページセクション", ko: "홈페이지 섹션", fr: "Sections de la page d'accueil", de: "Startseitenabschnitte", es: "Secciones de la página de inicio", ru: "Разделы главной страницы", pt: "Seções da página inicial" });
 raw.ariaOpenSettings = T("Open settings", { "zh-CN": "打开设置", "zh-TW": "開啟設定", ja: "設定を開く", ko: "설정 열기", fr: "Ouvrir les paramètres", de: "Einstellungen öffnen", es: "Abrir configuración", ru: "Открыть настройки", pt: "Abrir configurações" });
 
-raw.stPreviewSfx = T("Preview SFX", {});
+raw.stPreviewSfx = T("Preview SFX", { "zh-CN": "试听音效", "zh-TW": "試聽音效", ja: "効果音を試聴", ko: "효과음 미리 듣기", fr: "Écouter un effet sonore", de: "Soundeffekt anhören", es: "Escuchar efecto de sonido", ru: "Прослушать звуковой эффект", pt: "Ouvir efeito sonoro", it: "Ascolta effetto sonoro", nl: "Geluidseffect beluisteren", pl: "Odsłuchaj efekt dźwiękowy", tr: "Ses efektini dinle", vi: "Nghe thử hiệu ứng âm thanh", id: "Pratinjau efek suara", uk: "Прослухати звуковий ефект", el: "Ακρόαση ηχητικού εφέ", cs: "Přehrát zvukový efekt", sv: "Lyssna på ljudeffekt" });
 raw.changelogHistory = T("History", { "zh-CN": "历史记录", "zh-TW": "歷史記錄", ja: "履歴", ko: "기록", fr: "Historique", de: "Verlauf", es: "Historial", ru: "История", pt: "Histórico" });
 
 // Build final translations object

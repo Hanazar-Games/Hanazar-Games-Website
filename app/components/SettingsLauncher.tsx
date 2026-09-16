@@ -10,7 +10,7 @@ function isEditableTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   const tagName = target.tagName.toLowerCase();
   return (
-    tagName === "input" ||
+    (target instanceof HTMLInputElement && !["checkbox", "radio", "range"].includes(target.type)) ||
     tagName === "textarea" ||
     tagName === "select" ||
     target.isContentEditable

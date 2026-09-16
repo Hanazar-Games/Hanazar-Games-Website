@@ -101,6 +101,32 @@ test("keyboard activation plays once on click, after keydown", async () => {
   app.unmount();
 });
 
+test("settings shortcuts stay silent when unavailable, blocked, or held down", async () => {
+  for (const state of ["service", "modal", "repeat"]) {
+    const app = harness();
+    app.environment.querySelector = selector => {
+      if (selector === ".settingsFloatingButton") return state === "service" ? null : {};
+      if (selector.includes("dialog")) return state === "modal" ? {} : null;
+      return null;
+    };
+    await app.fire("keydown", { key: ",", ctrlKey: true, repeat: state === "repeat" });
+    assert.equal(app.contexts.length, 0, state);
+    assert.equal(app.count(), 0, state);
+    app.unmount();
+  }
+});
+
+test("available settings shortcuts honor mute and SFX preferences", async () => {
+  for (const [settings, expected] of [[{}, 1], [{ sfxEnabled: false }, 0], [{ masterVolume: 0 }, 0], [{ sfxVolume: 0 }, 0]]) {
+    const app = harness(settings);
+    app.environment.querySelector = selector => selector === ".settingsFloatingButton" ? {} : null;
+    await app.fire("keydown", { key: ",", ctrlKey: true });
+    assert.equal(app.count(), expected);
+    assert.equal(app.contexts.length, expected);
+    app.unmount();
+  }
+});
+
 test("BGM maintains one ambient group, cleans up on hide and mute, and resumes", async () => {
   const app = harness({ bgmEnabled: true, sfxEnabled: false });
   const states = [];
