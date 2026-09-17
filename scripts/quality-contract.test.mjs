@@ -5,6 +5,35 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
+test("focused navigation and reveal content never wait for entrance animations", async () => {
+  const css = await read("app/globals.css");
+  const rule = css.match(/\.heroNavButton:focus-visible,\s*\[data-reveal\]:focus-within\s*\{([^}]+)\}/)?.[1] ?? "";
+  for (const declaration of ["opacity: 1", "transform: none", "filter: none", "animation: none", "transition: none"]) {
+    assert.ok(rule.includes(declaration), declaration);
+  }
+});
+
+test("release notice keeps its close control outside the scrolling artwork", async () => {
+  const [component, css] = await Promise.all([read("app/components/ReleaseNotice.tsx"), read("app/globals.css")]);
+  assert.match(component, /className="releaseNoticeToolbar">\s*<span className="releaseNoticeVersion">[^]*?<button[^>]*className="releaseNoticeClose"[^]*?<\/div>\s*<div className="releaseNoticeArtwork">/);
+  const toolbar = css.match(/\.releaseNoticeToolbar\s*\{([^}]+)\}/)?.[1] ?? "";
+  assert.match(toolbar, /position: sticky/);
+  assert.match(toolbar, /top: 0/);
+  assert.match(toolbar, /background: inherit/);
+  const notice = css.match(/\.releaseNotice\s*\{([^}]+)\}/)?.[1] ?? "";
+  assert.match(notice, /scroll-padding-block:/);
+});
+
+test("skin service navigation has a translated label in every supported language", async () => {
+  const { getTranslation, langNames } = await import("../app/lib/i18n.ts");
+  for (const language of Object.keys(langNames)) {
+    const label = getTranslation(language, "navSkinService");
+    assert.ok(label.trim());
+    assert.notEqual(label, "navSkinService");
+    if (language !== "en") assert.notEqual(label, "Skin Service", language);
+  }
+});
+
 function base64Url(bytes) {
   return Buffer.from(bytes).toString("base64url");
 }

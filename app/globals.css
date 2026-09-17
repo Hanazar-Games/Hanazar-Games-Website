@@ -1318,6 +1318,16 @@ select:focus-visible {
     var(--reveal-delay, 0s) backwards;
 }
 
+.heroNavButton:focus-visible,
+[data-reveal]:focus-within {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  animation: none;
+  transition: none;
+  will-change: auto;
+}
+
 @keyframes scrollReveal {
   from {
     opacity: 0;
@@ -5595,6 +5605,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   padding: 0;
   overflow: auto;
   overscroll-behavior: contain;
+  scroll-padding-block: 88px 20px;
   color: var(--text);
   background: #10121b;
   border: 1px solid var(--line);
@@ -5615,12 +5626,22 @@ body[data-disable-blur="true"] .releaseNotice::backdrop { backdrop-filter: none;
 body[data-disable-modal-anim="true"] .releaseNotice[open] { animation: none; }
 body[data-theme="light"] .releaseNotice { background: #fafbff; }
 
-.releaseNoticeArtwork { position: relative; }
+.releaseNoticeToolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+  background: inherit;
+}
+
 .releaseNoticeArtwork img { display: block; width: 100%; height: auto; }
 .releaseNoticeClose {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+  flex-shrink: 0;
   width: 44px;
   height: 44px;
   border: 1px solid #ffffff50;

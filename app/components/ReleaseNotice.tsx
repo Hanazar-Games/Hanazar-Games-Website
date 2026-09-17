@@ -61,12 +61,14 @@ export default function ReleaseNotice() {
 
   return (
     <dialog ref={dialogRef} className="releaseNotice" aria-labelledby="release-notice-title" aria-describedby="release-notice-summary">
-      <div className="releaseNoticeArtwork">
-        <Image src={assetPath(currentRelease.image)} alt={tr("releaseArtworkAlt")} width={1200} height={600} sizes="(max-width: 700px) 94vw, 680px" />
+      <div className="releaseNoticeToolbar">
+        <span className="releaseNoticeVersion">{tr("releaseNew")} · v{currentRelease.version}</span>
         <button type="button" className="releaseNoticeClose" onClick={dismiss} aria-label={tr("releaseDismiss")} autoFocus>×</button>
       </div>
+      <div className="releaseNoticeArtwork">
+        <Image src={assetPath(currentRelease.image)} alt={tr("releaseArtworkAlt")} width={1200} height={600} sizes="(max-width: 700px) 94vw, 680px" />
+      </div>
       <div className="releaseNoticeBody">
-        <span className="releaseNoticeVersion">{tr("releaseNew")} · v{currentRelease.version}</span>
         <h2 id="release-notice-title">{tr(currentRelease.titleKey)}</h2>
         <p id="release-notice-summary">{tr("releaseNoticeSummary")}</p>
         <ul>{currentRelease.itemKeys.map(key => <li key={key}>{tr(key)}</li>)}</ul>

@@ -75,7 +75,7 @@ const raw: Record<string, { en: string } & Partial<Record<LangCode, string>>> = 
   navChat: T("Chat", { "zh-CN": "聊天", "zh-TW": "聊天", ja: "チャット", ko: "채팅", fr: "Chat", de: "Chat", es: "Chat", ru: "Чат", pt: "Chat" }),
   navTransfer: T("Transfer", { "zh-CN": "传输助手", "zh-TW": "傳輸助手", ja: "転送", ko: "전송" }),
   navTools: T("Tools", { "zh-CN": "工具", "zh-TW": "工具", ja: "ツール", ko: "도구", fr: "Outils", de: "Tools", es: "Herramientas", ru: "Инструменты", pt: "Ferramentas" }),
-  navSkinService: T("Skin Service", { "zh-CN": "代发皮肤服务", "zh-TW": "代發皮膚服務" }),
+  navSkinService: T("Skin Service", { "zh-CN": "代发皮肤服务", "zh-TW": "代發皮膚服務", ja: "スキン投稿サービス", ko: "스킨 게시 서비스", fr: "Publication de skins", de: "Skin-Veröffentlichung", es: "Publicación de skins", ru: "Публикация скинов", pt: "Publicação de skins", it: "Pubblicazione di skin", nl: "Skins publiceren", pl: "Publikacja skórek", tr: "Görünüm yayınlama", vi: "Đăng trang phục", id: "Publikasi skin", uk: "Публікація скінів", el: "Δημοσίευση εμφανίσεων", cs: "Zveřejňování skinů", sv: "Publicera skins" }),
   navAbout: T("About", { "zh-CN": "关于", "zh-TW": "關於", ja: "概要", ko: "소개", fr: "À propos", de: "Über", es: "Acerca de", ru: "О нас", pt: "Sobre" }),
   navDocuments: T("Documents", { "zh-CN": "文档", "zh-TW": "文件", ja: "ドキュメント", ko: "문서", fr: "Documents", de: "Dokumente", es: "Documentos", ru: "Документы", pt: "Documentos" }),
   navUpdates: T("Updates", { "zh-CN": "更新", "zh-TW": "更新", ja: "更新情報", ko: "업데이트", fr: "Mises à jour", de: "Updates", es: "Actualizaciones", ru: "Обновления", pt: "Atualizações" }),
