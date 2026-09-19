@@ -26,7 +26,7 @@ const catalogSource = readFileSync("app/lib/catalog.ts", "utf8");
 const catalogAssets = [...new Set(
   [...catalogSource.matchAll(/\bimage:\s*"\/([^"]+)"/g)].map((match) => match[1]),
 )];
-if (catalogAssets.length !== 39) throw new Error(`Expected 39 catalog assets, found ${catalogAssets.length}`);
+if (catalogAssets.length !== 40) throw new Error(`Expected 40 catalog assets, found ${catalogAssets.length}`);
 const releaseSource = readFileSync("app/lib/release.ts", "utf8");
 const releaseImage = releaseSource.match(/image: "\/([^"]+)"/)?.[1];
 if (!releaseImage) throw new Error("Missing release artwork");
@@ -35,6 +35,8 @@ const requiredFiles = [...new Set([
   "index.html",
   "404.html",
   "IntroPic.webp",
+  "games/mazeidentity-poster.svg",
+  "updates/2.19.1.svg",
   releaseImage,
   "games/index.html",
   "aigc/index.html",
@@ -94,6 +96,11 @@ const pluginStoreUrls = [
 
 const requiredContent = {
   "index.html": [
+    "Cloud Roads",
+    "https://hanazar-games.github.io/CLOUD-ROADS/",
+    "MazeIdentity",
+    "Coming soon to Steam",
+    `src="${basePath}/games/mazeidentity-poster.svg"`,
     "Xham！2 Dimention！",
     "https://openworldcraft.com/",
     "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
@@ -124,6 +131,9 @@ const requiredContent = {
     `src="${basePath}/skin-service/cover.svg"`,
   ],
   "games/index.html": [
+    "Cloud Roads",
+    "https://hanazar-games.github.io/CLOUD-ROADS/",
+    `src="${basePath}/games/cloud-roads.svg"`,
     "Xham！2 Dimention！",
     "https://openworldcraft.com/",
     "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/",
@@ -256,6 +266,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.20.0",
+    "Cloud Roads 上线与 MazeIdentity 预告",
     "2.19.1",
     "二次元中心更名与界面优化",
     "2.19.0",

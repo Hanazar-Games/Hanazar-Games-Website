@@ -10,8 +10,8 @@ test("the new release publishes all requested projects in the right collections"
   const { games, homepageGames, aigcExperiments, toolGroups, homepageToolGroups } = await import("../app/lib/catalog.ts");
   for (const href of ["https://openworldcraft.com/", "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/", "https://hanazar-games.github.io/xham/"]) {
     assert.ok(games.some(project => project.href === href), href);
-    assert.ok(homepageGames.some(project => project.href === href), `${href} must be featured`);
   }
+  assert.deepEqual(homepageGames.map(project => project.title), ["gameCloudRoadsTitle", "gameOpenWorldCraftTitle", "gameXhamTitle"]);
   const experiment = aigcExperiments.find(project => project.href === "https://hanazar-games.github.io/GPT6-Max-Test-Project-1/");
   assert.ok(experiment);
   assert.equal(games.find(project => project.href === experiment.href).image, experiment.image);
@@ -29,11 +29,11 @@ test("release acknowledgement persists by version without discarding other prefe
   const { currentRelease, hasSeenRelease, markReleaseSeen } = await import("../app/lib/release.ts");
   const entries = new Map([["hanazar-settings-v1", "existing-settings"]]);
   const storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
-  assert.equal(currentRelease.version, "2.19.1");
+  assert.equal(currentRelease.version, "2.20.0");
   assert.equal(hasSeenRelease(storage, currentRelease.version), false);
   markReleaseSeen(storage, currentRelease.version);
   assert.equal(hasSeenRelease(storage, currentRelease.version), true);
-  assert.equal(hasSeenRelease(storage, "2.20.0"), false);
+  assert.equal(hasSeenRelease(storage, "2.20.1"), false);
   assert.equal(entries.get("hanazar-settings-v1"), "existing-settings");
 });
 
@@ -58,16 +58,29 @@ test("Xham uses the requested English and Chinese names without changing its des
   }
 });
 
-test("current artwork and release copy use the new Xham identity", async () => {
+test("Xham artwork and archived announcement retain its requested identity", async () => {
   const { getTranslation } = await import("../app/lib/i18n.ts");
   const cover = readFileSync(new URL("../public/games/xham.svg", import.meta.url), "utf8");
-  const poster = readFileSync(new URL(`../public${release.currentRelease.image}`, import.meta.url), "utf8");
+  const poster = readFileSync(new URL("../public/updates/2.19.1.svg", import.meta.url), "utf8");
   assert.ok(cover.includes("2 Dimention！") && cover.includes("Hanazar二次元中心！"));
   assert.ok(poster.includes("Xham！2 Dimention！"));
   for (const [language, title] of [["en", "Xham！2 Dimention！"], ["zh-CN", "Hanazar二次元中心！"]]) {
-    const copy = release.currentRelease.itemKeys.map(key => getTranslation(language, key)).join(" ");
+    const copy = getTranslation(language, "release2191Name");
     assert.ok(copy.includes(title));
   }
+});
+
+test("current release presents Cloud Roads and MazeIdentity while retaining the previous announcement", async () => {
+  const { getTranslation } = await import("../app/lib/i18n.ts");
+  const poster = readFileSync(new URL(`../public${release.currentRelease.image}`, import.meta.url), "utf8");
+  assert.ok(poster.includes("Cloud Roads") && poster.includes("MazeIdentity"));
+  for (const language of ["en", "zh-CN", "zh-TW", "ja", "ko"]) {
+    const copy = release.currentRelease.itemKeys.map(key => getTranslation(language, key)).join(" ");
+    assert.ok(copy.includes("Cloud Roads") && copy.includes("MazeIdentity") && copy.includes("Steam"));
+  }
+  const announcement = readFileSync(new URL("../app/components/settings/AnnouncementTab.tsx", import.meta.url), "utf8");
+  assert.match(announcement, /version: "2.19.1"/);
+  assert.match(announcement, /release2191Name/);
 });
 
 test("supported languages resolve the new identity, release copy, and SFX preview label", async () => {

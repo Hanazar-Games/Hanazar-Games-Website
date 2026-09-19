@@ -255,10 +255,10 @@ test("every catalog image and direct page asset exists in the public tree", asyn
   ];
   const catalogImages = [...new Set(entries.map(({ image }) => image))];
   const { currentRelease } = await import("../app/lib/release.ts");
-  const assets = [...catalogImages, "/IntroPic.webp", "/skin-service/review-account-qr.svg", "/skin-service/cover.svg", currentRelease.image];
+  const assets = [...catalogImages, "/IntroPic.webp", "/skin-service/review-account-qr.svg", "/skin-service/cover.svg", "/games/mazeidentity-poster.svg", currentRelease.image];
 
-  assert.equal(catalogImages.length, 39);
-  assert.equal(assets.length, 43);
+  assert.equal(catalogImages.length, 40);
+  assert.equal(assets.length, 45);
   for (const asset of assets) {
     assert.match(asset, /^\/[a-zA-Z0-9][a-zA-Z0-9/._-]+$/);
     const info = await stat(new URL(`public${asset}`, root));
@@ -332,7 +332,7 @@ test("browser plugins have a dedicated GamesHub-style archive", async () => {
   assert.match(css, /@media \(max-width: 520px\)[\s\S]*?\.pluginsHero \.gamesHeroTitle \{[\s\S]*?max-width: 9ch;/);
   assert.match(verifier, /plugins\/index\.html/);
   assert.match(verifier, /const catalogAssets =/);
-  assert.match(verifier, /catalogAssets\.length !== 39/);
+  assert.match(verifier, /catalogAssets\.length !== 40/);
   assert.match(verifier, /\.\.\.catalogAssets/);
 });
 
@@ -443,7 +443,7 @@ test("settings dialog launchers avoid dangling control references", async () => 
   assert.doesNotMatch(launcher, /aria-expanded=\{open\}/);
 });
 
-test("patch release metadata stays synchronized", async () => {
+test("release metadata stays synchronized", async () => {
   const [packageText, lockText, center, copy, announcement, verifier] = await Promise.all([
     read("package.json"),
     read("package-lock.json"),
@@ -456,7 +456,7 @@ test("patch release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.19.1");
+  assert.equal(packageData.version, "2.20.0");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);
@@ -464,7 +464,7 @@ test("patch release metadata stays synchronized", async () => {
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
   assert.match(copy, /主站项目扩展与版本更新提醒/);
   assert.match(announcement, /\.\.\.currentRelease/);
-  assert.match(verifier, /2\.19\.1/);
+  assert.match(verifier, /2\.20\.0/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

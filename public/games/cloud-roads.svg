@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#123d53"/><stop offset="1" stop-color="#80b9bc"/></linearGradient>
+    <linearGradient id="shade"><stop stop-color="#102b3f"/><stop offset="1" stop-color="#102b3f" stop-opacity="0"/></linearGradient>
+    <linearGradient id="mountain" x2="0" y2="1"><stop stop-color="#5d9c98"/><stop offset="1" stop-color="#183f4d"/></linearGradient>
+    <linearGradient id="cloud" x2="0" y2="1"><stop stop-color="#e2f5ec" stop-opacity=".7"/><stop offset="1" stop-color="#e2f5ec" stop-opacity="0"/></linearGradient>
+    <path id="road" d="M920 768C955 655 566 653 610 536S1140 460 1078 353 741 320 801 250 966 214 949 173"/>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1280v720H0z"/>
+  <circle cx="1045" cy="133" r="65" fill="#f1e7b8"/>
+  <path d="m370 450 157-220 76 84 123-181 147 224 115-172 97 95 138-211 157 381Z" fill="#8cbdba" opacity=".5"/>
+  <path d="m365 575 167-205 103 80 164-248 71 61 63-121 97 138 114 28 136 225V720H365Z" fill="url(#mountain)"/>
+  <path d="m717 366 82-164 71 61 63-121 45 76-51-24-39 109-76-62Z" fill="#c4d6c0" opacity=".6"/>
+  <g fill="url(#cloud)">
+    <ellipse cx="1251" cy="372" rx="300" ry="48"/>
+    <ellipse cx="481" cy="460" rx="264" ry="51"/>
+    <ellipse cx="1040" cy="661" rx="412" ry="77"/>
+  </g>
+  <use href="#road" fill="none" stroke="#143441" stroke-width="53"/>
+  <use href="#road" fill="none" stroke="#c0d3c7" stroke-width="39"/>
+  <use href="#road" fill="none" stroke="#355563" stroke-width="32"/>
+  <use href="#road" fill="none" stroke="#ecdfa5" stroke-width="2.5" stroke-dasharray="15 16"/>
+  <g transform="translate(673 507) rotate(53)">
+    <rect x="-15" y="-29" width="30" height="58" rx="9" fill="#152c37" opacity=".4" transform="translate(5 6)"/>
+    <rect x="-13" y="-29" width="26" height="58" rx="8" fill="#f0b870"/>
+    <rect x="-10" y="-13" width="20" height="26" rx="5" fill="#284954"/>
+    <path d="M-9-24h5m8 0h5M-9 23h5m8 0h5" stroke="#fff3ca" stroke-width="3"/>
+  </g>
+  <path fill="url(#shade)" d="M0 0h830v720H0z"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="72" y="112" fill="#abd3d4" font-size="18" letter-spacing="5">HANAZAR GAMES / DRIVING</text>
+    <text x="66" y="299" fill="#f1f7ec" font-size="107" font-weight="750" letter-spacing="-5">Cloud</text>
+    <text x="66" y="408" fill="#acd9d3" font-size="107" font-weight="750" letter-spacing="-5">Roads</text>
+    <path d="M73 454h80" stroke="#e5c794" stroke-width="4"/>
+    <text x="72" y="648" fill="#b3d2d3" font-size="19" letter-spacing="3">ENDLESS ROADS. ONE MORE TURN.</text>
+  </g>
+</svg>

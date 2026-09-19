@@ -28,13 +28,19 @@ const gpt6Project: GameEntry = {
 
 export const games: GameEntry[] = [
   {
+    title: "gameCloudRoadsTitle",
+    description: "gameCloudRoadsDesc",
+    href: "https://hanazar-games.github.io/CLOUD-ROADS/",
+    tag: "gameTagDriving",
+    image: "/games/cloud-roads.svg",
+  },
+  {
     title: "gameOpenWorldCraftTitle",
     description: "gameOpenWorldCraftDesc",
     href: "https://openworldcraft.com/",
     tag: "gameTagWeb",
     image: "/games/openworldcraft.svg",
   },
-  gpt6Project,
   {
     title: "gameXhamTitle",
     description: "gameXhamDesc",
@@ -42,6 +48,7 @@ export const games: GameEntry[] = [
     tag: "gameTagQuiz",
     image: "/games/xham.svg",
   },
+  gpt6Project,
   {
     title: "gameGuandanTitle",
     description: "gameGuandanDesc",

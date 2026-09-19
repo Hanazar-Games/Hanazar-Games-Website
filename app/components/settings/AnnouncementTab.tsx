@@ -799,6 +799,13 @@ export default function AnnouncementTab() {
   };
   const history = [
     {
+      version: "2.19.1",
+      date: "2026-09-17",
+      title: tr("release2191Title"),
+      items: ["release2191Name", "release2191Ui", "release2191Audio"].map(tr),
+      image: "/updates/2.19.1.svg",
+    },
+    {
       version: "2.19.0",
       date: "2026-09-17",
       title: tr("release219Title"),
@@ -828,6 +835,9 @@ export default function AnnouncementTab() {
 
         {history.map((entry) => (
           <div className="changelogEntry changelogEntryHistory" key={entry.version}>
+            {"image" in entry && (
+              <Image src={assetPath(entry.image)} alt="" width={1200} height={600} sizes="(max-width: 800px) 85vw, 620px" style={{ width: "100%", height: "auto", borderRadius: 14, marginBottom: 16 }} />
+            )}
             <div className="changelogHeader">
               <span className="changelogVersion">{entry.version}</span>
               <span className="changelogDate">{entry.date}</span>

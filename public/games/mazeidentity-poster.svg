@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0b1a23"/><stop offset="1" stop-color="#183d46"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#86dec6" stop-opacity=".25"/><stop offset="1" stop-color="#86dec6" stop-opacity="0"/></radialGradient>
+    <linearGradient id="wall" x2="1" y2="1"><stop stop-color="#a2cebf"/><stop offset=".5" stop-color="#65a9a4"/><stop offset="1" stop-color="#dcbe8b"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#020e17" flood-opacity=".65"/></filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1600v600H0z"/>
+  <ellipse cx="1110" cy="260" rx="530" ry="420" fill="url(#glow)"/>
+  <g fill="none" stroke="#9bd5c4" stroke-opacity=".1">
+    <circle cx="1100" cy="300" r="274"/><circle cx="1100" cy="300" r="334"/><circle cx="1100" cy="300" r="424"/>
+    <path d="M565 300h1000M1100 0v600"/>
+  </g>
+  <g transform="translate(1110 305) rotate(-24) skewX(12) scale(1 .78)" filter="url(#shadow)">
+    <rect x="-232" y="-232" width="464" height="464" rx="8" fill="#12333e" stroke="#507d80" stroke-width="2"/>
+    <g fill="none" stroke="url(#wall)" stroke-width="11" stroke-linecap="square" stroke-linejoin="miter">
+      <path d="M-15-221h235v441H34m-62 0h-193v-441h145"/>
+      <path d="M-169-221v94h89v-47H38v95h94v-95h41v95h47"/>
+      <path d="M-221-80h94v45h-46v92h93v116h45v47"/>
+      <path d="M-127-80v-47m47 92V57h45m-138 69v47h46M-35-174v47"/>
+      <path d="M79-221v47m-42 48v93h95v90h41v-90h47M-35-80v47h-45"/>
+      <path d="M220 105h-88v68H34v-47H-35M79 126V79H34M173 173v47M-80 126h-47"/>
+    </g>
+    <path d="M-49-233v61h-67v93h35v91h80v67h34v140" fill="none" stroke="#e6ca92" stroke-width="3" stroke-dasharray="5 9" opacity=".8"/>
+    <rect x="-24" y="-22" width="55" height="55" rx="5" fill="#15323b" stroke="#e6ca92" stroke-width="3"/>
+    <path d="M-11 21V-2a15 15 0 0 1 30 0v23" fill="#b9efd9"/>
+  </g>
+  <g fill="#c8eada"><circle cx="787" cy="105" r="3"/><circle cx="1454" cy="199" r="3"/><circle cx="1350" cy="498" r="2"/></g>
+  <path d="M1438 498v30h-30M789 72h-30v30" fill="none" stroke="#c3ac83" stroke-width="2" opacity=".7"/>
+</svg>

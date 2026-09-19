@@ -518,6 +518,88 @@ body:has(.gamesShell) .settingsFloatingButton {
   filter: contrast(var(--ui-contrast, 1));
 }
 
+.mazeSpotlight {
+  position: relative;
+  isolation: isolate;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  margin-top: 24px;
+  padding: clamp(28px, 5vw, 64px);
+  border: 1px solid #8bb8c633;
+  border-radius: 28px;
+  overflow: hidden;
+  color: #effbfa;
+  background: #0b1a23;
+}
+
+.mazeSpotlightArtwork {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.mazeSpotlightArtwork img {
+  object-fit: cover;
+  object-position: right center;
+}
+
+.mazeSpotlightArtwork::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #0b1a23f5 0%, #0b1a23e8 34%, #0b1a2340 65%, transparent 100%);
+}
+
+.mazeSpotlightCopy {
+  max-width: 65%;
+}
+
+.mazeSpotlightStatus {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid #a9dfce55;
+  border-radius: 8px;
+  color: #b9e6d7;
+  background: #102e32;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+.mazeSpotlight h2 {
+  margin: 18px 0 14px;
+  font-size: clamp(2.1rem, 5vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.mazeSpotlight p {
+  max-width: 44ch;
+  margin: 0;
+  color: #c0d3db;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .mazeSpotlight {
+    min-height: 360px;
+    margin-top: 16px;
+    align-items: flex-end;
+    padding-top: 160px;
+    border-radius: 22px;
+  }
+
+  .mazeSpotlightCopy { max-width: 100%; }
+  .mazeSpotlightArtwork img { object-position: 80% center; }
+  .mazeSpotlightArtwork::after {
+    background: linear-gradient(180deg, #0b1a2320, #0b1a23f2 50%, #0b1a23);
+  }
+}
+
 .heroSection {
   min-height: 100svh;
   width: 100vw;
