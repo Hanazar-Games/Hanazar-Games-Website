@@ -37,6 +37,7 @@ const requiredFiles = [...new Set([
   "IntroPic.webp",
   "games/mazeidentity-poster.svg",
   "updates/2.19.1.svg",
+  "updates/2.20.0.svg",
   releaseImage,
   "games/index.html",
   "aigc/index.html",
@@ -266,6 +267,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.20.1",
+    "音频控制与交互体验修复",
     "2.20.0",
     "Cloud Roads 上线与 MazeIdentity 预告",
     "2.19.1",

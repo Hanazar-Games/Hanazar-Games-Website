@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#122a3e"/><stop offset="1" stop-color="#272746"/></linearGradient>
+    <linearGradient id="panel" x2="0" y2="1"><stop stop-color="#304760"/><stop offset="1" stop-color="#1c2c42"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v600H0z"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="60" y="76" fill="#aecfdc" font-size="18" letter-spacing="4">HANAZAR GAMES / v2.20.1</text>
+    <text x="55" y="171" fill="#f0f6ff" font-size="62" font-weight="750" letter-spacing="-2">More reliable controls.</text>
+    <text x="60" y="221" fill="#acc5d9" font-size="24">Touch. Sound. Motion.</text>
+  </g>
+  <rect x="60" y="270" width="520" height="238" rx="24" fill="url(#panel)" stroke="#7e9aba" stroke-opacity=".4"/>
+  <path d="M112 339h416M112 431h416" stroke="#9cbad3" stroke-opacity=".2" stroke-width="10" stroke-linecap="round"/>
+  <path d="M112 339h248M112 431h146" stroke="#8ccbbf" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="360" cy="339" r="20" fill="#c7ebdc"/><circle cx="258" cy="431" r="20" fill="#c7ebdc"/>
+  <rect x="614" y="270" width="526" height="238" rx="24" fill="url(#panel)" stroke="#7e9aba" stroke-opacity=".4"/>
+  <g fill="none" stroke="#bcb7eb" stroke-width="10" stroke-linecap="round">
+    <path d="M703 368v44m39-79v114m39-131v148m39-105v62m39-42v22m39-66v110m39-148v186m39-127v68m39-43v18"/>
+  </g>
+  <text x="60" y="565" fill="#9faec9" font-family="system-ui, sans-serif" font-size="16" letter-spacing="3">44PX TOUCH TARGETS / RESPECT YOUR PREFERENCES</text>
+</svg>

@@ -60,7 +60,7 @@ function MainSettingsLauncher() {
 
       if (modifier && key === ",") {
         event.preventDefault();
-        openSettings();
+        if (!event.repeat) openSettings();
         return;
       }
 
@@ -68,6 +68,7 @@ function MainSettingsLauncher() {
 
       if (event.shiftKey && key === "l") {
         event.preventDefault();
+        if (event.repeat) return;
         const currentTheme = document.body.dataset.theme ?? settings.theme;
         const nextTheme = currentTheme === "light" ? "dark" : "light";
         update("theme", nextTheme);
@@ -77,12 +78,16 @@ function MainSettingsLauncher() {
 
       if (!event.shiftKey && key === "m") {
         event.preventDefault();
+        if (event.repeat) return;
         if (settings.masterVolume > 0) {
           lastVolumeRef.current = settings.masterVolume;
           update("masterVolume", 0);
           showShortcutStatus(tr("shortcutMuted"));
         } else {
           update("masterVolume", lastVolumeRef.current);
+          if (settings.bgmEnabled && settings.bgmVolume > 0) {
+            window.dispatchEvent(new Event("hanazar:audio-unlock"));
+          }
           showShortcutStatus(tr("shortcutVolumeRestored"));
         }
       }
@@ -90,7 +95,7 @@ function MainSettingsLauncher() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [openSettings, settings.masterVolume, settings.theme, showShortcutStatus, tr, update]);
+  }, [openSettings, settings.masterVolume, settings.bgmEnabled, settings.bgmVolume, settings.theme, showShortcutStatus, tr, update]);
 
   return (
     <>

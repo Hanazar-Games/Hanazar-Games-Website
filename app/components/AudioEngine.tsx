@@ -243,6 +243,7 @@ export default function AudioEngine() {
 
   const playSfx = useCallback((kind: SfxKind = "click", style?: string) => {
     const current = settingsRef.current;
+    if (document.visibilityState !== "visible") return;
     if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
 
     const nowMs = performance.now();
@@ -304,7 +305,7 @@ export default function AudioEngine() {
       const current = settingsRef.current;
       const wantsSfx = current.sfxEnabled && current.masterVolume > 0 && current.sfxVolume > 0;
       const wantsBgm = current.bgmEnabled && current.masterVolume > 0 && current.bgmVolume > 0;
-      const isAudioControl = Boolean(target.closest("[data-audio-unlock], [data-sfx-preview]"));
+      const isAudioControl = Boolean(target.closest("[data-audio-unlock]"));
       if (!wantsSfx && !wantsBgm && !isAudioControl) return;
       await unlock();
     };
@@ -320,10 +321,11 @@ export default function AudioEngine() {
     };
 
     const handleKeyDown = async (event: KeyboardEvent) => {
+      if (event.repeat) return;
       const modifier = event.ctrlKey || event.metaKey;
       const key = event.key.toLowerCase();
       if (modifier && key === ",") {
-        if (event.repeat || !document.querySelector(".settingsFloatingButton")) return;
+        if (!document.querySelector(".settingsFloatingButton")) return;
         if (document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) return;
         const current = settingsRef.current;
         if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
@@ -331,17 +333,14 @@ export default function AudioEngine() {
         playSfx("click");
         return;
       }
-      if (modifier && !event.shiftKey && event.key.toLowerCase() === "m") {
+      if (event.key === "Escape" && document.querySelector('.settingsModal[aria-modal="true"]')) {
         const current = settingsRef.current;
-        if (current.bgmEnabled || current.sfxEnabled) await unlock();
-        return;
-      }
-      if (event.key === "Escape" && document.querySelector(".settingsModal")) {
+        if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
         await unlock();
         playSfx("close");
         return;
       }
-      if ((event.key !== "Enter" && event.key !== " ") || event.repeat) return;
+      if (event.key !== "Enter" && event.key !== " ") return;
       const target = event.target;
       if (!(target instanceof Element)) return;
       const interactive = target.closest(interactiveSelector);
@@ -351,12 +350,14 @@ export default function AudioEngine() {
       const current = settingsRef.current;
       const wantsSfx = current.sfxEnabled && current.masterVolume > 0 && current.sfxVolume > 0;
       const wantsBgm = current.bgmEnabled && current.masterVolume > 0 && current.bgmVolume > 0;
-      const isAudioControl = Boolean(target.closest("[data-audio-unlock], [data-sfx-preview]"));
+      const isAudioControl = Boolean(target.closest("[data-audio-unlock]"));
       if (!wantsSfx && !wantsBgm && !isAudioControl) return;
       await unlock();
     };
 
     const handlePreview = async (event: Event) => {
+      const current = settingsRef.current;
+      if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
       await unlock();
       const style = (event as CustomEvent<{ style?: string }>).detail?.style;
       playSfx("navigate", style);
@@ -370,6 +371,7 @@ export default function AudioEngine() {
     window.addEventListener("click", handleClick, { capture: true });
     window.addEventListener("keydown", handleKeyDown, { capture: true });
     window.addEventListener("hanazar:sfx-preview", handlePreview);
+    window.addEventListener("hanazar:audio-unlock", unlock);
     window.addEventListener("hanazar:bgm-state-request", handleStateRequest);
     window.addEventListener("hanazar:audio-context-state", handleContextState);
     document.addEventListener("visibilitychange", handleVisibility);
@@ -378,6 +380,7 @@ export default function AudioEngine() {
       window.removeEventListener("click", handleClick, { capture: true });
       window.removeEventListener("keydown", handleKeyDown, { capture: true });
       window.removeEventListener("hanazar:sfx-preview", handlePreview);
+      window.removeEventListener("hanazar:audio-unlock", unlock);
       window.removeEventListener("hanazar:bgm-state-request", handleStateRequest);
       window.removeEventListener("hanazar:audio-context-state", handleContextState);
       document.removeEventListener("visibilitychange", handleVisibility);

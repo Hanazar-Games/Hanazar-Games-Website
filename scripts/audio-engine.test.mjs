@@ -68,7 +68,7 @@ function harness(overrides = {}) {
   const render = patch => { settings = { ...settings, ...patch }; cursor = 0; exports.default(); effects.splice(0).forEach(fn => fn()); };
   render();
   return {
-    contexts, environment, render,
+    contexts, environment, render, Element,
     async fire(type, properties = {}) { await Promise.all([...listeners.get(type) ?? []].map(fn => fn({type, target: new Element(), button: 0, isPrimary: true, ...properties}))); },
     flushTimers() { const pending = [...timers.values()]; timers.clear(); pending.forEach(fn => fn()); },
     unmount() { slots.forEach(slot => slot?.cleanup?.()); },
@@ -153,4 +153,61 @@ test("BGM maintains one ambient group, cleans up on hide and mute, and resumes",
   app.flushTimers();
   assert.equal(app.contexts[0].state, "closed");
   assert.ok(app.contexts[0].oscillators.every(n => n.disconnected));
+});
+
+test("raw mute keys cannot initialize audio without a valid launcher action", async () => {
+  const app = harness({ bgmEnabled: true, sfxEnabled: false });
+  await app.fire("keydown", { key: "m", ctrlKey: true });
+  assert.equal(app.contexts.length, 0);
+  await app.fire("hanazar:audio-unlock");
+  assert.equal(app.count(), 5);
+  app.unmount();
+});
+
+test("muted SFX previews and settings dismissal never create an audio context", async () => {
+  for (const settings of [{ sfxEnabled: false }, { masterVolume: 0 }, { sfxVolume: 0 }]) {
+    for (const action of ["preview", "escape"]) {
+      const app = harness(settings);
+      app.environment.querySelector = () => ({});
+      await app.fire(action === "preview" ? "hanazar:sfx-preview" : "keydown", { key: "Escape" });
+      assert.equal(app.contexts.length, 0, JSON.stringify({ settings, action }));
+      app.unmount();
+    }
+  }
+});
+
+test("selecting a preview style while SFX is off stays silent for pointer and keyboard activation", async () => {
+  const app = harness({ sfxEnabled: false });
+  const target = new app.Element();
+  target.closest = selector => selector.includes("[data-sfx-preview]") || selector.includes("button:not") ? target : null;
+  await app.fire("pointerdown", { target });
+  await app.fire("keydown", { target, key: "Enter" });
+  await app.fire("hanazar:sfx-preview");
+  assert.equal(app.contexts.length, 0);
+  app.unmount();
+});
+
+test("held Escape and closing settings surfaces do not emit repeated close sounds", async () => {
+  for (const closing of [true, false]) {
+    const app = harness();
+    app.environment.querySelector = selector => closing && selector.includes('aria-modal="true"') ? null : {};
+    await app.fire("keydown", { key: "Escape", repeat: !closing });
+    assert.equal(app.count(), 0);
+    app.unmount();
+  }
+});
+
+test("SFX waiting for audio resume stay silent when the tab becomes hidden", async () => {
+  const app = harness();
+  await app.fire("pointerdown");
+  const ctx = app.contexts[0];
+  ctx.state = "suspended";
+  let resume;
+  ctx.resume = () => new Promise(resolve => { resume = () => { ctx.state = "running"; resolve(); }; });
+  const click = app.fire("click");
+  app.environment.visibilityState = "hidden";
+  resume();
+  await click;
+  assert.equal(app.count(), 0);
+  app.unmount();
 });

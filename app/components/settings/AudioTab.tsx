@@ -32,6 +32,13 @@ export default function AudioTab() {
     update("sfxStyle", style);
     previewSfx(style);
   };
+  const changeVolume = (key: "masterVolume" | "bgmVolume", value: number) => {
+    update(key, value);
+    const otherVolume = key === "masterVolume" ? settings.bgmVolume : settings.masterVolume;
+    if (settings.bgmEnabled && value > 0 && otherVolume > 0) {
+      window.dispatchEvent(new Event("hanazar:audio-unlock"));
+    }
+  };
 
   useEffect(() => {
     const handleState = (event: Event) => {
@@ -59,7 +66,7 @@ export default function AudioTab() {
           min={0}
           max={100}
           value={settings.masterVolume}
-          onChange={(e) => update("masterVolume", Number(e.target.value))}
+          onChange={(e) => changeVolume("masterVolume", Number(e.target.value))}
         />
         <div className="audioPreviewRow">
           <button
@@ -146,7 +153,7 @@ export default function AudioTab() {
           max={100}
           value={settings.bgmVolume}
           disabled={!settings.bgmEnabled}
-          onChange={(e) => update("bgmVolume", Number(e.target.value))}
+          onChange={(e) => changeVolume("bgmVolume", Number(e.target.value))}
         />
         <p className={`audioState audioState-${bgmState}`} role="status" aria-live="polite">
           <span className="audioStateDot" aria-hidden="true" />

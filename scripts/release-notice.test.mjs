@@ -29,11 +29,11 @@ test("release acknowledgement persists by version without discarding other prefe
   const { currentRelease, hasSeenRelease, markReleaseSeen } = await import("../app/lib/release.ts");
   const entries = new Map([["hanazar-settings-v1", "existing-settings"]]);
   const storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
-  assert.equal(currentRelease.version, "2.20.0");
+  assert.equal(currentRelease.version, "2.20.1");
   assert.equal(hasSeenRelease(storage, currentRelease.version), false);
   markReleaseSeen(storage, currentRelease.version);
   assert.equal(hasSeenRelease(storage, currentRelease.version), true);
-  assert.equal(hasSeenRelease(storage, "2.20.1"), false);
+  assert.equal(hasSeenRelease(storage, "2.20.2"), false);
   assert.equal(entries.get("hanazar-settings-v1"), "existing-settings");
 });
 
@@ -70,16 +70,17 @@ test("Xham artwork and archived announcement retain its requested identity", asy
   }
 });
 
-test("current release presents Cloud Roads and MazeIdentity while retaining the previous announcement", async () => {
+test("Cloud Roads and MazeIdentity keep their artwork and archived announcement", async () => {
   const { getTranslation } = await import("../app/lib/i18n.ts");
-  const poster = readFileSync(new URL(`../public${release.currentRelease.image}`, import.meta.url), "utf8");
+  const poster = readFileSync(new URL("../public/updates/2.20.0.svg", import.meta.url), "utf8");
   assert.ok(poster.includes("Cloud Roads") && poster.includes("MazeIdentity"));
   for (const language of ["en", "zh-CN", "zh-TW", "ja", "ko"]) {
-    const copy = release.currentRelease.itemKeys.map(key => getTranslation(language, key)).join(" ");
+    const copy = ["release220Cloud", "release220Maze"].map(key => getTranslation(language, key)).join(" ");
     assert.ok(copy.includes("Cloud Roads") && copy.includes("MazeIdentity") && copy.includes("Steam"));
   }
   const announcement = readFileSync(new URL("../app/components/settings/AnnouncementTab.tsx", import.meta.url), "utf8");
   assert.match(announcement, /version: "2.19.1"/);
+  assert.match(announcement, /version: "2.20.0"/);
   assert.match(announcement, /release2191Name/);
 });
 

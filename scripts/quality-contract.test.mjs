@@ -5,6 +5,18 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
+test("site reduced-motion settings also disable smooth anchor scrolling", async () => {
+  const css = await read("app/globals.css");
+  assert.match(css, /html:has\(body\[data-reduce-motion="true"\]\)\s*\{\s*scroll-behavior: auto;/);
+});
+
+test("audio sliders and switches have 44px touch targets while tracks stay compact", async () => {
+  const css = await read("app/globals.css");
+  assert.match(css.match(/^\.rangeSlider \{([^}]+)\}/m)?.[1] ?? "", /height: 44px/);
+  assert.match(css.match(/^\.switch \{([^}]+)\}/m)?.[1] ?? "", /height: 44px/);
+  assert.match(css.match(/^\.switch \.slider \{([^}]+)\}/m)?.[1] ?? "", /inset: 10px 0/);
+});
+
 test("focused navigation and reveal content never wait for entrance animations", async () => {
   const css = await read("app/globals.css");
   const rule = css.match(/\.heroNavButton:focus-visible,\s*\[data-reveal\]:focus-within\s*\{([^}]+)\}/)?.[1] ?? "";
@@ -456,7 +468,7 @@ test("release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.20.0");
+  assert.equal(packageData.version, "2.20.1");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);
@@ -464,7 +476,7 @@ test("release metadata stays synchronized", async () => {
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
   assert.match(copy, /主站项目扩展与版本更新提醒/);
   assert.match(announcement, /\.\.\.currentRelease/);
-  assert.match(verifier, /2\.20\.0/);
+  assert.match(verifier, /2\.20\.1/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {
