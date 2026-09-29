@@ -3473,6 +3473,10 @@ body[data-theme="light"] .skinCommunityLightbox {
     linear-gradient(145deg, #151430 0%, #121a38 56%, #111a33 100%);
 }
 
+.skinServiceHero::after {
+  background: linear-gradient(180deg, transparent, var(--skin-page));
+}
+
 .skinServiceHero::before {
   content: "";
   position: absolute;
@@ -5903,6 +5907,12 @@ body[data-theme="light"] .releaseNotice { background: #fafbff; }
   padding: 24px 28px;
   overflow-y: auto;
   min-width: 0;
+  overscroll-behavior: contain;
+}
+
+.settingsTabPanel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
 }
 
 .settingsTabContent {

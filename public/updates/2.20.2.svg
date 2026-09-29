@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#17283e"/><stop offset="1" stop-color="#303055"/></linearGradient>
+    <linearGradient id="light" x2="0" y2="1"><stop stop-color="#dcd6ff"/><stop offset="1" stop-color="#f2f6ff"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v600H0z"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="60" y="76" fill="#b8cbdc" font-size="18" letter-spacing="4">HANAZAR GAMES / v2.20.2</text>
+    <text x="56" y="166" fill="#f0f6ff" font-size="58" font-weight="750" letter-spacing="-2">Clearer reading.</text>
+    <text x="60" y="219" fill="#c1bfdf" font-size="25">Keyboard focus. Calmer transitions.</text>
+  </g>
+  <rect x="60" y="270" width="636" height="238" rx="24" fill="#1b2c45" stroke="#a6a0ee" stroke-width="3"/>
+  <g fill="#a9bad1"><rect x="96" y="306" width="326" height="12" rx="6"/><rect x="96" y="338" width="470" height="8" rx="4"/><rect x="96" y="362" width="438" height="8" rx="4"/></g>
+  <rect x="94" y="408" width="145" height="62" rx="12" fill="#393d61" stroke="#a6a0ee"/>
+  <text x="126" y="448" fill="#e6e5ff" font-family="system-ui, sans-serif" font-size="25">Tab</text>
+  <path d="M288 439h312m-20-14 20 14-20 14" fill="none" stroke="#a6a0ee" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="732" y="270" width="194" height="238" rx="24" fill="url(#light)"/>
+  <circle cx="829" cy="358" r="29" fill="#8475d6"/>
+  <path d="M779 441h100m-82 22h64" stroke="#a79dcf" stroke-width="8" stroke-linecap="round"/>
+  <rect x="946" y="270" width="194" height="238" rx="24" fill="#10182c" stroke="#73739b"/>
+  <path d="M1054 328a30 30 0 1 0 20 49 32 32 0 0 1-20-49" fill="#aea3f4"/>
+  <path d="M993 441h100m-82 22h64" stroke="#6c7196" stroke-width="8" stroke-linecap="round"/>
+  <text x="60" y="565" fill="#adbcd1" font-family="system-ui, sans-serif" font-size="16" letter-spacing="3">YOUR THEME / YOUR PACE</text>
+</svg>

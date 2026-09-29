@@ -29,11 +29,11 @@ test("release acknowledgement persists by version without discarding other prefe
   const { currentRelease, hasSeenRelease, markReleaseSeen } = await import("../app/lib/release.ts");
   const entries = new Map([["hanazar-settings-v1", "existing-settings"]]);
   const storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
-  assert.equal(currentRelease.version, "2.20.1");
+  assert.equal(currentRelease.version, "2.20.2");
   assert.equal(hasSeenRelease(storage, currentRelease.version), false);
   markReleaseSeen(storage, currentRelease.version);
   assert.equal(hasSeenRelease(storage, currentRelease.version), true);
-  assert.equal(hasSeenRelease(storage, "2.20.2"), false);
+  assert.equal(hasSeenRelease(storage, "2.20.3"), false);
   assert.equal(entries.get("hanazar-settings-v1"), "existing-settings");
 });
 

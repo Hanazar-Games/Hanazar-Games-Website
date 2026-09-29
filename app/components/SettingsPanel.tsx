@@ -38,11 +38,6 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
-  const previousOverflowRef = useRef("");
-  const previousPaddingRightRef = useRef("");
-  const previousMainAriaHiddenRef = useRef<string | null>(null);
-  const previousMainInertRef = useRef(false);
   const { tr } = useTranslation();
   const { settings } = useSettingsContext();
   const modalTransitionMs = (
@@ -52,7 +47,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   useEffect(() => {
     if (open) {
       setVisible(true);
-      requestAnimationFrame(() => setAnimating(true));
+      const frame = requestAnimationFrame(() => setAnimating(true));
+      return () => cancelAnimationFrame(frame);
     } else {
       setAnimating(false);
       if (modalTransitionMs === 0) {
@@ -112,38 +108,34 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   );
 
   useEffect(() => {
-    if (open) {
-      previousFocusRef.current = document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-      previousOverflowRef.current = document.body.style.overflow;
-      previousPaddingRightRef.current = document.body.style.paddingRight;
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      if (scrollbarWidth > 0) {
-        const currentPadding = Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0;
-        document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
-      }
-      const main = document.querySelector<HTMLElement>("main");
-      if (main) {
-        previousMainAriaHiddenRef.current = main.getAttribute("aria-hidden");
-        previousMainInertRef.current = main.hasAttribute("inert");
-        main.setAttribute("aria-hidden", "true");
-        main.setAttribute("inert", "");
-      }
-      document.addEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "hidden";
+    if (!open) return;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const main = document.querySelector<HTMLElement>("main");
+    const previousMainAriaHidden = main?.getAttribute("aria-hidden") ?? null;
+    const previousMainInert = main?.hasAttribute("inert");
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      const currentPadding = Number.parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+      document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
     }
+    if (main) {
+      main.setAttribute("aria-hidden", "true");
+      main.setAttribute("inert", "");
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = previousOverflowRef.current;
-      document.body.style.paddingRight = previousPaddingRightRef.current;
-      const main = document.querySelector<HTMLElement>("main");
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
       if (main) {
-        if (previousMainAriaHiddenRef.current === null) main.removeAttribute("aria-hidden");
-        else main.setAttribute("aria-hidden", previousMainAriaHiddenRef.current);
-        if (!previousMainInertRef.current) main.removeAttribute("inert");
+        if (previousMainAriaHidden === null) main.removeAttribute("aria-hidden");
+        else main.setAttribute("aria-hidden", previousMainAriaHidden);
+        if (!previousMainInert) main.removeAttribute("inert");
       }
-      previousFocusRef.current?.focus({ preventScroll: true });
+      previousFocus?.focus({ preventScroll: true });
     };
   }, [open, handleKeyDown]);
 
@@ -255,6 +247,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
             id="settings-tab-panel"
             ref={panelRef}
             role="tabpanel"
+            tabIndex={0}
             aria-labelledby={`settings-tab-${activeTab}`}
           >
             {renderTab()}

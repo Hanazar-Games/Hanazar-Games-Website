@@ -38,6 +38,7 @@ const requiredFiles = [...new Set([
   "games/mazeidentity-poster.svg",
   "updates/2.19.1.svg",
   "updates/2.20.0.svg",
+  "updates/2.20.1.svg",
   releaseImage,
   "games/index.html",
   "aigc/index.html",
@@ -267,6 +268,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.20.2",
+    "键盘阅读与服务中心配色修复",
     "2.20.1",
     "音频控制与交互体验修复",
     "2.20.0",
