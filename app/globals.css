@@ -64,6 +64,14 @@ body[data-theme="light"] .heroSection::after {
   background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.5));
 }
 
+body[data-theme="light"] .heroNavButton {
+  color: #f2f2f2;
+}
+
+body[data-theme="light"] .heroNavButton:focus-visible {
+  outline-color: #f2f2f2;
+}
+
 body[data-theme="light"] .settingsModal {
   background: rgba(245, 245, 245, 0.98);
   color: #1a1a1a;
@@ -378,8 +386,18 @@ body[data-disable-decorations="true"] .skinServiceHero::before {
 }
 
 /* ── Individual Animation Toggles ── */
+body[data-disable-ui-fade="true"] .heroNavButton {
+  opacity: 1 !important;
+  animation: none !important;
+}
+
 body[data-disable-ui-fade="true"] .reveal,
 body[data-disable-ui-fade="true"] [data-reveal],
+body[data-disable-ui-fade="true"] .heroImageLayer,
+body[data-disable-ui-fade="true"] .heroEyebrow,
+body[data-disable-ui-fade="true"] .heroTitle,
+body[data-disable-ui-fade="true"] .heroSubtitle,
+body[data-disable-ui-fade="true"] .shortcutToast,
 body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroBack,
 body[data-disable-ui-fade="true"] .skinServiceQuickSettings,
 body[data-disable-ui-fade="true"] .skinServiceSearch,
@@ -401,9 +419,9 @@ body[data-disable-ui-fade="true"] .skinReviewQrButton,
 body[data-disable-ui-fade="true"] .skinReviewCurrentBatches a,
 body[data-disable-ui-fade="true"] .skinServiceUpdateList article,
 body[data-disable-ui-fade="true"] .skinServiceSectionIcon svg,
-body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroEyebrow,
-body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroTitle,
-body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroSubtitle {
+body[data-disable-ui-fade="true"] .gamesHeroEyebrow,
+body[data-disable-ui-fade="true"] .gamesHeroTitle,
+body[data-disable-ui-fade="true"] .gamesHeroSubtitle {
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
@@ -412,6 +430,9 @@ body[data-disable-ui-fade="true"] .skinServiceShell .gamesHeroSubtitle {
 }
 
 body[data-disable-btn-hover="true"] .heroNavButton:hover,
+body[data-disable-btn-hover="true"] .gamesHeroBack:hover,
+body[data-disable-btn-hover="true"] .contactModule:hover,
+body[data-disable-btn-hover="true"] .skinCommunityPromptActions button:hover,
 body[data-disable-btn-hover="true"] .settingsFloatingButton:hover,
 body[data-disable-btn-hover="true"] .moduleButton:hover,
 body[data-disable-btn-hover="true"] .gameCardButton:hover,
@@ -800,7 +821,6 @@ body:has(.gamesShell) .settingsFloatingButton {
   backdrop-filter: blur(6px);
   cursor: pointer;
   opacity: 0;
-  transform: translateY(12px);
   animation: fadeInBody calc(0.5s * var(--anim-speed, 1)) ease forwards;
   animation-delay: calc((0.24s + (var(--button-index) * 0.02s)) * var(--anim-speed, 1));
   transition:

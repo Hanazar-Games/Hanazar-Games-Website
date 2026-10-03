@@ -45,15 +45,20 @@ test("Cloud Roads is featured with a clean direct link and dedicated cover", () 
   assert.match(readFileSync(new URL(`../public${entry.image}`, import.meta.url), "utf8"), /<svg/);
 });
 
-test("MazeIdentity is the first homepage section and has no clickable poster or invented store link", () => {
+test("MazeIdentity sits between the homepage hero and GamesHub without a clickable poster or invented store link", () => {
   const page = home("en");
-  const section = page.props.children[0];
+  const sections = page.props.children.filter(node => node?.type === "section");
+  assert.equal(sections[0].props.className, "heroSection");
+  const section = sections[1];
   assert.equal(section.props.id, "mazeidentity");
+  assert.equal(sections[2].props.id, "games");
   const nodes = descendants(section);
   const title = nodes.find(node => node.props?.id === section.props["aria-labelledby"]);
   assert.equal(title.props.children, "MazeIdentity");
   assert.ok(nodes.some(node => node.props?.children === "Coming soon to Steam"));
   assert.ok(nodes.some(node => node.type === "img" && node.props.src === "/Hanazar-Games-Website/games/mazeidentity-poster.svg"));
+  assert.ok(nodes.filter(node => node.type === "img").every(node => !node.props.priority));
+  assert.ok(descendants(sections[0]).some(node => node.type === "img" && node.props.priority));
   for (const node of nodes) {
     assert.ok(!["a", "button"].includes(node.type));
     assert.equal(node.props?.onClick, undefined);

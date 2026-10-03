@@ -137,23 +137,6 @@ export default function HomePage() {
 
   return (
     <main className="pageShell">
-      <section className="mazeSpotlight" id="mazeidentity" aria-labelledby="mazeidentity-title">
-        <div className="mazeSpotlightArtwork" aria-hidden="true">
-          <Image
-            src={assetPath("/games/mazeidentity-poster.svg")}
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 800px) 100vw, 1184px"
-          />
-        </div>
-        <div className="mazeSpotlightCopy">
-          <span className="mazeSpotlightStatus">{tr("mazeComingSoon")}</span>
-          <h2 id="mazeidentity-title">MazeIdentity</h2>
-          <p>{tr("mazeIntro")}</p>
-        </div>
-      </section>
-
       <section className="heroSection">
         <div className="heroBackdrop" aria-hidden="true">
           <div className="heroImageLayer">
@@ -162,6 +145,7 @@ export default function HomePage() {
               alt=""
               className="heroImage"
               fill
+              priority
               sizes="100vw"
             />
           </div>
@@ -202,6 +186,22 @@ export default function HomePage() {
               {tr("navSettings")}
             </button>
           </nav>
+        </div>
+      </section>
+
+      <section className="mazeSpotlight" id="mazeidentity" aria-labelledby="mazeidentity-title">
+        <div className="mazeSpotlightArtwork" aria-hidden="true">
+          <Image
+            src={assetPath("/games/mazeidentity-poster.svg")}
+            alt=""
+            fill
+            sizes="(max-width: 800px) 100vw, 1184px"
+          />
+        </div>
+        <div className="mazeSpotlightCopy">
+          <span className="mazeSpotlightStatus">{tr("mazeComingSoon")}</span>
+          <h2 id="mazeidentity-title">MazeIdentity</h2>
+          <p>{tr("mazeIntro")}</p>
         </div>
       </section>
 

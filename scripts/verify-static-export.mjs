@@ -39,6 +39,7 @@ const requiredFiles = [...new Set([
   "updates/2.19.1.svg",
   "updates/2.20.0.svg",
   "updates/2.20.1.svg",
+  "updates/2.20.2.svg",
   releaseImage,
   "games/index.html",
   "aigc/index.html",
@@ -268,6 +269,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.20.3",
+    "首页预告位置与动效开关修复",
     "2.20.2",
     "键盘阅读与服务中心配色修复",
     "2.20.1",

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102931"/><stop offset="1" stop-color="#262b48"/></linearGradient>
+    <linearGradient id="teaser" x2="1" y2="0"><stop stop-color="#20525d"/><stop offset="1" stop-color="#234051"/></linearGradient>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h1200v600H0z"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="60" y="72" fill="#adcfda" font-size="18" letter-spacing="4">HANAZAR GAMES / v2.20.3</text>
+    <text x="56" y="152" fill="#effaff" font-size="55" font-weight="750" letter-spacing="-2">A clearer start.</text>
+    <text x="60" y="202" fill="#acc9d8" font-size="24">Your homepage. Your motion preferences.</text>
+    <rect x="60" y="252" width="690" height="260" rx="22" fill="#162b3b" stroke="#7395ac" stroke-opacity=".4"/>
+    <rect x="84" y="274" width="642" height="44" rx="10" fill="#294253"/>
+    <text x="104" y="303" fill="#c7dae4" font-size="19">Welcome</text>
+    <rect x="84" y="333" width="642" height="80" rx="10" fill="url(#teaser)" stroke="#76b6b6"/>
+    <text x="104" y="365" fill="#e9ffff" font-size="24" font-weight="650">MazeIdentity</text>
+    <text x="104" y="392" fill="#adcecf" font-size="17">Coming soon to Steam</text>
+    <rect x="84" y="428" width="642" height="60" rx="10" fill="#294253"/>
+    <text x="104" y="466" fill="#d4e6ee" font-size="23">GamesHub</text>
+    <rect x="788" y="252" width="352" height="260" rx="22" fill="#22364c" stroke="#8c9abb" stroke-opacity=".4"/>
+    <text x="820" y="306" fill="#d4e6ee" font-size="21">Motion controls</text>
+    <g fill="#95acc5"><rect x="820" y="351" width="143" height="9" rx="4"/><rect x="820" y="423" width="143" height="9" rx="4"/></g>
+    <rect x="1005" y="337" width="100" height="37" rx="18" fill="#57908f"/><circle cx="1085" cy="355.5" r="13" fill="#d8f3e9"/>
+    <rect x="1005" y="410" width="100" height="37" rx="18" fill="#475979"/><circle cx="1025" cy="428.5" r="13" fill="#bac9df"/>
+    <text x="60" y="563" fill="#a6bdd1" font-size="16" letter-spacing="3">WELCOME FIRST / MAZEIDENTITY / GAMESHUB</text>
+  </g>
+</svg>

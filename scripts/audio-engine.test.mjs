@@ -211,3 +211,38 @@ test("SFX waiting for audio resume stay silent when the tab becomes hidden", asy
   assert.equal(app.count(), 0);
   app.unmount();
 });
+
+test("missing Web Audio support reports unavailable without creating audio nodes", async () => {
+  const app = harness({ bgmEnabled: true });
+  const states = [];
+  app.environment.AudioContext = undefined;
+  app.environment.addEventListener("hanazar:bgm-state", event => states.push(event.detail.state));
+  await app.fire("hanazar:bgm-state-request");
+  await app.fire("click");
+  assert.equal(states.at(-1), "unavailable");
+  assert.equal(app.count(), 0);
+  assert.equal(app.contexts.length, 0);
+  app.unmount();
+});
+
+test("a rejected audio resume stays silent and a later user gesture can recover BGM", async () => {
+  const app = harness({ bgmEnabled: true, sfxEnabled: false });
+  const states = [];
+  app.environment.addEventListener("hanazar:bgm-state", event => states.push(event.detail.state));
+  await app.fire("pointerdown");
+  const ctx = app.contexts[0];
+  ctx.state = "suspended";
+  await app.fire("hanazar:audio-context-state");
+  app.flushTimers();
+  assert.ok(ctx.oscillators.every(node => node.stopped && node.disconnected));
+  ctx.resume = async () => { throw new Error("Playback blocked"); };
+  await app.fire("hanazar:audio-unlock");
+  assert.equal(states.at(-1), "waiting");
+  assert.equal(app.count(), 5);
+  ctx.resume = async () => { ctx.state = "running"; };
+  await app.fire("hanazar:audio-unlock");
+  assert.equal(states.at(-1), "playing");
+  assert.equal(app.count(), 10);
+  app.unmount();
+  app.flushTimers();
+});
