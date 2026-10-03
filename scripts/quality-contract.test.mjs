@@ -503,7 +503,7 @@ test("release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.20.3");
+  assert.equal(packageData.version, "2.20.4");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);
@@ -511,9 +511,9 @@ test("release metadata stays synchronized", async () => {
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
   assert.match(copy, /主站项目扩展与版本更新提醒/);
   assert.match(announcement, /\.\.\.currentRelease/);
-  assert.match(announcement, /version: "2\.20\.2"/);
-  assert.match(announcement, /image: "\/updates\/2\.20\.2\.svg"/);
-  assert.match(verifier, /2\.20\.3/);
+  assert.match(announcement, /version: "2\.20\.3"/);
+  assert.match(announcement, /image: "\/updates\/2\.20\.3\.svg"/);
+  assert.match(verifier, /2\.20\.4/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSettingsContext } from "../SettingsContext";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 
 export default function OtherTab() {
@@ -9,7 +9,8 @@ export default function OtherTab() {
   const { tr } = useTranslation();
   const [importArea, setImportArea] = useState("");
   const [showImport, setShowImport] = useState(false);
-  const [status, setStatus] = useState("");
+  const [statusKey, setStatusKey] = useState("");
+  const importToggleRef = useRef<HTMLButtonElement>(null);
 
   const handleExport = () => {
     const blob = new Blob([exportJson()], { type: "application/json" });
@@ -22,17 +23,17 @@ export default function OtherTab() {
     a.click();
     a.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
-    setStatus(tr("stDownloaded"));
+    setStatusKey("stDownloaded");
   };
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(exportJson());
-      setStatus(tr("stCopied"));
+      setStatusKey("stCopied");
     } catch {
       setImportArea(exportJson());
       setShowImport(true);
-      setStatus(tr("stCopyFallback"));
+      setStatusKey("stCopyFallback");
     }
   };
 
@@ -41,22 +42,23 @@ export default function OtherTab() {
     if (ok) {
       setImportArea("");
       setShowImport(false);
-      setStatus(tr("stImported"));
+      setStatusKey("stImported");
+      importToggleRef.current?.focus();
     } else {
-      setStatus(tr("stImportFail"));
+      setStatusKey("stImportFail");
     }
   };
 
   const handleReset = () => {
     if (!window.confirm(tr("stResetConfirm"))) return;
     reset();
-    setStatus(tr("stResetDone"));
+    setStatusKey("stResetDone");
   };
 
   const handleClearCache = () => {
     if (!window.confirm(tr("stClearCacheConfirm"))) return;
     clearCache();
-    setStatus(tr("stCacheCleared"));
+    setStatusKey("stCacheCleared");
   };
 
   return (
@@ -74,13 +76,21 @@ export default function OtherTab() {
         <div className="dataActions">
           <button className="settingsBtn" type="button" onClick={handleCopy}>{tr("stCopyJson")}</button>
           <button className="settingsBtn" type="button" onClick={handleExport}>{tr("stDownloadJson")}</button>
-          <button className="settingsBtn" type="button" onClick={() => setShowImport((v) => !v)}>
+          <button
+            className="settingsBtn"
+            type="button"
+            ref={importToggleRef}
+            aria-expanded={showImport}
+            aria-controls={showImport ? "settings-import-area" : undefined}
+            onClick={() => setShowImport((v) => !v)}
+          >
             {showImport ? tr("stCancel") : tr("stImportJson")}
           </button>
         </div>
         {showImport && (
-          <div className="importArea">
+          <div className="importArea" id="settings-import-area">
             <textarea
+              autoFocus
               className="settingsTextarea"
               placeholder={tr("stImportPlaceholder")}
               aria-label={tr("stImportPlaceholder")}
@@ -103,8 +113,8 @@ export default function OtherTab() {
         </button>
       </div>
 
-      {status ? (
-        <p className="settingsStatus" role="status" aria-live="polite">{status}</p>
+      {statusKey ? (
+        <p className="settingsStatus" role="status" aria-live="polite">{tr(statusKey)}</p>
       ) : null}
     </div>
   );
