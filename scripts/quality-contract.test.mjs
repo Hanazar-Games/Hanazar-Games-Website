@@ -5,6 +5,25 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
+test("entrances release interactive transforms when finished", async () => {
+  const css = await read("app/globals.css");
+  for (const name of ["skinControlEnter", "skinCardEnter", "skinSearchResultEnter", "skinQrSettle"]) {
+    const rules = [...css.matchAll(new RegExp(`animation: ${name}[^;]+;`, "g"))];
+    assert.ok(rules.length > 0, name);
+    for (const [rule] of rules) assert.match(rule, /backwards;/);
+  }
+  const navigation = css.match(/^\.heroNavButton \{([^}]+)\}/m)?.[1] ?? "";
+  assert.doesNotMatch(navigation, /opacity: 0/);
+  assert.match(navigation, /backwards;/);
+});
+
+test("scroll entrances avoid persistent layer hints and blur animation", async () => {
+  const css = await read("app/globals.css");
+  const pending = css.match(/^\.revealPending \{([^}]+)\}/m)?.[1] ?? "";
+  assert.doesNotMatch(pending, /will-change|filter/);
+  assert.doesNotMatch(css.slice(css.indexOf("@keyframes scrollReveal"), css.indexOf("@keyframes fadeInTitle")), /filter:/);
+});
+
 test("light-theme navigation remains readable on the dark homepage hero", async () => {
   const css = await read("app/globals.css");
   const rule = css.match(/body\[data-theme="light"\] \.heroNavButton\s*\{([^}]+)\}/)?.[1] ?? "";
@@ -218,7 +237,7 @@ test("homepage hero uses a right-sized modern image for static hosting", async (
 test("homepage navigation enters promptly and follows animation speed", async () => {
   const css = await read("app/globals.css");
 
-  assert.match(css, /\.heroNavButton \{[\s\S]*?animation: fadeInBody calc\(0\.5s \* var\(--anim-speed, 1\)\) ease forwards;/);
+  assert.match(css, /\.heroNavButton \{[\s\S]*?animation: fadeInBody calc\(0\.5s \* var\(--anim-speed, 1\)\) ease backwards;/);
   assert.match(css, /animation-delay: calc\(\(0\.24s \+ \(var\(--button-index\) \* 0\.02s\)\) \* var\(--anim-speed, 1\)\);/);
   assert.doesNotMatch(css, /\.heroNavButton \{[\s\S]*?animation: fadeInBody 1s ease forwards;/);
 });
@@ -503,7 +522,7 @@ test("release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.20.4");
+  assert.equal(packageData.version, "2.20.5");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);
@@ -511,9 +530,9 @@ test("release metadata stays synchronized", async () => {
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
   assert.match(copy, /主站项目扩展与版本更新提醒/);
   assert.match(announcement, /\.\.\.currentRelease/);
-  assert.match(announcement, /version: "2\.20\.3"/);
-  assert.match(announcement, /image: "\/updates\/2\.20\.3\.svg"/);
-  assert.match(verifier, /2\.20\.4/);
+  assert.match(announcement, /version: "2\.20\.4"/);
+  assert.match(announcement, /image: "\/updates\/2\.20\.4\.svg"/);
+  assert.match(verifier, /2\.20\.5/);
 });
 
 test("skin service hub contains only section entries and owns the first-visit prompt", async () => {

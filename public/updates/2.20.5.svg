@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" fill="none">
+  <defs>
+    <linearGradient id="bg" x2="1200" y2="600" gradientUnits="userSpaceOnUse"><stop stop-color="#121c30"/><stop offset="1" stop-color="#263756"/></linearGradient>
+    <linearGradient id="card" x2="290" y2="180" gradientUnits="userSpaceOnUse"><stop stop-color="#46518a"/><stop offset="1" stop-color="#2c4c64"/></linearGradient>
+  </defs>
+  <rect width="1200" height="600" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="60" y="72" fill="#abc8dc" font-size="18" letter-spacing="4">HANAZAR GAMES / v2.20.5</text>
+    <text x="60" y="155" fill="#f3f5ff" font-size="52" font-weight="700">Motion at the right moment.</text>
+    <text x="62" y="202" fill="#becde0" font-size="23">Scroll into view. Settle in. Respond to you.</text>
+    <rect x="60" y="250" width="650" height="260" rx="24" fill="#17273d" stroke="#90acc8" stroke-opacity=".4"/>
+    <path d="M94 358h582" stroke="#9abacb" stroke-dasharray="7 8"/>
+    <text x="94" y="294" fill="#b9cfe0" font-size="18" letter-spacing="2">VIEWPORT</text>
+    <rect x="103" y="393" width="158" height="78" rx="14" fill="#415370" opacity=".45"/>
+    <path d="M285 423c32 0 35-79 74-79m-11-8 12 8-12 8" stroke="#bcb5fa" stroke-width="3" stroke-linecap="round"/>
+    <rect x="393" y="316" width="265" height="154" rx="18" fill="url(#card)" stroke="#b1a4ee"/>
+    <rect x="421" y="348" width="54" height="48" rx="12" fill="#a89cf0"/>
+    <path d="m435 373 9 9 18-21" stroke="#152c40" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="495" y="356" width="128" height="10" rx="5" fill="#d4deef"/>
+    <rect x="495" y="380" width="95" height="8" rx="4" fill="#a2b9d2"/>
+    <rect x="421" y="422" width="202" height="8" rx="4" fill="#9ab0cd"/>
+    <rect x="744" y="250" width="396" height="260" rx="24" fill="#1d3048" stroke="#90acc8" stroke-opacity=".4"/>
+    <text x="778" y="294" fill="#b9cfe0" font-size="18" letter-spacing="2">READY TO INTERACT</text>
+    <rect x="795" y="363" width="288" height="98" rx="18" stroke="#819ab6" stroke-dasharray="6 7"/>
+    <rect x="795" y="346" width="288" height="98" rx="18" fill="#53608d" stroke="#c7b6ff"/>
+    <text x="830" y="403" fill="#f1f3ff" font-size="25">Explore</text>
+    <path d="M1015 389h29m-10-10 10 10-10 10" stroke="#d4dff1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="60" y="563" fill="#a6bdd1" font-size="16" letter-spacing="3">SCROLL / FOCUS / INTERACT</text>
+  </g>
+</svg>

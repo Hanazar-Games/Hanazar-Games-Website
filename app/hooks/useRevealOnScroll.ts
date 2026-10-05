@@ -4,43 +4,56 @@ import { useEffect } from "react";
 
 export function useRevealOnScroll() {
   useEffect(() => {
-    const nodes = document.querySelectorAll<HTMLElement>("[data-reveal]");
-    const reveal = (node: HTMLElement) => {
-      node.classList.add("revealVisible");
+    const pending = new Set(document.querySelectorAll<HTMLElement>("[data-reveal]:not(.revealVisible)"));
+    let observer: IntersectionObserver | undefined;
+    let fallback: number | undefined;
+
+    const reveal = (node: HTMLElement, animate = true) => {
+      if (!pending.delete(node)) return;
       node.classList.remove("revealPending");
+      if (animate && !node.matches(":focus-within")) node.classList.add("revealVisible");
+      observer?.unobserve(node);
+    };
+    const handleFocus = () => {
+      pending.forEach((node) => {
+        if (node.matches(":focus-within")) reveal(node, false);
+      });
+    };
+    const cleanup = () => {
+      window.clearTimeout(fallback);
+      observer?.disconnect();
+      document.removeEventListener("focusin", handleFocus);
+      pending.forEach((node) => node.classList.remove("revealPending"));
+      pending.clear();
     };
 
-    if (!("IntersectionObserver" in window)) {
-      nodes.forEach(reveal);
+    if (typeof window.IntersectionObserver !== "function" || pending.size === 0) {
+      cleanup();
       return;
     }
 
-    nodes.forEach((node) => node.classList.add("revealPending"));
+    try {
+      observer = new IntersectionObserver(
+        (entries) => {
+          // A healthy observer owns offscreen entrances; the timer only guards startup failure.
+          window.clearTimeout(fallback);
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) reveal(entry.target as HTMLElement);
+          });
+        },
+        { threshold: 0, rootMargin: "0px 0px -24px 0px" }
+      );
+      fallback = window.setTimeout(cleanup, 1800);
+      pending.forEach((node) => {
+        node.classList.add("revealPending");
+        observer!.observe(node);
+      });
+      document.addEventListener("focusin", handleFocus);
+      handleFocus();
+    } catch {
+      cleanup();
+    }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            reveal(entry.target as HTMLElement);
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.16,
-        rootMargin: "0px 0px -10% 0px"
-      }
-    );
-
-    nodes.forEach((node) => observer.observe(node));
-    const fallback = window.setTimeout(() => {
-      nodes.forEach(reveal);
-      observer.disconnect();
-    }, 1800);
-
-    return () => {
-      window.clearTimeout(fallback);
-      observer.disconnect();
-    };
+    return cleanup;
   }, []);
 }

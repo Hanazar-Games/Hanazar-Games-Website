@@ -820,8 +820,7 @@ body:has(.gamesShell) .settingsFloatingButton {
   text-transform: uppercase;
   backdrop-filter: blur(6px);
   cursor: pointer;
-  opacity: 0;
-  animation: fadeInBody calc(0.5s * var(--anim-speed, 1)) ease forwards;
+  animation: fadeInBody calc(0.5s * var(--anim-speed, 1)) ease backwards;
   animation-delay: calc((0.24s + (var(--button-index) * 0.02s)) * var(--anim-speed, 1));
   transition:
     border-color 0.25s ease,
@@ -1387,44 +1386,40 @@ select:focus-visible {
 
 .revealPending {
   opacity: 0;
-  filter: blur(3px);
-  will-change: opacity, transform, filter;
 }
 
 .revealFade {
   --reveal-x: 0px;
-  --reveal-y: 18px;
+  --reveal-y: 12px;
 }
 
 .revealPending.revealFade {
-  transform: translateY(18px);
+  transform: translateY(12px);
 }
 
 .revealLeft {
-  --reveal-x: -24px;
+  --reveal-x: -16px;
   --reveal-y: 0px;
 }
 
 .revealPending.revealLeft {
-  transform: translateX(-24px);
+  transform: translateX(-16px);
 }
 
 .revealRight {
-  --reveal-x: 24px;
+  --reveal-x: 16px;
   --reveal-y: 0px;
 }
 
 .revealPending.revealRight {
-  transform: translateX(24px);
+  transform: translateX(16px);
 }
 
 .revealVisible {
   opacity: 1;
   transform: translate(0, 0);
-  filter: blur(0);
-  will-change: auto;
-  animation: scrollReveal calc(0.72s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1)
-    var(--reveal-delay, 0s) backwards;
+  animation: scrollReveal calc(0.56s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1)
+    calc(var(--reveal-delay, 0s) * var(--anim-speed, 1)) backwards;
 }
 
 .heroNavButton:focus-visible,
@@ -1441,12 +1436,10 @@ select:focus-visible {
   from {
     opacity: 0;
     transform: translate(var(--reveal-x, 0px), var(--reveal-y, 0px));
-    filter: blur(3px);
   }
   to {
     opacity: 1;
     transform: translate(0, 0);
-    filter: blur(0);
   }
 }
 
@@ -3565,8 +3558,7 @@ body[data-theme="light"] .skinServiceShell .gamesHeroSubtitle {
   border-color: rgba(220, 228, 255, 0.24);
   background: rgba(12, 19, 40, 0.56);
   color: #eef2ff;
-  opacity: 0;
-  animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.06s both;
+  animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) calc(0.06s * var(--anim-speed, 1)) backwards;
 }
 
 body[data-theme="light"] .skinServiceShell .gamesHeroBack {
@@ -3583,8 +3575,7 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   display: flex;
   align-items: center;
   gap: 8px;
-  opacity: 0;
-  animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) calc(0.1s * var(--anim-speed, 1)) backwards;
 }
 
 .skinServiceQuickToggle {
@@ -3746,8 +3737,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border-radius: 12px;
   color: var(--skin-text);
   background: var(--skin-card);
-  opacity: 0;
-  animation: skinSearchResultEnter calc(0.34s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinSearchResultEnter calc(0.34s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinServiceSearchResults > :nth-child(2) { animation-delay: calc(0.035s * var(--anim-speed, 1)); }
@@ -3866,8 +3856,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
     linear-gradient(135deg, var(--skin-tone-soft), transparent 46%),
     var(--skin-surface);
   box-shadow: 0 14px 38px rgba(2, 8, 22, 0.12);
-  opacity: 0;
-  animation: skinCardEnter calc(0.56s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.56s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinServiceHubGrid .skinServiceIndexLink:nth-child(1) { animation-delay: calc(0.18s * var(--anim-speed, 1)); }
@@ -3901,8 +3890,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinServiceSectionNav .skinServiceIndexLink {
   min-height: 62px;
   padding: 10px;
-  opacity: 0;
-  animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinServiceSectionNav .skinServiceIndexLink:nth-child(1) { animation-delay: calc(0.22s * var(--anim-speed, 1)); }
@@ -4014,8 +4002,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinServiceDocumentSection > * {
   position: relative;
   z-index: 1;
-  opacity: 0;
-  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinServiceDocumentSection > :nth-child(1) { animation-delay: calc(0.08s * var(--anim-speed, 1)); }
@@ -4177,7 +4164,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border-radius: 16px;
   background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
   box-shadow: 0 14px 34px color-mix(in srgb, var(--skin-tone) 10%, transparent);
-  animation: skinCardEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinCommunityUnavailable::after {
@@ -4271,8 +4258,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border: 1px solid var(--skin-border);
   border-radius: 16px;
   background: var(--skin-card);
-  opacity: 0;
-  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
   transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -4452,7 +4438,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border-radius: 16px;
   background: var(--skin-card);
   transition: border-color 0.2s ease, transform 0.2s ease;
-  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinArticleGrid article:nth-child(2n) { animation-delay: calc(0.06s * var(--anim-speed, 1)); }
@@ -4678,8 +4664,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border: 1px solid var(--skin-border);
   border-radius: 13px;
   background: var(--skin-input);
-  opacity: 0;
-  animation: skinSearchResultEnter calc(0.4s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinSearchResultEnter calc(0.4s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinFeedbackList article:nth-child(2n) { animation-delay: calc(0.05s * var(--anim-speed, 1)); }
@@ -4761,8 +4746,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   background: #fff;
   box-shadow: 0 18px 44px rgba(2, 8, 22, 0.18);
   cursor: zoom-in;
-  opacity: 0;
-  animation: skinQrSettle calc(0.62s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+  animation: skinQrSettle calc(0.62s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) calc(0.24s * var(--anim-speed, 1)) backwards;
   transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -4858,8 +4842,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border-radius: 13px;
   background: linear-gradient(135deg, var(--skin-tone-soft), var(--skin-card));
   color: var(--skin-text);
-  opacity: 0;
-  animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.42s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
   transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
 }
 
@@ -5113,7 +5096,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   border: 1px solid var(--skin-border);
   border-radius: 18px;
   background: var(--skin-card);
-  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: skinCardEnter calc(0.46s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .skinServiceUpdateList article:first-child {

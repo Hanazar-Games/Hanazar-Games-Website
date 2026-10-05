@@ -41,6 +41,7 @@ const requiredFiles = [...new Set([
   "updates/2.20.1.svg",
   "updates/2.20.2.svg",
   "updates/2.20.3.svg",
+  "updates/2.20.4.svg",
   releaseImage,
   "games/index.html",
   "aigc/index.html",
@@ -270,6 +271,8 @@ const requiredContent = {
   ],
   "skin-service/updates/index.html": [
     "更新公告",
+    "2.20.5",
+    "滚动入场与交互动效优化",
     "2.20.4",
     "设置导入与语言提示修复",
     "2.20.3",
