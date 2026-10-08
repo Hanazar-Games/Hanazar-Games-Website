@@ -8,13 +8,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import * as batches from "../app/lib/reviewBatches.ts";
 import * as translations from "../app/lib/skinServiceI18n.ts";
+import * as terms from "../app/lib/skinServiceTerms.ts";
 
 const require = createRequire(import.meta.url);
 const source = ts.transpileModule(readFileSync(new URL("../app/components/SkinServiceCenter.tsx", import.meta.url), "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
 }).outputText;
 
-function render(language = "zh-CN") {
+function render(language = "zh-CN", activeSection = "review-notices") {
   const exports = {};
   const mocks = {
     "next/link": { default: ({ children, ...props }) => createElement("a", props, children) },
@@ -23,11 +24,25 @@ function render(language = "zh-CN") {
     "./SettingsContext": { useSettingsContext: () => ({ settings: { language, theme: "light", animationsEnabled: true }, update() {} }) },
     "../lib/paths": { assetPath: path => path },
     "../lib/reviewBatches": batches,
+    "../lib/skinServiceTerms": terms,
+    "./SkinTermsReader": { default: () => null },
     "../lib/skinServiceI18n": translations,
   };
   runInNewContext(source, { exports, require: name => mocks[name] ?? require(name) });
-  return renderToStaticMarkup(createElement(exports.default, { activeSection: "review-notices", serviceUrl: null }));
+  return renderToStaticMarkup(createElement(exports.default, { activeSection, serviceUrl: null }));
 }
+
+test("terms replace the fifth hub entry while updates remain available in the header", () => {
+  for (const language of translations.skinServiceLanguages) {
+    const html = render(language, null);
+    const nav = html.match(/<nav class="skinServiceIndex[^]*?<\/nav>/)?.[0] ?? "";
+    assert.equal([...nav.matchAll(/class="skinServiceIndexLink/g)].length, 6);
+    assert.ok(nav.includes('/skin-service/terms'));
+    assert.ok(!nav.includes('/skin-service/updates'));
+    assert.match(html, /class="skinServiceUpdatesLink" href="\/skin-service\/updates"/);
+    assert.ok(render(language, "updates").includes(`<h1 class="gamesHeroTitle">${translations.skinText(language, "updatesTitle")}</h1>`));
+  }
+});
 
 test("recent review results render outside the collapsed historical archive with exact counts", () => {
   const html = render();
@@ -68,7 +83,7 @@ test("review totals use exact localized wording when all completed counts are kn
   }
 });
 
-function searchClickHarness(activeSection = "review-notices") {
+function searchClickHarness(activeSection = "review-notices", query = "216", href = "/skin-service/review-notices#review-batch-216") {
   const exports = {};
   const updates = [];
   const frames = [];
@@ -76,7 +91,7 @@ function searchClickHarness(activeSection = "review-notices") {
   const mocks = {
     react: {
       ...require("react"),
-      useState: value => [stateIndex++ === 0 ? "216" : value, value => updates.push(value)],
+      useState: value => [stateIndex++ === 0 ? query : value, value => updates.push(value)],
       useRef: value => ({ current: value }),
       useMemo: fn => fn(),
       useCallback: fn => fn,
@@ -88,6 +103,8 @@ function searchClickHarness(activeSection = "review-notices") {
     "./SettingsContext": { useSettingsContext: () => ({ settings: { language: "zh-CN", theme: "light", animationsEnabled: true }, update() {} }) },
     "../lib/paths": { assetPath: path => path },
     "../lib/reviewBatches": batches,
+    "../lib/skinServiceTerms": terms,
+    "./SkinTermsReader": { default: () => null },
     "../lib/skinServiceI18n": translations,
   };
   runInNewContext(source, {
@@ -97,13 +114,18 @@ function searchClickHarness(activeSection = "review-notices") {
   });
   const findLink = node => {
     if (Array.isArray(node)) return node.map(findLink).find(Boolean);
-    if (node?.props?.href === "/skin-service/review-notices#review-batch-216") return node;
+    if (node?.props?.href === href) return node;
     return node?.props ? findLink(node.props.children) : undefined;
   };
   const link = findLink(exports.default({ activeSection, serviceUrl: null }));
-  assert.ok(link, "search must include the matching batch link");
+  assert.ok(link, "search must include the matching result link");
   return { click: link.props.onClick, updates, frames };
 }
+
+test("global search retains the moved announcement entry and indexes full agreement clauses", () => {
+  searchClickHarness("terms", "更新公告", "/skin-service/updates#updates");
+  searchClickHarness("terms", "2.14", "/skin-service/terms#terms-clause-2");
+});
 
 test("modified and canceled search clicks preserve native navigation and the search query", () => {
   for (const properties of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {

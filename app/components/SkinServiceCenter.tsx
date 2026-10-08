@@ -7,6 +7,8 @@ import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } fro
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
 import { reviewBatches, type ReviewBatch } from "../lib/reviewBatches";
+import SkinTermsReader from "./SkinTermsReader";
+import { serviceTerms } from "../lib/skinServiceTerms";
 import {
   skinServiceLanguage,
   skinText,
@@ -38,9 +40,9 @@ interface ApiEnvelope {
 type WallState = "loading" | "ready" | "unavailable" | "failed";
 type ArticleCategoryId = "introduction" | "preparation" | "review" | "privacy";
 type ArticleCategory = "all" | ArticleCategoryId;
-type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "updates" | "support";
+type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "updates" | "terms" | "support";
 type CommunityPlatform = "qq" | "discord";
-export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "updates" | "support";
+export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "updates" | "terms" | "support";
 
 const EDIT_WINDOW_MS = 5 * 60 * 1000;
 const WALL_PAGE_SIZE = 20;
@@ -71,7 +73,7 @@ const sectionDefinitions: Array<{
   { id: "questions", icon: "questions", title: "questionsTitle", summary: "questionsSummary", description: "questionsDescription" },
   { id: "feedback", icon: "feedback", title: "feedbackTitle", summary: "feedbackSummary", description: "feedbackDescription" },
   { id: "review-notices", icon: "notices", title: "noticesTitle", summary: "noticesSummary", description: "noticesDescription" },
-  { id: "updates", icon: "updates", title: "updatesTitle", summary: "updatesSummary", description: "updatesDescription" },
+  { id: "terms", icon: "terms", title: "termsTitle", summary: "termsSummary", description: "termsDescription" },
   { id: "support", icon: "support", title: "supportTitle", summary: "supportSummary", description: "supportDescription" },
 ];
 
@@ -161,6 +163,7 @@ function SectionIcon({ name }: { name: SectionIconName }) {
     feedback: <><path d="M4 5.5h16v11H9l-5 4v-15Z" /><path d="m15.8 3 .5 1.4 1.4.5-1.4.5-.5 1.4-.5-1.4-1.4-.5 1.4-.5.5-1.4Z" /></>,
     notices: <><path d="M6.5 17.5h11l-1.4-2.1V10a4.1 4.1 0 0 0-8.2 0v5.4l-1.4 2.1Z" /><path d="M10 20.2h4M12 3V1.8M4.8 5.2 3.9 4.3M19.2 5.2l.9-.9" /></>,
     updates: <><path d="M4 5h16v14H4z" /><path d="M8 9h8M8 13h6M8 17h4M7 2v5M17 2v5" /></>,
+    terms: <><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 11h7M9 14h3" /><path d="m10 17 2 2 4-4" /></>,
     support: <><path d="M12 20S4 15.5 4 9.4A4.1 4.1 0 0 1 11.2 6L12 7l.8-1A4.1 4.1 0 0 1 20 9.4C20 15.5 12 20 12 20Z" /><path d="M8.6 12h2l1-2.2 1.5 4.2 1-2h1.5" /></>,
   } satisfies Record<SectionIconName, React.ReactNode>;
 
@@ -444,7 +447,9 @@ export default function SkinServiceCenter({
     summary: skinText(language, section.summary),
     description: skinText(language, section.description),
   }));
-  const activeSectionDetails = sections.find((section) => section.id === activeSection);
+  const activeSectionDetails = activeSection === "updates"
+    ? { title: skinText(language, "updatesTitle"), description: skinText(language, "updatesDescription") }
+    : sections.find((section) => section.id === activeSection);
   const communities = communityDefinitions.map((community) => ({
     ...community,
     name: skinText(language, community.name),
@@ -809,12 +814,33 @@ export default function SkinServiceCenter({
         section: "review-notices" as const,
         targetId: reviewBatchId(batch),
       })),
+      {
+        title: skinText(language, "updatesTitle"),
+        text: skinText(language, "updatesSummary"),
+        href: "/skin-service/updates#updates",
+        section: "updates" as const,
+        targetId: "updates",
+      },
       ...serviceUpdates.map((update) => ({
         title: `${update.version} · ${update.title}`,
         text: update.body,
         href: `/skin-service/updates#update-${update.version.replaceAll(".", "-")}`,
         section: "updates" as const,
         targetId: `update-${update.version.replaceAll(".", "-")}`,
+      })),
+      {
+        title: serviceTerms.title,
+        text: `${serviceTerms.version} ${serviceTerms.importantParagraphs.join(" ")}`,
+        href: "/skin-service/terms#terms",
+        section: "terms" as const,
+        targetId: "terms",
+      },
+      ...serviceTerms.sections.map((section) => ({
+        title: section.title,
+        text: section.paragraphs.join(" "),
+        href: `/skin-service/terms#${section.id}`,
+        section: "terms" as const,
+        targetId: section.id,
       })),
       {
         title: skinText(language, "donationReserved"),
@@ -1005,8 +1031,13 @@ export default function SkinServiceCenter({
       )}
       <main className="pageShell gamesShell skinServiceShell" lang={language} ref={pageMainRef}>
       <section className="gamesHero skinServiceHero">
+        <div className="skinServiceTopbar">
         <Link href={activeSection ? "/skin-service" : "/"} className="gamesHeroBack">
           {skinText(language, activeSection ? "backServiceCenter" : "backHome")}
+        </Link>
+        <div className="skinServiceTopActions">
+        <Link className="skinServiceUpdatesLink" href="/skin-service/updates" aria-current={activeSection === "updates" ? "page" : undefined}>
+          <SectionIcon name="updates" />{skinText(language, "updatesTitle")}
         </Link>
         <div className="skinServiceQuickSettings" aria-label={skinText(language, "quickSettingsAria")}>
           <div className="skinServiceQuickToggle" role="group" aria-label={skinText(language, "quickThemeAria")}>
@@ -1035,6 +1066,8 @@ export default function SkinServiceCenter({
               </button>
             ))}
           </div>
+        </div>
+        </div>
         </div>
         <div className="gamesHeroInner">
           <span className="gamesHeroEyebrow">{skinText(language, "eyebrow")}</span>
@@ -1346,6 +1379,11 @@ export default function SkinServiceCenter({
               <ReviewBatchList batches={ARCHIVED_REVIEW_BATCHES} language={language} />
             </details>
           </div>
+        </section>}
+
+        {activeSection === "terms" && <section className="skinServiceDocumentSection" id="terms" tabIndex={-1}>
+          <SectionHeader icon="terms" title={skinText(language, "termsTitle")} description={skinText(language, "termsDescription")} />
+          <SkinTermsReader language={language} />
         </section>}
 
         {activeSection === "updates" && <section className="skinServiceDocumentSection" id="updates" tabIndex={-1}>

@@ -3555,6 +3555,9 @@ body[data-theme="light"] .skinServiceShell .gamesHeroSubtitle {
 }
 
 .skinServiceShell .gamesHeroBack {
+  position: static;
+  align-self: flex-start;
+  flex-shrink: 0;
   border-color: rgba(220, 228, 255, 0.24);
   background: rgba(12, 19, 40, 0.56);
   color: #eef2ff;
@@ -3567,15 +3570,58 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
   color: #26324d;
 }
 
-.skinServiceQuickSettings {
+.skinServiceTopbar {
   position: absolute;
   z-index: 4;
   top: 22px;
   right: clamp(18px, 4vw, 52px);
+  left: clamp(18px, 4vw, 52px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skinServiceTopActions,
+.skinServiceQuickSettings {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.skinServiceQuickSettings {
   animation: skinControlEnter calc(0.48s * var(--anim-speed, 1)) cubic-bezier(0.16, 1, 0.3, 1) calc(0.1s * var(--anim-speed, 1)) backwards;
+}
+
+.skinServiceUpdatesLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: 1px solid var(--skin-border);
+  border-radius: 13px;
+  background: var(--skin-card);
+  color: var(--skin-text);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.skinServiceUpdatesLink:hover,
+.skinServiceUpdatesLink[aria-current="page"] {
+  border-color: var(--skin-tone);
+  background: var(--skin-tone-soft);
+}
+
+.skinServiceUpdatesLink svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .skinServiceQuickToggle {
@@ -3590,7 +3636,7 @@ body[data-theme="light"] .skinServiceShell .gamesHeroBack {
 }
 
 .skinServiceQuickToggle button {
-  min-height: 36px;
+  min-height: 44px;
   padding: 7px 10px;
   display: inline-flex;
   align-items: center;
@@ -5211,6 +5257,280 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   outline-offset: 3px;
 }
 
+.skinServiceDocumentSection#terms {
+  overflow: clip;
+}
+
+.skinTermsReader {
+  min-width: 0;
+  display: grid;
+  gap: 20px;
+}
+
+.skinTermsDocumentMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.skinTermsDocumentMeta h3,
+.skinTermsImportant h3,
+.skinTermsConsent h3 {
+  margin: 0 0 8px;
+  color: var(--skin-text);
+}
+
+.skinTermsDocumentMeta p,
+.skinTermsDocumentMeta > span,
+.skinTermsLanguageNote {
+  margin: 0;
+  color: var(--skin-muted);
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+.skinTermsImportant,
+.skinTermsConsent {
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--skin-border);
+  border-radius: 18px;
+  background: var(--skin-card);
+}
+
+.skinTermsImportant {
+  border-left: 3px solid var(--skin-tone);
+  background: linear-gradient(130deg, var(--skin-tone-soft), var(--skin-card));
+}
+
+.skinTermsImportant p,
+.skinTermsConsent p,
+.skinTermsPdf > p {
+  margin: 10px 0;
+  font-size: 0.92rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.skinTermsDownloads,
+.skinTermsConsentActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skinTermsDownloads a,
+.skinTermsConsentActions button,
+.skinTermsFontControls button {
+  min-height: 44px;
+  padding: 10px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--skin-border);
+  border-radius: 12px;
+  background: var(--skin-card);
+  color: var(--skin-text);
+  font: inherit;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.skinTermsDownloads a:hover,
+.skinTermsConsentActions button:not(:disabled):hover,
+.skinTermsFontControls button:not(:disabled):hover {
+  border-color: var(--skin-tone);
+  background: var(--skin-tone-soft);
+}
+
+.skinTermsConsentActions button[type="submit"] {
+  border-color: #6756d9;
+  background: #6756d9;
+  color: #fff;
+}
+
+.skinTermsConsentActions button[type="submit"]:not(:disabled):hover {
+  border-color: #5846c4;
+  background: #5846c4;
+}
+
+.skinTermsConsentActions button:disabled,
+.skinTermsFontControls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.skinTermsPdf,
+.skinTermsText {
+  min-width: 0;
+  border: 1px solid var(--skin-border);
+  border-radius: 16px;
+  background: var(--skin-surface);
+  scroll-margin-top: 24px;
+}
+
+.skinTermsPdf > summary,
+.skinTermsText > summary {
+  padding: 18px;
+  min-height: 52px;
+  cursor: pointer;
+  color: var(--skin-text);
+  font-weight: 600;
+}
+
+.skinTermsPdf > p { padding: 0 18px; }
+.skinTermsPdf a { color: var(--skin-tone); text-decoration: underline; }
+
+.skinTermsPdf iframe {
+  display: block;
+  width: 100%;
+  height: clamp(360px, 70svh, 760px);
+  border: 0;
+  border-top: 1px solid var(--skin-border);
+  border-radius: 0 0 16px 16px;
+  background: #fff;
+  color-scheme: light;
+}
+
+.skinTermsText article {
+  max-width: 80ch;
+  margin: 0 auto;
+  padding: 4px clamp(16px, 3vw, 32px) 28px;
+  line-height: 1.95;
+  color: var(--skin-text);
+  overflow-wrap: anywhere;
+}
+
+.skinTermsText article section { scroll-margin-top: 24px; padding-top: 14px; }
+.skinTermsText article h3 { font-size: 1.2em; }
+.skinTermsText article h4 { font-size: 1.06em; }
+.skinTermsText article :is(h3, h4, p) { white-space: pre-wrap; }
+.skinTermsText article,
+.skinTermsText article * { transition-property: none; }
+.skinTermsText article p[id] { scroll-margin-top: 24px; }
+.skinTermsText article :is(section, p[id]):focus { outline: 2px solid var(--skin-tone); outline-offset: 4px; }
+.skinTermsText article :is(section, p[id]):target { background: var(--skin-tone-soft); border-radius: 6px; }
+
+.skinTermsReadingTools {
+  padding: 0 clamp(16px, 3vw, 32px) 20px;
+  border-bottom: 1px solid var(--skin-border);
+  margin-bottom: 24px;
+}
+
+.skinTermsReadingTools > p {
+  margin: 0 0 14px;
+  font-size: 0.86rem;
+  line-height: 1.75;
+  color: var(--skin-muted);
+}
+
+.skinTermsFontControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.86rem;
+}
+
+.skinTermsFontControls > span { flex-basis: 100%; }
+.skinTermsFontControls button { min-width: 44px; }
+.skinTermsFontControls output { min-width: 5ch; text-align: center; font-variant-numeric: tabular-nums; }
+
+.skinTermsContents {
+  margin-top: 18px;
+  border: 1px solid var(--skin-border);
+  border-radius: 12px;
+  background: var(--skin-card);
+  overflow-wrap: anywhere;
+  scroll-margin-top: 24px;
+}
+
+.skinTermsContents summary {
+  padding: 12px;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.skinTermsContents > summary { font-weight: 600; }
+.skinTermsContents ul { list-style: none; padding: 0; margin: 0; }
+.skinTermsContents nav > ul { padding: 0 12px 12px; }
+.skinTermsContents nav > ul > li + li { border-top: 1px solid var(--skin-border); }
+.skinTermsContents details > ul { margin: 0 4px 12px 12px; padding-left: 6px; border-left: 2px solid var(--skin-border); }
+.skinTermsContents a,
+.skinTermsBackToContents {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px;
+  color: var(--skin-tone);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  line-height: 1.7;
+  font-size: 0.86rem;
+}
+.skinTermsContents li li a { gap: 10px; align-items: baseline; }
+.skinTermsContents li li a > span:first-child { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.skinTermsContents li li a > span:last-child {
+  color: var(--skin-text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.skinTermsContents .skinTermsSectionLink { margin-left: 22px; }
+.skinTermsContents a:hover { background: var(--skin-tone-soft); border-radius: 8px; }
+.skinTermsBackToContents { margin: 0 16px 16px; width: fit-content; }
+
+.skinTermsConsent fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 20px 0;
+  border: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.skinTermsConsent label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  min-height: 44px;
+  border: 1px solid var(--skin-border);
+  border-radius: 12px;
+  line-height: 1.7;
+  cursor: pointer;
+}
+
+.skinTermsConsent input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 3px 0 0;
+  accent-color: var(--skin-tone);
+}
+
+.skinTermsAccepted { font-weight: 600; color: var(--skin-tone); }
+.skinTermsStatus:empty { display: none; }
+
+.skinTermsReader :is(a, button, summary, input):focus-visible,
+.skinServiceUpdatesLink:focus-visible {
+  outline: 3px solid var(--skin-tone);
+  outline-offset: 4px;
+}
+
+@media (max-width: 900px) {
+  .skinServiceTopbar { display: grid; grid-template-columns: 1fr auto; }
+  .skinServiceTopActions { display: contents; }
+  .skinServiceQuickSettings { grid-column: 1 / -1; justify-content: flex-end; }
+  .skinServiceUpdatesLink { justify-self: end; }
+  .skinServiceShell .gamesHeroInner { padding-top: 160px; }
+}
+
 @keyframes skinAmbientDrift {
   from { transform: translate3d(-58%, -2%, 0) rotate(-8deg) scale(0.92); }
   to { transform: translate3d(-42%, 10%, 0) rotate(12deg) scale(1.08); }
@@ -5435,16 +5755,13 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
 @media (max-width: 480px) {
   .skinServiceQuickSettings {
-    top: 62px;
-    right: 14px;
-    left: 14px;
     justify-content: center;
     flex-wrap: wrap;
     gap: 6px;
   }
 
   .skinServiceQuickToggle button {
-    min-height: 34px;
+    min-height: 44px;
     padding: 6px 8px;
   }
 
@@ -5453,7 +5770,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   }
 
   .skinServiceShell .gamesHeroInner {
-    padding-top: 130px;
+    padding-top: 170px;
   }
 
   .skinCommunityPromptOverlay {

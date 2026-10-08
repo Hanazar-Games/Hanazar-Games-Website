@@ -442,8 +442,8 @@ test("homepage text and footer links keep a usable pointer target", async () => 
   assert.match(css, /\.footerSocials a,[\s\S]*?\.footerMetaLinks a \{[\s\S]*?display: inline-flex;[\s\S]*?min-height: 28px;/);
 });
 
-test("skin service hub exports six dedicated section routes", async () => {
-  const sectionIds = ["communities", "questions", "feedback", "review-notices", "updates", "support"];
+test("skin service exports six hub sections and a separate updates route", async () => {
+  const sectionIds = ["communities", "questions", "feedback", "review-notices", "terms", "updates", "support"];
   const [center, route, rootPage, verifier, ...sectionPages] = await Promise.all([
     read("app/components/SkinServiceCenter.tsx"),
     read("app/skin-service/SkinServiceRoute.tsx"),
