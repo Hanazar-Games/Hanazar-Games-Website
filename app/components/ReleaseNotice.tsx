@@ -73,6 +73,7 @@ export default function ReleaseNotice() {
         <p id="release-notice-summary">{tr("releaseNoticeSummary")}</p>
         <ul>{currentRelease.itemKeys.map(key => <li key={key}>{tr(key)}</li>)}</ul>
         <div className="releaseNoticeActions">
+          <Link href="/skin-service" onClick={dismiss}>{tr("navSkinService")} <span aria-hidden="true">↗</span></Link>
           <Link href="/games" onClick={dismiss}>{tr("releaseExploreGames")} <span aria-hidden="true">↗</span></Link>
           <Link href="/tools#web-tools" onClick={dismiss}>{tr("releaseExploreTools")} <span aria-hidden="true">↗</span></Link>
           <button type="button" onClick={dismiss}>{tr("releaseDismiss")}</button>

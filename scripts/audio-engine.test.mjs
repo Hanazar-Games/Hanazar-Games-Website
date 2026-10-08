@@ -17,6 +17,7 @@ function harness(overrides = {}) {
   let cursor = 0;
   let timerId = 0;
   let now = 1000;
+  let clockStep = 250;
   let settings = { sfxEnabled: true, sfxVolume: 28, sfxStyle: "Classic", masterVolume: 75, bgmEnabled: false, bgmVolume: 12, ...overrides };
   const react = {
     useRef(value) { const i = cursor++; return slots[i] ??= { current: value }; },
@@ -63,12 +64,13 @@ function harness(overrides = {}) {
     exports, require: name => name === "react" ? react : { useSettingsContext: () => ({ settings }) },
     window: environment, document: environment, Element, Event,
     CustomEvent: class extends Event { constructor(type, init) { super(type); this.detail = init.detail; } },
-    performance: { now: () => now += 250 },
+    performance: { now: () => now += clockStep },
   });
   const render = patch => { settings = { ...settings, ...patch }; cursor = 0; exports.default(); effects.splice(0).forEach(fn => fn()); };
   render();
   return {
     contexts, environment, render, Element,
+    setClockStep(value) { clockStep = value; },
     async fire(type, properties = {}) { await Promise.all([...listeners.get(type) ?? []].map(fn => fn({type, target: new Element(), button: 0, isPrimary: true, ...properties}))); },
     flushTimers() { const pending = [...timers.values()]; timers.clear(); pending.forEach(fn => fn()); },
     unmount() { slots.forEach(slot => slot?.cleanup?.()); },
@@ -89,6 +91,46 @@ test("pointer press and canceled drag stay silent; committed click plays once", 
   assert.equal(app.count(), 0);
   await app.fire("click");
   assert.equal(app.count(), 1);
+  app.unmount();
+});
+
+test("rapid committed clicks are throttled until the 190ms boundary", async () => {
+  const app = harness();
+  app.setClockStep(0);
+  await app.fire("click");
+  await app.fire("click");
+  await app.fire("click");
+  assert.equal(app.count(), 1);
+  app.setClockStep(190);
+  await app.fire("click");
+  assert.equal(app.count(), 2);
+  app.unmount();
+});
+
+test("all twelve SFX styles create one valid voice and disconnect it after playback", async () => {
+  for (const [style, wave] of Object.entries({ Classic: "sine", Electronic: "sawtooth", Retro: "square", Wood: "triangle", Bell: "sine", Space: "sine", Drum: "triangle", Piano: "triangle", Synth: "sawtooth", Chiptune: "square", Pluck: "triangle", Crystal: "sine" })) {
+    const app = harness({ sfxStyle: style });
+    await app.fire("hanazar:sfx-preview");
+    assert.equal(app.count(), 1, style);
+    assert.equal(app.contexts[0].oscillators[0].type, wave, style);
+    app.flushTimers();
+    assert.ok(app.contexts[0].oscillators[0].disconnected, style);
+    app.unmount();
+  }
+});
+
+test("muting during a pending audio resume suppresses the delayed click", async () => {
+  const app = harness();
+  await app.fire("pointerdown");
+  const ctx = app.contexts[0];
+  ctx.state = "suspended";
+  let resume;
+  ctx.resume = () => new Promise(resolve => { resume = () => { ctx.state = "running"; resolve(); }; });
+  const click = app.fire("click");
+  app.render({ masterVolume: 0 });
+  resume();
+  await click;
+  assert.equal(app.count(), 0);
   app.unmount();
 });
 

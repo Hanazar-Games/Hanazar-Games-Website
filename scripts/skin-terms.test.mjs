@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import { runInNewContext } from "node:vm";
 import test from "node:test";
 import ts from "typescript";
-import { serviceTerms } from "../app/lib/skinServiceTerms.ts";
+import { serviceTerms, serviceTermsSections } from "../app/lib/skinServiceTerms.ts";
 import * as translations from "../app/lib/skinServiceI18n.ts";
 
 const exports = {};
@@ -47,10 +47,25 @@ test("the terms surface cannot horizontally scroll its content behind clipped de
   assert.match(css, /\.skinServiceDocumentSection#terms\s*\{\s*overflow: clip;/);
 });
 
+test("large browser text cannot force the agreement grid wider than the viewport", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  const surface = css.match(/\.skinServiceDocumentSection#terms\s*\{([^}]+)\}/)?.[1] ?? "";
+  assert.match(surface, /min-width: 0;/);
+  assert.match(surface, /overflow-wrap: anywhere;/);
+});
+
 test("read-only document typography preserves spaces and cannot inherit font transitions", () => {
   const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(css, /\.skinTermsText article :is\(h3, h4, p\)\s*\{\s*white-space: pre-wrap;/);
   assert.match(css, /\.skinTermsText article,\s*\.skinTermsText article \*\s*\{\s*transition-property: none;/);
+});
+
+test("agreement and Q&A entrances never transform documents while hash navigation positions a target", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.ok(/\.skinServiceDocumentSection:where\(#terms, #questions\),\s*\.skinServiceDocumentSection:where\(#terms, #questions\) > \*\s*\{\s*animation-name: skinPromptFade;/.test(css));
+  const fade = css.match(/@keyframes skinPromptFade\s*\{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(fade);
+  assert.ok(!/transform/.test(fade));
 });
 
 test("agreement defaults to unaccepted and persists only after explicit confirmation", () => {
@@ -114,7 +129,7 @@ function readerHarness(local = storage()) {
   const mocks = {
     react,
     "../lib/paths": { assetPath: value => `/pages-base${value}` },
-    "../lib/skinServiceTerms": { serviceTerms },
+    "../lib/skinServiceTerms": { serviceTerms, serviceTermsSections },
     "../lib/skinTermsConsent": exports,
     "../lib/skinServiceI18n": translations,
   };
@@ -158,7 +173,7 @@ test("the read-only article renders only the original paragraphs, including inte
 test("the collapsible contents tree links every clause and subclause to a unique focusable target", () => {
   const app = readerHarness();
   const tree = app.render();
-  const nav = findAll(tree, node => node.type === "nav")[0];
+  const nav = findAll(tree, node => node.type === "nav" && node.props["aria-label"] === translations.skinText("zh-CN", "termsContents"))[0];
   const groups = findAll(nav, node => node.type === "details");
   assert.equal(groups.length, serviceTerms.sections.length);
   assert.ok(groups.every(node => !node.props.open));
@@ -170,6 +185,42 @@ test("the collapsible contents tree links every clause and subclause to a unique
     assert.equal(targets.length, 1, id);
     assert.equal(targets[0].props.tabIndex, -1, id);
   }
+  app.unmount();
+});
+
+test("reading shortcuts expose the directory, inline PDF and confirmation without accepting anything", () => {
+  const app = readerHarness();
+  const tree = app.render();
+  const shortcuts = findAll(tree, node => node.type === "nav" && node.props.className === "skinTermsReadingNav")[0];
+  assert.ok(shortcuts);
+  const links = findAll(shortcuts, node => node.type === "a");
+  assert.deepEqual(links.map(link => link.props.href), ["#terms-contents", "#terms-pdf", "#terms-consent"]);
+  for (const link of links) assert.equal(findAll(tree, node => node.props?.id === link.props.href.slice(1)).length, 1);
+  assert.equal(form(tree).props.tabIndex, -1);
+  assert.ok(fields(tree).every(field => !field.props.checked));
+  assert.equal(readTermsConsent(app.local), null);
+  app.unmount();
+});
+
+test("inline PDF shortcut reopens its disclosure and preserves modified native navigation", () => {
+  const app = readerHarness();
+  const tree = app.render();
+  const pdf = findAll(tree, node => node.props?.id === "terms-pdf")[0];
+  const shortcut = findAll(tree, node => node.type === "a" && node.props.href === "#terms-pdf")[0];
+  assert.ok(pdf?.props.ref);
+  let focused = false;
+  pdf.props.ref.current = { open: false, querySelector: () => ({ focus: () => { focused = true; } }) };
+  for (const properties of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
+    shortcut.props.onClick({ button: 0, ...properties });
+    assert.equal(pdf.props.ref.current.open, false);
+    assert.equal(focused, false);
+  }
+  shortcut.props.onClick({ button: 0 });
+  assert.equal(pdf.props.ref.current.open, true);
+  assert.equal(focused, true);
+  pdf.props.ref.current.open = false;
+  shortcut.props.onClick({ button: 0 });
+  assert.equal(pdf.props.ref.current.open, true);
   app.unmount();
 });
 

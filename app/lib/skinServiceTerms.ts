@@ -141,3 +141,10 @@ export const serviceTerms = {
   ]
 } as const;
 
+export const serviceTermsSections = serviceTerms.sections.map((section) => ({
+  ...section,
+  clauses: section.paragraphs.map((text) => {
+    const number = text.split(" ", 1)[0];
+    return { text, number, id: `terms-subclause-${number.replaceAll(".", "-")}` };
+  }),
+}));

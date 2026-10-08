@@ -1,21 +1,20 @@
 "use client";
 
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, type MouseEvent, useEffect, useRef, useState } from "react";
 import { assetPath } from "../lib/paths";
-import { serviceTerms } from "../lib/skinServiceTerms";
+import { serviceTerms, serviceTermsSections as sections } from "../lib/skinServiceTerms";
 import { clearTermsConsent, consentStorageKey, readTermsConsent, saveTermsConsent } from "../lib/skinTermsConsent";
 import { skinText, type SkinServiceLanguage, type SkinTextKey } from "../lib/skinServiceI18n";
 
 const FONT_MIN = 87.5;
 const FONT_MAX = 200;
 const FONT_STEP = 12.5;
-const sections = serviceTerms.sections.map((section) => ({
-  ...section,
-  clauses: section.paragraphs.map((text) => {
-    const number = text.split(" ", 1)[0];
-    return { text, number, id: `terms-subclause-${number.replaceAll(".", "-")}` };
-  }),
-}));
+
+function openDetails(event: MouseEvent<HTMLAnchorElement>, target: HTMLDetailsElement | null) {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || !target) return;
+  target.open = true;
+  target.querySelector("summary")?.focus({ preventScroll: true });
+}
 
 function browserStorage() {
   try { return window.localStorage; } catch { return null; }
@@ -29,6 +28,8 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
   const [notice, setNotice] = useState<SkinTextKey | null>(null);
   const [fontScale, setFontScale] = useState(100);
   const textRef = useRef<HTMLDetailsElement>(null);
+  const contentsRef = useRef<HTMLDetailsElement>(null);
+  const pdfRef = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
     setAcceptedAt(readTermsConsent(browserStorage()));
@@ -86,6 +87,11 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
       </div>
       <details className="skinTermsText" id="terms-full-text" ref={textRef} open suppressHydrationWarning>
         <summary>{skinText(language, "termsTextReader")}</summary>
+        <nav className="skinTermsReadingNav" aria-label={skinText(language, "termsReadingNavigation")}>
+          <a href="#terms-contents" aria-label={skinText(language, "termsContents")} onClick={(event) => openDetails(event, contentsRef.current)}>{skinText(language, "termsJumpContents")}</a>
+          <a href="#terms-pdf" aria-label={skinText(language, "termsPdfReader")} onClick={(event) => openDetails(event, pdfRef.current)}>{skinText(language, "termsJumpPdf")}</a>
+          <a href="#terms-consent" aria-label={skinText(language, "termsConfirmTitle")}>{skinText(language, "termsJumpConfirm")}</a>
+        </nav>
         <div className="skinTermsReadingTools">
           <p id="terms-readonly-note">{skinText(language, "termsReadonly")}</p>
           <div className="skinTermsFontControls" role="group" aria-label={skinText(language, "termsFontSize")}>
@@ -95,7 +101,7 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
             <button type="button" aria-label={skinText(language, "termsFontIncrease")} aria-controls="terms-original-text" disabled={fontScale >= FONT_MAX} onClick={() => setFontScale((size) => Math.min(FONT_MAX, size + FONT_STEP))}>A+</button>
             <button type="button" aria-label={skinText(language, "termsFontReset")} aria-controls="terms-original-text" disabled={fontScale === 100} onClick={() => setFontScale(100)}>{skinText(language, "termsFontReset")}</button>
           </div>
-          <details className="skinTermsContents" id="terms-contents" suppressHydrationWarning>
+          <details className="skinTermsContents" id="terms-contents" ref={contentsRef} suppressHydrationWarning>
             <summary>{skinText(language, "termsContents")} · {skinText(language, "termsClauseCount", { count: sections.length })}</summary>
             <nav aria-label={skinText(language, "termsContents")}>
               <ul>
@@ -127,18 +133,18 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
             </section>
           ))}
         </article>
-        <a className="skinTermsBackToContents" href="#terms-contents">{skinText(language, "termsBackToContents")} ↑</a>
+        <a className="skinTermsBackToContents" href="#terms-contents" onClick={(event) => openDetails(event, contentsRef.current)}>{skinText(language, "termsBackToContents")} ↑</a>
       </details>
-      <details className="skinTermsPdf" suppressHydrationWarning>
+      <details className="skinTermsPdf" id="terms-pdf" ref={pdfRef} suppressHydrationWarning>
         <summary>{skinText(language, "termsPdfReader")}</summary>
-        <p>{skinText(language, "termsPdfFallback")} <a href="#terms-full-text" onClick={() => { if (textRef.current) textRef.current.open = true; }}>{skinText(language, "termsTextReader")}</a></p>
+        <p>{skinText(language, "termsPdfFallback")} <a href="#terms-full-text" onClick={(event) => openDetails(event, textRef.current)}>{skinText(language, "termsTextReader")}</a></p>
         <iframe
           src={`${assetPath(serviceTerms.pdf)}#view=FitH`}
           title={`${skinText(language, "termsPdfReader")} — ${serviceTerms.title}`}
           loading="lazy"
         />
       </details>
-      <form className="skinTermsConsent" onSubmit={confirm} aria-labelledby="terms-consent-title">
+      <form className="skinTermsConsent" id="terms-consent" tabIndex={-1} onSubmit={confirm} aria-labelledby="terms-consent-title">
         <h3 id="terms-consent-title">{skinText(language, "termsConfirmTitle")}</h3>
         <p id="terms-consent-privacy">{skinText(language, "termsLocalOnly")}</p>
         <p>{skinText(language, "termsDeclineHint")}</p>

@@ -59,9 +59,32 @@ test("skin-service hero fade follows its own theme instead of inheriting a black
   assert.match(rule, /background: linear-gradient\(180deg, transparent, var\(--skin-page\)\)/);
 });
 
+test("filled skin-service controls retain readable contrast in both themes", async () => {
+  const css = await read("app/globals.css");
+  const luminance = hex => hex.match(/[a-f0-9]{2}/gi).map(value => parseInt(value, 16) / 255).map(value => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+  for (const selector of [/^\.skinServiceShell \{([^}]+)\}/m, /body\[data-theme="light"\] \.skinServiceShell \{([^}]+)\}/]) {
+    const tokens = css.match(selector)?.[1] ?? "";
+    const tone = tokens.match(/--skin-tone: (#[a-f0-9]{6});/)?.[1];
+    const onTone = tokens.match(/--skin-on-tone: (#[a-f0-9]{6});/)?.[1];
+    assert.ok(tone && onTone, "filled controls need an explicit foreground token");
+    const values = [luminance(tone), luminance(onTone)].sort((a, b) => a - b);
+    assert.ok((values[1] + 0.05) / (values[0] + 0.05) >= 4.5);
+  }
+  for (const selector of [".skinCommunityUnavailable > a", '.skinArticleFormatFilters button[aria-pressed="true"]', ".skinFeedbackReplyNotice > a:hover", ".skinFeedbackForm button", ".skinServiceSupportLink"]) {
+    const rule = css.split(`${selector} {`).slice(1).map(part => part.split("}")[0]).find(part => part.includes("background: var(--skin-tone)"));
+    assert.ok(rule?.includes("color: var(--skin-on-tone)"), selector);
+  }
+});
+
 test("site reduced-motion settings also disable smooth anchor scrolling", async () => {
   const css = await read("app/globals.css");
   assert.match(css, /html:has\(body\[data-reduce-motion="true"\]\)\s*\{\s*scroll-behavior: auto;/);
+});
+
+test("service deep links explicitly override inherited smooth scrolling", async () => {
+  const center = await read("app/components/SkinServiceCenter.tsx");
+  assert.match(center, /revealTarget\(targetId, "instant"\)/);
+  assert.match(center, /\? "instant"\s*:\s*"smooth"/);
 });
 
 test("audio sliders and switches have 44px touch targets while tracks stay compact", async () => {
@@ -457,7 +480,7 @@ test("skin service exports six hub sections and a separate updates route", async
   assert.match(center, /activeSection\?: SkinServiceSection/);
   assert.match(center, /`\/skin-service\/\$\{section\.id\}`/);
   assert.match(center, /aria-current=\{activeSection === section\.id \? "page" : undefined\}/);
-  assert.match(center, /revealTarget\(targetId, "auto"\)/);
+  assert.match(center, /revealTarget\(targetId, "instant"\)/);
   assert.match(center, /id=\{article\.id\} key=\{article\.id\} tabIndex=\{-1\}/);
   sectionPages.forEach((page, index) => {
     assert.match(page, new RegExp(`section=["']${sectionIds[index]}["']`));
@@ -522,7 +545,7 @@ test("release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.20.5");
+  assert.equal(packageData.version, "2.20.6");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);
@@ -530,8 +553,8 @@ test("release metadata stays synchronized", async () => {
   assert.match(copy, /第 215 批次已出 19 个组件，第 216 批次已出 24 个组件/);
   assert.match(copy, /主站项目扩展与版本更新提醒/);
   assert.match(announcement, /\.\.\.currentRelease/);
-  assert.match(announcement, /version: "2\.20\.4"/);
-  assert.match(announcement, /image: "\/updates\/2\.20\.4\.svg"/);
+  assert.match(announcement, /version: "2\.20\.5"/);
+  assert.match(announcement, /image: "\/updates\/2\.20\.5\.svg"/);
   assert.match(verifier, /2\.20\.5/);
 });
 
