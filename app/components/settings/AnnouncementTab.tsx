@@ -799,6 +799,13 @@ export default function AnnouncementTab() {
   };
   const history = [
     {
+      version: "2.20.7",
+      date: "2026-10-10",
+      title: tr("release2207Title"),
+      items: ["release2207Search", "release2207Keyboard", "release2207Coverage"].map(tr),
+      image: "/updates/2.20.7.svg",
+    },
+    {
       version: "2.20.6",
       date: "2026-10-09",
       title: tr("release2206Title"),
@@ -867,7 +874,7 @@ export default function AnnouncementTab() {
     <div className="settingsTabContent">
       <div className="changelogList">
         <div className="changelogEntry changelogEntryLatest" key={latest.version}>
-          <Image src={assetPath(currentRelease.image)} alt={tr("releaseArtworkAlt")} width={1200} height={600} sizes="(max-width: 800px) 85vw, 620px" style={{ width: "100%", height: "auto", borderRadius: 14, marginBottom: 16 }} />
+          <Image src={assetPath(currentRelease.image)} alt={`${tr("releaseArtworkAlt")} · v${currentRelease.version}: ${tr(currentRelease.titleKey)}`} width={1200} height={600} sizes="(max-width: 800px) 85vw, 620px" style={{ width: "100%", height: "auto", borderRadius: 14, marginBottom: 16 }} />
           <div className="changelogHeader">
             <span className="changelogVersion">{latest.version}</span>
             <span className="changelogDate">{latest.date}</span>

@@ -70,6 +70,7 @@ function harness(overrides = {}) {
   render();
   return {
     contexts, environment, render, Element,
+    setClock(value) { now = value; },
     setClockStep(value) { clockStep = value; },
     async fire(type, properties = {}) { await Promise.all([...listeners.get(type) ?? []].map(fn => fn({type, target: new Element(), button: 0, isPrimary: true, ...properties}))); },
     flushTimers() { const pending = [...timers.values()]; timers.clear(); pending.forEach(fn => fn()); },
@@ -104,6 +105,17 @@ test("rapid committed clicks are throttled until the 190ms boundary", async () =
   app.setClockStep(190);
   await app.fire("click");
   assert.equal(app.count(), 2);
+  app.unmount();
+});
+
+test("the first committed click is audible even within 190ms of page startup", async () => {
+  const app = harness();
+  app.setClock(100);
+  app.setClockStep(0);
+  await app.fire("click");
+  assert.equal(app.count(), 1);
+  await app.fire("click");
+  assert.equal(app.count(), 1, "subsequent rapid clicks must still be throttled");
   app.unmount();
 });
 

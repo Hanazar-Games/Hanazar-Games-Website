@@ -67,7 +67,7 @@ export default function AudioEngine() {
   const audioRef = useRef<AudioContext | null>(null);
   const ambientRef = useRef<AmbientNodes | null>(null);
   const settingsRef = useRef(settings);
-  const lastSfxTimeRef = useRef(0);
+  const lastSfxTimeRef = useRef(-Infinity);
 
   const publishBgmState = useCallback((state: BgmPlaybackState) => {
     window.dispatchEvent(new CustomEvent("hanazar:bgm-state", { detail: { state } }));

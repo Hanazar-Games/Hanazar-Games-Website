@@ -13,11 +13,30 @@ import * as developerDocs from "../app/lib/skinDeveloperResources.ts";
 
 const require = createRequire(import.meta.url);
 
+function assertSourceUrl(source) {
+  const url = new URL(source.href);
+  assert.ok(["https://mc.163.com", "https://mcwiki.easecation.net", "https://github.com", "https://blockbench.net", "https://web.blockbench.net", "https://www.youtube.com", "https://www.bilibili.com"].includes(url.origin));
+  assert.equal(url.hash + url.username + url.password, "");
+  assert.ok(!decodeURI(url.pathname).includes("_catalog"));
+  if (source.format === "video" && url.origin === "https://www.youtube.com") {
+    assert.equal(url.pathname, "/watch");
+    assert.deepEqual([...url.searchParams.keys()], ["v"]);
+    assert.match(url.searchParams.get("v"), /^[A-Za-z0-9_-]{11}$/);
+  } else {
+    assert.equal(url.search, "");
+    if (source.format === "video") {
+      assert.equal(url.origin, "https://www.bilibili.com");
+      assert.match(url.pathname, /^\/video\/BV1[A-Za-z0-9]{9}\/$/);
+    }
+  }
+}
+
 test("developer resources have unique stable IDs, classified HTTPS sources and complete translations", () => {
   const { developerResources: resources, developerSources: sources } = developerDocs;
   assert.ok(resources.length >= 30);
   assert.equal(new Set(resources.map(resource => resource.id)).size, resources.length);
   assert.ok(Object.keys(sources).length >= 20);
+  assert.equal(new Set(Object.values(sources).map(source => source.href)).size, Object.keys(sources).length);
   assert.equal(new Set(resources.map(resource => resource.sourceId)).size, Object.keys(sources).length);
   for (const resource of resources) {
     assert.match(resource.id, /^developer-[a-z0-9-]+$/);
@@ -28,23 +47,26 @@ test("developer resources have unique stable IDs, classified HTTPS sources and c
     }
   }
   for (const source of Object.values(sources)) {
-    const url = new URL(source.href);
-    assert.ok(["https://mc.163.com", "https://mcwiki.easecation.net", "https://github.com", "https://blockbench.net", "https://web.blockbench.net", "https://www.youtube.com"].includes(url.origin));
+    assertSourceUrl(source);
     assert.ok(["official", "tutorial", "tools", "community"].includes(source.kind));
     assert.ok(["article", "video", "tool", "repository", "news"].includes(source.format));
     assert.ok(source.publisher.trim());
     assert.ok(["zh-CN", "en"].includes(source.language));
-    if (source.format === "video") {
-      assert.equal(url.origin, "https://www.youtube.com");
-      assert.equal(url.pathname, "/watch");
-      assert.deepEqual([...url.searchParams.keys()], ["v"]);
-      assert.match(url.searchParams.get("v"), /^[A-Za-z0-9_-]{11}$/);
-    } else assert.equal(url.search, "");
-    assert.equal(url.hash + url.username + url.password, "");
-    assert.ok(!decodeURI(url.pathname).includes("_catalog"));
     assert.ok(source.title.trim());
     if (source.referenceHref) assert.equal(new URL(source.referenceHref).origin, "https://blockbench.net");
   }
+});
+
+test("video sources reject search pages, tracking parameters and lookalike domains", () => {
+  for (const href of [
+    "https://search.bilibili.com/all?keyword=skin",
+    "https://www.bilibili.com/video/BV1sb411B7Ya/?spm_id_from=tracking",
+    "https://www.bilibili.com/video/BV1sb411B7Ya/#comments",
+    "https://www.bilibili.com/video/invalid/",
+    "https://www.bilibili.com.evil.test/video/BV1sb411B7Ya/",
+    "https://user:password@www.bilibili.com/video/BV1sb411B7Ya/",
+    "http://www.bilibili.com/video/BV1sb411B7Ya/",
+  ]) assert.throws(() => assertSourceUrl({ href, format: "video" }), href);
 });
 
 const source = ts.transpileModule(readFileSync(new URL("../app/components/SkinServiceCenter.tsx", import.meta.url), "utf8"), {
@@ -86,15 +108,16 @@ test("terms replace the fifth hub entry while updates remain available in the he
 test("service updates publish the new version and retain the previous announcement", () => {
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "updates");
-    assert.ok(html.indexOf('id="update-2-20-7"') < html.indexOf('id="update-2-20-6"'));
+    assert.ok(html.indexOf('id="update-2-20-8"') < html.indexOf('id="update-2-20-7"'));
+    assert.ok(html.includes(translations.skinText(language, "update2208Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2207Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2206Title")));
     assert.ok(html.includes(translations.skinText(language, "update2205Title")));
-    assert.equal([...html.matchAll(/id="update-2-20-7"/g)].length, 1);
+    assert.equal([...html.matchAll(/id="update-2-20-8"/g)].length, 1);
     const [current, history] = html.split('<details class="skinServiceUpdateHistory"');
-    assert.ok(current.includes('id="update-2-20-7"'));
-    assert.ok(!current.includes('id="update-2-20-6"'));
-    assert.ok(history?.includes('id="update-2-20-6"'));
+    assert.ok(current.includes('id="update-2-20-8"'));
+    assert.ok(!current.includes('id="update-2-20-7"'));
+    assert.ok(history?.includes('id="update-2-20-7"'));
     assert.ok(!history.split(">")[0].includes(" open"));
   }
 });
@@ -140,14 +163,95 @@ test("archive includes direct videos, source projects and historical update form
   }
 });
 
+const chineseVideoIds = [
+  "developer-video-china-upload", "developer-video-china-upload-followup", "developer-video-mcskin3d",
+  "developer-video-skinseed-clothing", "developer-video-skin-eyes", "developer-video-skin-gradient",
+  "developer-video-skin-resolution", "developer-video-blockbench-paint", "developer-video-blockbench-model-layers",
+  "developer-video-blockbench-mobile",
+  "developer-video-blockbench-mobile-import", "developer-video-skinseed-hair", "developer-video-head-basics",
+  "developer-video-hair-gradient", "developer-video-skinseed-export", "developer-video-blockbench-export",
+  "developer-video-skinseed-ios-alpha",
+];
+const troubleshootingIds = [
+  "developer-alpha-preview", "developer-review-delay", "developer-upload-cdn", "developer-review-appeal",
+  "developer-resubmit-cooldown", "developer-source-backup", "developer-unlisting", "developer-delegated-rights",
+  "developer-account-transfer", "developer-infringement-report", "developer-authorized-materials",
+  "developer-promotional-links", "developer-transparent-review", "developer-machine-review", "developer-demo-video-format",
+  "developer-missing-alpha", "developer-listing-interface-failure", "developer-package-path-errors",
+  "developer-package-structure-errors", "developer-missing-skin-preview", "developer-originality-vanilla",
+  "developer-recolor-rejection", "developer-incentivized-reviews", "developer-mobile-self-test", "developer-edition-test-clients",
+];
+
+test("Chinese video references and official troubleshooting render with original source attribution", () => {
+  assert.equal(developerDocs.developerResources.length, 83);
+  assert.equal(Object.keys(developerDocs.developerSources).length, 53);
+  assert.equal(developerDocs.developerResourcesCompiledAt, "2026-10-11");
+  for (const language of translations.skinServiceLanguages) {
+    const html = render(language, "questions");
+    for (const id of [...chineseVideoIds, ...troubleshootingIds]) {
+      const resource = developerDocs.developerResources.find(resource => resource.id === id);
+      assert.ok(resource, id);
+      const source = developerDocs.developerSources[resource.sourceId];
+      const card = html.match(new RegExp(`<article id="${id}"[^>]*>([\\s\\S]*?)</article>`))?.[1];
+      assert.ok(card?.includes(source.href));
+      assert.ok(card.includes('lang="zh-CN"'));
+      if (chineseVideoIds.includes(id)) {
+        assert.equal(source.kind, "community");
+        assert.equal(source.format, "video");
+        assert.ok(source.publisher.endsWith(" · 哔哩哔哩"));
+        assert.equal(new URL(source.href).origin, "https://www.bilibili.com");
+      } else assert.equal(source.kind, "official");
+    }
+  }
+});
+
+test("new export and troubleshooting references preserve authors, dates and applicability limits", () => {
+  const references = [
+    ["developer-video-blockbench-mobile-import", "BV15uwbzoEHW", "屑牲-", "2026", "03", "14"],
+    ["developer-video-skinseed-hair", "BV1XSNwzsEuF", "屑牲-", "2026", "03", "07"],
+    ["developer-video-head-basics", "BV1JHTbzjEGW", "Jzium芥子", "2025", "06", "06"],
+    ["developer-video-hair-gradient", "BV1TMAQzSE2u", "斯末坚坚子", "2026", "02", "27"],
+    ["developer-video-skinseed-export", "BV1FY411Q7Rq", "TAC_两小伙", "2023", "01", "28"],
+    ["developer-video-blockbench-export", "BV1iVGyzvEfB", "小夜禾", "2025", "04", "29"],
+    ["developer-video-skinseed-ios-alpha", "BV1t2r2YpEPw", "StrSpring-13", "2025", "01", "07"],
+  ];
+  for (const [id, bv, author, ...dateParts] of references) {
+    const resource = developerDocs.developerResources.find(resource => resource.id === id);
+    assert.ok(resource, id);
+    const source = developerDocs.developerSources[resource.sourceId];
+    assert.equal(source.href, `https://www.bilibili.com/video/${bv}/`);
+    assert.equal(source.publisher, `${author} · 哔哩哔哩`);
+    for (const language of translations.skinServiceLanguages) {
+      assert.ok(resource.summary[language].includes(author), `${id}: ${language}`);
+      assert.ok(resource.summary[language].includes(dateParts.join("-")), `${id}: original publication date`);
+    }
+  }
+  for (const id of ["developer-missing-alpha", "developer-video-skinseed-ios-alpha"]) {
+    const resource = developerDocs.developerResources.find(resource => resource.id === id);
+    for (const language of translations.skinServiceLanguages) assert.match(resource.summary[language], /Alpha/);
+  }
+  const ios = developerDocs.developerResources.find(resource => resource.id === "developer-video-skinseed-ios-alpha");
+  for (const language of translations.skinServiceLanguages) {
+    assert.match(ios.summary[language], /64×64/);
+    assert.match(ios.summary[language], /128/);
+  }
+  const paths = developerDocs.developerResources.find(resource => resource.id === "developer-package-path-errors");
+  for (const language of translations.skinServiceLanguages) {
+    assert.match(paths.summary[language], /FileOrPathNameError/);
+    assert.match(paths.summary[language], /NameOverSizeError/);
+    assert.match(paths.summary[language], /PNG/);
+  }
+});
+
 test("format filters compose with topic and source filters while keeping the disclaimer visible", () => {
-  for (const [format, count] of [["all", 47], ["article", 41], ["video", 3], ["tool", 1], ["repository", 1], ["news", 1]]) {
+  for (const format of ["all", "article", "video", "tool", "repository", "news"]) {
+    const count = developerDocs.developerResources.filter(resource => format === "all" || developerDocs.developerSources[resource.sourceId].format === format).length + (format === "all" || format === "article" ? 6 : 0);
     const html = render("zh-CN", "questions", ["", "all", "all", format]);
     assert.equal([...html.matchAll(/<article id=/g)].length, count, format);
     assert.ok(html.includes('id="questions-disclaimer"'));
   }
   const videos = render("zh-CN", "questions", ["", "creation", "community", "video"]);
-  assert.equal([...videos.matchAll(/<article id=/g)].length, 2);
+  assert.equal([...videos.matchAll(/<article id=/g)].length, developerDocs.developerResources.filter(resource => resource.category === "creation" && developerDocs.developerSources[resource.sourceId].kind === "community" && developerDocs.developerSources[resource.sourceId].format === "video").length);
   const empty = render("zh-CN", "questions", ["", "privacy", "official", "video"]);
   assert.equal([...empty.matchAll(/<article id=/g)].length, 0);
   assert.ok(empty.includes('class="skinArticleEmpty"'));
@@ -173,7 +277,7 @@ test("source context remains complete inside a default-collapsed accessible disc
     assert.ok(!notice[1].includes(" open"));
     assert.match(notice[2], /<summary id="developer-docs-title">/);
     assert.ok(notice[2].includes(developerDocs.developerResourcesCompiledAt));
-    assert.ok(notice[2].includes(renderToStaticMarkup(createElement("p", null, translations.skinText(language, "developerDocsNotice", { questions: 41, sources: 29 })))));
+    assert.ok(notice[2].includes(renderToStaticMarkup(createElement("p", null, translations.skinText(language, "developerDocsNotice", { questions: developerDocs.developerResources.length, sources: Object.keys(developerDocs.developerSources).length })))));
   }
 });
 
@@ -285,8 +389,18 @@ function searchClickHarness(activeSection = "review-notices", query = "216", hre
   const cancelledFrames = [];
   const hashEffects = [];
   const listeners = new Map();
+  const reveals = [];
+  class HTMLElement {
+    parentElement = null;
+    scrollIntoView(options) { reveals.push(options); }
+    hasAttribute() { return true; }
+    focus() {}
+  }
+  class HTMLDetailsElement extends HTMLElement {}
   const browser = {
     location: { hash: "" },
+    matchMedia: () => ({ matches: false }),
+    history: { replaceState(_state, _title, hash) { browser.location.hash = hash; } },
     requestAnimationFrame: callback => frames.push(callback),
     cancelAnimationFrame: frame => cancelledFrames.push(frame),
     addEventListener: (name, callback) => listeners.set(name, callback),
@@ -317,6 +431,8 @@ function searchClickHarness(activeSection = "review-notices", query = "216", hre
     exports,
     require: name => mocks[name] ?? require(name),
     window: browser,
+    document: { getElementById: () => new HTMLElement() },
+    HTMLElement, HTMLDetailsElement,
   });
   const findLink = node => {
     if (Array.isArray(node)) return node.map(findLink).find(Boolean);
@@ -326,8 +442,28 @@ function searchClickHarness(activeSection = "review-notices", query = "216", hre
   const tree = exports.default({ activeSection, serviceUrl: null });
   const link = findLink(tree);
   assert.ok(link, "search must include the matching result link");
-  return { click: link.props.onClick, updates, frames, tree, cancelledFrames, browser, listeners, runHashEffect: () => hashEffects[0]() };
+  return { click: link.props.onClick, updates, frames, tree, cancelledFrames, browser, listeners, reveals, runHashEffect: () => hashEffects[0]() };
 }
+
+test("same-section search cancels stale reveal frames on repeated clicks and navigation", () => {
+  const app = searchClickHarness();
+  const cleanup = app.runHashEffect();
+  app.click({ button: 0, preventDefault() {} });
+  app.click({ button: 0, preventDefault() {} });
+  assert.ok(app.cancelledFrames.includes(1), "the replacement reveal must cancel the earlier search frame");
+  cleanup();
+  assert.ok(app.cancelledFrames.includes(2), "navigation must cancel the pending search frame before it can rewrite the new route hash");
+});
+
+test("same-section document search locates the focused target instantly", () => {
+  for (const [section, query, href] of [["questions", "PNG", "/skin-service/questions#developer-skin-format"], ["terms", "2.14", "/skin-service/terms#terms-subclause-2-14"]]) {
+    const app = searchClickHarness(section, query, href);
+    app.click({ button: 0, preventDefault() {} });
+    app.frames[0]();
+    assert.equal(app.reveals[0].behavior, "instant");
+    assert.equal(app.browser.location.hash, href.slice(href.indexOf("#")));
+  }
+});
 
 test("document hash callbacks cancel on navigation, removal and malformed links", () => {
   const app = searchClickHarness("questions", "", node => node?.props?.id === "developer-skin-format");

@@ -236,7 +236,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
                 aria-controls="settings-tab-panel"
                 tabIndex={activeTab === tab.key ? 0 : -1}
               >
-                <span className="settingsTabIcon">{tab.icon}</span>
+                <span className="settingsTabIcon" aria-hidden="true">{tab.icon}</span>
                 <span className="settingsTabLabel">{tr(tab.label)}</span>
               </button>
             ))}

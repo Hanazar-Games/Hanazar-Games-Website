@@ -100,6 +100,20 @@ test("settings content is a keyboard focus stop even when it has no controls", (
   app.unmount();
 });
 
+test("settings category icons do not prefix the translated accessible tab names", () => {
+  const app = harness();
+  app.render(true);
+  const navigation = find(app.render(), element => element.props?.role === "tablist");
+  assert.equal(navigation.props.children.length, 9);
+  for (const tab of navigation.props.children) {
+    const icon = find(tab, element => element.props?.className === "settingsTabIcon");
+    const label = find(tab, element => element.props?.className === "settingsTabLabel");
+    assert.equal(icon.props["aria-hidden"], "true");
+    assert.ok(label.props.children);
+  }
+  app.unmount();
+});
+
 test("an unopened settings panel never restores another dialog's scroll lock or inert state", () => {
   const app = harness();
   app.render(false);

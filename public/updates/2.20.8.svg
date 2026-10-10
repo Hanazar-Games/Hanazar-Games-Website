@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" fill="none">
+  <defs><linearGradient id="bg" x2="1200" y2="600" gradientUnits="userSpaceOnUse"><stop stop-color="#111a30"/><stop offset="1" stop-color="#302959"/></linearGradient></defs>
+  <rect width="1200" height="600" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="60" y="72" fill="#c3baff" font-size="18" letter-spacing="4">HANAZAR GAMES / v2.20.8</text>
+    <text x="60" y="155" fill="#f6f4ff" font-size="50" font-weight="700">More sources. Steadier controls.</text>
+    <text x="62" y="203" fill="#c2cce4" font-size="23">Learn from the source. Find your place. Click with confidence.</text>
+    <g stroke="#9d8feb" stroke-opacity=".5" fill="#1d2945"><rect x="60" y="250" width="340" height="252" rx="22"/><rect x="430" y="250" width="340" height="252" rx="22"/><rect x="800" y="250" width="340" height="252" rx="22"/></g>
+    <g stroke="#c5baff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M92 287h42v48H92zM102 301h22M102 312h22M102 323h13"/><circle cx="484" cy="308" r="18"/><path d="m497 321 15 15M837 302h12l15-12v38l-15-12h-12zM875 300q12 8 0 16"/></g>
+    <g fill="#f4f3ff" font-size="26" font-weight="650"><text x="92" y="393">SOURCE ARCHIVE</text><text x="462" y="393">STEADY SEARCH</text><text x="832" y="393">QUIET AUDIO</text></g>
+    <g fill="#b9c7e0" font-size="19"><text x="92" y="433">89 Q&amp;As · 53 sources</text><text x="92" y="466">20 direct video references</text><text x="462" y="433">Instant document jumps</text><text x="462" y="466">Stale callbacks canceled</text><text x="832" y="433">First-click feedback fixed</text><text x="832" y="466">BGM remains opt-in</text></g>
+    <text x="60" y="558" fill="#c3baff" font-size="16" letter-spacing="3">SKIN SERVICE / UI / SEARCH / SFX / BGM</text>
+  </g>
+</svg>

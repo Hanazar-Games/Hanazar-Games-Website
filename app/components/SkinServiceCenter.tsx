@@ -163,6 +163,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.20.8", date: "2026-10-11", title: "update2208Title", body: "update2208Body" },
   { version: "2.20.7", date: "2026-10-10", title: "update2207Title", body: "update2207Body" },
   { version: "2.20.6", date: "2026-10-09", title: "update2206Title", body: "update2206Body" },
   { version: "2.20.5", date: "2026-10-05", title: "update2205Title", body: "update2205Body" },
@@ -492,6 +493,7 @@ export default function SkinServiceCenter({
   const articleFiltersRef = useRef<HTMLDivElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const articleSearchRef = useRef<HTMLInputElement | null>(null);
+  const targetFrameRef = useRef(0);
   const sections = sectionDefinitions.map((section) => ({
     ...section,
     title: skinText(language, section.title),
@@ -795,9 +797,8 @@ export default function SkinServiceCenter({
   }, [reduceAnimations]);
 
   useEffect(() => {
-    let frame = 0;
     const revealHash = () => {
-      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(targetFrameRef.current);
       let targetId: string;
       try {
         targetId = decodeURIComponent(window.location.hash.slice(1));
@@ -811,13 +812,13 @@ export default function SkinServiceCenter({
           setActiveArticleFormat("all");
           setArticleQuery("");
         }
-        frame = window.requestAnimationFrame(() => revealTarget(targetId, "instant"));
+        targetFrameRef.current = window.requestAnimationFrame(() => revealTarget(targetId, "instant"));
       }
     };
     revealHash();
     window.addEventListener("hashchange", revealHash);
     return () => {
-      window.cancelAnimationFrame(frame);
+      window.cancelAnimationFrame(targetFrameRef.current);
       window.removeEventListener("hashchange", revealHash);
     };
   }, [activeSection, revealTarget]);
@@ -1228,8 +1229,9 @@ export default function SkinServiceCenter({
                   setArticleQuery("");
                   if (result.section !== activeSection) return;
                   event.preventDefault();
-                  window.requestAnimationFrame(() => {
-                    revealTarget(result.targetId);
+                  window.cancelAnimationFrame(targetFrameRef.current);
+                  targetFrameRef.current = window.requestAnimationFrame(() => {
+                    revealTarget(result.targetId, result.section === "questions" || result.section === "terms" ? "instant" : scrollBehavior(reduceAnimations));
                     window.history.replaceState(null, "", `#${result.targetId}`);
                   });
                 }}

@@ -66,7 +66,7 @@ export default function ReleaseNotice() {
         <button type="button" className="releaseNoticeClose" onClick={dismiss} aria-label={tr("releaseDismiss")} autoFocus>×</button>
       </div>
       <div className="releaseNoticeArtwork">
-        <Image src={assetPath(currentRelease.image)} alt={tr("releaseArtworkAlt")} width={1200} height={600} sizes="(max-width: 700px) 94vw, 680px" />
+        <Image src={assetPath(currentRelease.image)} alt={`${tr("releaseArtworkAlt")} · v${currentRelease.version}: ${tr(currentRelease.titleKey)}`} width={1200} height={600} sizes="(max-width: 700px) 94vw, 680px" />
       </div>
       <div className="releaseNoticeBody">
         <h2 id="release-notice-title">{tr(currentRelease.titleKey)}</h2>
