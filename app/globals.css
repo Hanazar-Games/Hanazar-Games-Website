@@ -3770,10 +3770,19 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 
 .skinServiceSearchResults {
   grid-column: 1 / -1;
+  max-height: min(60vh, 480px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding-top: 4px;
+}
+
+.skinServiceSearchResults > .skinSearchCount {
+  grid-column: 1 / -1;
+  color: var(--skin-muted);
+  font-size: 0.85rem;
 }
 
 .skinServiceSearchResults a,
@@ -4096,6 +4105,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   font-size: clamp(1.45rem, 3vw, 2.2rem);
   font-weight: 480;
   line-height: 1.2;
+  text-wrap: balance;
 }
 
 .skinServiceSectionHeader p,
@@ -4463,12 +4473,20 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
   background: var(--skin-card);
 }
 
-.skinDeveloperNotice h3 { margin: 0 0 8px; font-size: 1rem; }
+.skinDeveloperNotice summary { min-height: 44px; padding: 10px 0; font-size: 1rem; font-weight: 600; cursor: pointer; }
+.skinDeveloperNotice[open] > summary { margin-bottom: 8px; }
 .skinDeveloperNotice p { margin: 0 0 10px; line-height: 1.75; color: var(--skin-muted); }
 .skinDeveloperNotice small { color: var(--skin-muted); }
 .skinArticleCount { margin: 0 0 12px; color: var(--skin-muted); font-size: 0.85rem; }
 
 .skinArticleFilterLabel { margin-bottom: 8px; color: var(--skin-muted); font-size: 0.85rem; }
+
+.skinArticleSearch { margin-bottom: 24px; }
+.skinArticleSearch > label { display: block; margin-bottom: 10px; font-weight: 600; }
+.skinArticleSearch > p { margin: 10px 0 0; color: var(--skin-muted); font-size: 0.85rem; line-height: 1.7; }
+.skinArticlePermalink { display: inline-flex; align-items: center; gap: 8px; width: fit-content; min-height: 44px; margin-top: 12px; color: var(--skin-tone); font-size: 0.8rem; text-underline-offset: 4px; }
+.skinArticleGrid article:target { border-color: var(--skin-tone); }
+.skinArticleGrid article:focus-visible { outline: 2px solid var(--skin-tone); outline-offset: 3px; }
 
 .skinArticleFilters,
 .skinArticleSourceFilters,

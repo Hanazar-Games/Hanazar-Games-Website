@@ -1,9 +1,9 @@
 export const currentRelease = {
-  version: "2.20.6",
-  date: "2026-10-09",
-  image: "/updates/2.20.6.svg",
-  titleKey: "release2206Title",
-  itemKeys: ["release2206Archive", "release2206Reader", "release2206Qa"],
+  version: "2.20.7",
+  date: "2026-10-10",
+  image: "/updates/2.20.7.svg",
+  titleKey: "release2207Title",
+  itemKeys: ["release2207Search", "release2207Keyboard", "release2207Coverage"],
 };
 
 const SEEN_KEY = "hanazar.release-notice.seen";

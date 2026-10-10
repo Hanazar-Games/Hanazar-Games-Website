@@ -30,6 +30,7 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
   const textRef = useRef<HTMLDetailsElement>(null);
   const contentsRef = useRef<HTMLDetailsElement>(null);
   const pdfRef = useRef<HTMLDetailsElement>(null);
+  const consentRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     setAcceptedAt(readTermsConsent(browserStorage()));
@@ -53,6 +54,7 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
     if (saveTermsConsent(browserStorage(), read, risks, now)) {
       setAcceptedAt(now);
       setNotice("termsSaved");
+      consentRef.current?.focus({ preventScroll: true });
     } else {
       setNotice("termsSaveFailed");
     }
@@ -67,6 +69,7 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
     setRead(false);
     setRisks(false);
     setNotice("termsCleared");
+    consentRef.current?.focus({ preventScroll: true });
   };
 
   return (
@@ -144,7 +147,7 @@ export default function SkinTermsReader({ language }: { language: SkinServiceLan
           loading="lazy"
         />
       </details>
-      <form className="skinTermsConsent" id="terms-consent" tabIndex={-1} onSubmit={confirm} aria-labelledby="terms-consent-title">
+      <form className="skinTermsConsent" id="terms-consent" ref={consentRef} tabIndex={-1} onSubmit={confirm} aria-labelledby="terms-consent-title">
         <h3 id="terms-consent-title">{skinText(language, "termsConfirmTitle")}</h3>
         <p id="terms-consent-privacy">{skinText(language, "termsLocalOnly")}</p>
         <p>{skinText(language, "termsDeclineHint")}</p>

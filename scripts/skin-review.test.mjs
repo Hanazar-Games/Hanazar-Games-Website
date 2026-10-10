@@ -51,7 +51,7 @@ const source = ts.transpileModule(readFileSync(new URL("../app/components/SkinSe
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
 }).outputText;
 
-function render(language = "zh-CN", activeSection = "review-notices", filters = ["", "all", "all", "all"]) {
+function render(language = "zh-CN", activeSection = "review-notices", filters = ["", "all", "all", "all", ""]) {
   const exports = {};
   let stateIndex = 0;
   const mocks = {
@@ -86,14 +86,15 @@ test("terms replace the fifth hub entry while updates remain available in the he
 test("service updates publish the new version and retain the previous announcement", () => {
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "updates");
-    assert.ok(html.indexOf('id="update-2-20-6"') < html.indexOf('id="update-2-20-5"'));
+    assert.ok(html.indexOf('id="update-2-20-7"') < html.indexOf('id="update-2-20-6"'));
+    assert.ok(html.includes(translations.skinText(language, "update2207Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2206Title")));
     assert.ok(html.includes(translations.skinText(language, "update2205Title")));
-    assert.equal([...html.matchAll(/id="update-2-20-6"/g)].length, 1);
+    assert.equal([...html.matchAll(/id="update-2-20-7"/g)].length, 1);
     const [current, history] = html.split('<details class="skinServiceUpdateHistory"');
-    assert.ok(current.includes('id="update-2-20-6"'));
-    assert.ok(!current.includes('id="update-2-20-5"'));
-    assert.ok(history?.includes('id="update-2-20-5"'));
+    assert.ok(current.includes('id="update-2-20-7"'));
+    assert.ok(!current.includes('id="update-2-20-6"'));
+    assert.ok(history?.includes('id="update-2-20-6"'));
     assert.ok(!history.split(">")[0].includes(" open"));
   }
 });
@@ -151,6 +152,68 @@ test("format filters compose with topic and source filters while keeping the dis
   assert.equal([...empty.matchAll(/<article id=/g)].length, 0);
   assert.ok(empty.includes('class="skinArticleEmpty"'));
   assert.ok(empty.includes('id="questions-disclaimer"'));
+});
+
+test("Q&A keyword search combines with filters and searches source titles and authors", () => {
+  for (const [query, id] of [["Skinseed", "developer-skinseed-mobile"], ["ArtsByKev", "developer-video-hd-skin"], ["同步 审核", "developer-sync-review"]]) {
+    const html = render("zh-CN", "questions", ["", "all", "all", "all", query]);
+    assert.ok(html.includes(`id="${id}"`), query);
+    assert.ok(!html.includes('id="service-introduction"'));
+  }
+  const empty = render("zh-CN", "questions", ["", "privacy", "official", "video", "Skinseed"]);
+  assert.match(empty, /class="skinArticleEmpty"/);
+  assert.match(empty, /id="questions-disclaimer"/);
+});
+
+test("source context remains complete inside a default-collapsed accessible disclosure", () => {
+  for (const language of translations.skinServiceLanguages) {
+    const html = render(language, "questions");
+    const notice = html.match(/<details class="skinDeveloperNotice"([^>]+)>([\s\S]*?)<\/details>/);
+    assert.ok(notice);
+    assert.ok(!notice[1].includes(" open"));
+    assert.match(notice[2], /<summary id="developer-docs-title">/);
+    assert.ok(notice[2].includes(developerDocs.developerResourcesCompiledAt));
+    assert.ok(notice[2].includes(renderToStaticMarkup(createElement("p", null, translations.skinText(language, "developerDocsNotice", { questions: 41, sources: 29 })))));
+  }
+});
+
+test("each Q&A keeps a native bookmark link and a searchable title in every service language", () => {
+  for (const language of translations.skinServiceLanguages) {
+    const html = render(language, "questions");
+    assert.match(html, /id="skin-article-search"/);
+    for (const resource of developerDocs.developerResources) {
+      assert.ok(html.includes(`href="#${resource.id}"`), resource.id);
+      const filtered = render(language, "questions", ["", "all", "all", "all", resource.title[language]]);
+      assert.ok(filtered.includes(`id="${resource.id}"`), `${language} ${resource.id}`);
+      searchClickHarness("questions", resource.title[language], `/skin-service/questions#${resource.id}`, {}, language);
+    }
+    for (const [id, title] of [["service-introduction", "article1Title"], ["submission-preparation", "article2Title"], ["review-status", "article3Title"], ["returned-materials", "article4Title"], ["change-submission", "article5Title"], ["privacy-protection", "article6Title"]]) {
+      assert.ok(html.includes(`href="#${id}"`), id);
+      const filtered = render(language, "questions", ["", "all", "all", "all", translations.skinText(language, title)]);
+      assert.ok(filtered.includes(`id="${id}"`), `${language} ${id}`);
+      searchClickHarness("questions", translations.skinText(language, title), `/skin-service/questions#${id}`, {}, language);
+    }
+  }
+});
+
+test("all 972 language, topic, source and format combinations retain the correct Q&A count", () => {
+  const entries = [
+    ...developerDocs.developerResources.map(resource => ({ category: resource.category, source: developerDocs.developerSources[resource.sourceId].kind, format: developerDocs.developerSources[resource.sourceId].format })),
+    ...["introduction", "preparation", "review", "review", "review", "privacy"].map(category => ({ category, source: "service", format: "article" })),
+  ];
+  for (const language of translations.skinServiceLanguages) {
+    for (const category of ["all", "introduction", "tools", "creation", "preparation", "publishing", "pricing", "review", "privacy"]) {
+      for (const source of ["all", "official", "tutorial", "tools", "community", "service"]) {
+        for (const format of ["all", "article", "video", "tool", "repository", "news"]) {
+          const count = entries.filter(entry => (category === "all" || entry.category === category) && (source === "all" || entry.source === source) && (format === "all" || entry.format === format)).length;
+          const html = render(language, "questions", ["", category, source, format, ""]);
+          assert.equal([...html.matchAll(/<article id=/g)].length, count, `${language} ${category} ${source} ${format}`);
+          assert.ok(html.includes('id="questions-disclaimer"'));
+          assert.ok(html.includes(translations.skinText(language, "articleCount", { count, total: entries.length })));
+        }
+      }
+    }
+  }
 });
 
 test("disclaimer follows all archived topics and offers takedown contact without denying agreement fees", () => {
@@ -215,10 +278,20 @@ test("review totals use exact localized wording when all completed counts are kn
   }
 });
 
-function searchClickHarness(activeSection = "review-notices", query = "216", href = "/skin-service/review-notices#review-batch-216", filters = {}) {
+function searchClickHarness(activeSection = "review-notices", query = "216", href = "/skin-service/review-notices#review-batch-216", filters = {}, language = "zh-CN") {
   const exports = {};
   const updates = [];
   const frames = [];
+  const cancelledFrames = [];
+  const hashEffects = [];
+  const listeners = new Map();
+  const browser = {
+    location: { hash: "" },
+    requestAnimationFrame: callback => frames.push(callback),
+    cancelAnimationFrame: frame => cancelledFrames.push(frame),
+    addEventListener: (name, callback) => listeners.set(name, callback),
+    removeEventListener: name => listeners.delete(name),
+  };
   let stateIndex = 0;
   const mocks = {
     react: {
@@ -227,12 +300,12 @@ function searchClickHarness(activeSection = "review-notices", query = "216", hre
       useRef: value => ({ current: value }),
       useMemo: fn => fn(),
       useCallback: fn => fn,
-      useEffect() {},
+      useEffect(effect) { if (effect.toString().includes('"hashchange"')) hashEffects.push(effect); },
     },
     "next/link": { default: "a" },
     "next/image": { default: "img" },
     "next/navigation": { useRouter: () => ({}) },
-    "./SettingsContext": { useSettingsContext: () => ({ settings: { language: "zh-CN", theme: "light", animationsEnabled: true }, update() {} }) },
+    "./SettingsContext": { useSettingsContext: () => ({ settings: { language, theme: "light", animationsEnabled: true }, update() {} }) },
     "../lib/paths": { assetPath: path => path },
     "../lib/reviewBatches": batches,
     "../lib/skinServiceTerms": terms,
@@ -243,7 +316,7 @@ function searchClickHarness(activeSection = "review-notices", query = "216", hre
   runInNewContext(source, {
     exports,
     require: name => mocks[name] ?? require(name),
-    window: { requestAnimationFrame: callback => frames.push(callback) },
+    window: browser,
   });
   const findLink = node => {
     if (Array.isArray(node)) return node.map(findLink).find(Boolean);
@@ -253,8 +326,24 @@ function searchClickHarness(activeSection = "review-notices", query = "216", hre
   const tree = exports.default({ activeSection, serviceUrl: null });
   const link = findLink(tree);
   assert.ok(link, "search must include the matching result link");
-  return { click: link.props.onClick, updates, frames, tree };
+  return { click: link.props.onClick, updates, frames, tree, cancelledFrames, browser, listeners, runHashEffect: () => hashEffects[0]() };
 }
+
+test("document hash callbacks cancel on navigation, removal and malformed links", () => {
+  const app = searchClickHarness("questions", "", node => node?.props?.id === "developer-skin-format");
+  app.browser.location.hash = "#developer-skin-format";
+  const cleanup = app.runHashEffect();
+  assert.equal(app.frames.length, 1);
+  app.browser.location.hash = "";
+  app.listeners.get("hashchange")();
+  assert.ok(app.cancelledFrames.includes(1));
+  cleanup();
+  assert.equal(app.listeners.size, 0);
+  const invalid = searchClickHarness("questions", "", node => node?.props?.id === "developer-skin-format");
+  invalid.browser.location.hash = "#%broken";
+  assert.doesNotThrow(() => invalid.runHashEffect()());
+  assert.equal(invalid.frames.length, 0);
+});
 
 test("resetting an empty archive filter restores focus to the topic controls", () => {
   const app = searchClickHarness("questions", "", node => node?.type === "button" && node.props.children === translations.skinText("zh-CN", "resetArticleFilters"), { 1: "privacy", 2: "official", 3: "video" });
@@ -264,7 +353,7 @@ test("resetting an empty archive filter restores focus to the topic controls", (
   let focused = false;
   group.props.ref.current = { querySelector: () => ({ focus() { focused = true; } }) };
   app.click();
-  assert.deepEqual(app.updates, ["all", "all", "all"]);
+  assert.deepEqual(app.updates, ["all", "all", "all", ""]);
   assert.equal(focused, true);
 });
 
@@ -289,6 +378,32 @@ test("global search indexes media authors and the disclaimer", () => {
   searchClickHarness("terms", "合法权益", "/skin-service/questions#questions-disclaimer");
 });
 
+test("global Q&A search does not silently discard matches after the first twenty", () => {
+  const app = searchClickHarness("questions", "皮肤", node => node?.props?.className === "skinServiceSearchResults");
+  const links = [];
+  const visit = node => {
+    if (Array.isArray(node)) return node.forEach(visit);
+    if (node?.type === "a") links.push(node.props.href);
+    if (node?.props) visit(node.props.children);
+  };
+  visit(app.tree);
+  const expected = developerDocs.developerResources.filter(resource => `${resource.title["zh-CN"]} ${resource.summary["zh-CN"]} ${developerDocs.developerSources[resource.sourceId].title}`.includes("皮肤"));
+  assert.ok(expected.length > 20);
+  for (const resource of expected) assert.ok(links.includes(`/skin-service/questions#${resource.id}`), resource.id);
+});
+
+test("clearing the global search returns keyboard focus to its input", () => {
+  const app = searchClickHarness("questions", "Skinseed", node => node?.type === "button" && node.props.children === translations.skinText("zh-CN", "clear"));
+  const find = node => Array.isArray(node) ? node.map(find).find(Boolean) : node?.type === "input" && node.props.type === "search" ? node : node?.props ? find(node.props.children) : undefined;
+  const input = find(app.tree);
+  assert.ok(input.props.ref);
+  let focused = false;
+  input.props.ref.current = { focus() { focused = true; } };
+  app.click();
+  assert.deepEqual(app.updates, [""]);
+  assert.equal(focused, true);
+});
+
 test("modified and canceled search clicks preserve native navigation and the search query", () => {
   for (const properties of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
     const app = searchClickHarness();
@@ -305,7 +420,7 @@ test("plain same-section search clicks still clear the query and schedule target
   let prevented = false;
   app.click({ button: 0, preventDefault() { prevented = true; } });
   assert.equal(prevented, true);
-  assert.deepEqual(app.updates, ["", "all", "all", "all"]);
+  assert.deepEqual(app.updates, ["", "all", "all", "all", ""]);
   assert.equal(app.frames.length, 1);
 });
 
@@ -314,6 +429,6 @@ test("plain cross-section search clicks retain router navigation", () => {
   let prevented = false;
   app.click({ button: 0, preventDefault() { prevented = true; } });
   assert.equal(prevented, false);
-  assert.deepEqual(app.updates, ["", "all", "all", "all"]);
+  assert.deepEqual(app.updates, ["", "all", "all", "all", ""]);
   assert.equal(app.frames.length, 0);
 });

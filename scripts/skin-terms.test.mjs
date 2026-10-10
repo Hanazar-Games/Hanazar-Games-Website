@@ -290,6 +290,23 @@ test("reader keeps confirmation retryable when persistence fails", () => {
   app.unmount();
 });
 
+test("confirming and clearing keep keyboard focus in the agreement form", () => {
+  const app = readerHarness();
+  app.render();
+  let tree = app.render();
+  assert.ok(form(tree).props.ref);
+  let focused = 0;
+  form(tree).props.ref.current = { focus() { focused++; } };
+  fields(tree).forEach(field => field.props.onChange({ target: { checked: true } }));
+  form(app.render()).props.onSubmit({ preventDefault() {} });
+  assert.equal(focused, 1);
+  tree = app.render();
+  findAll(tree, node => node.type === "button" && node.props.className === "secondary")[0].props.onClick();
+  assert.equal(focused, 2);
+  assert.ok(fields(app.render()).every(field => !field.props.checked));
+  app.unmount();
+});
+
 test("reader resynchronizes confirmation after another tab clears its local record", () => {
   const local = storage();
   saveTermsConsent(local, true, true);

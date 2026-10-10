@@ -43,6 +43,7 @@ const requiredFiles = [...new Set([
   "updates/2.20.3.svg",
   "updates/2.20.4.svg",
   "updates/2.20.5.svg",
+  "updates/2.20.6.svg",
   releaseImage,
   "games/index.html",
   "aigc/index.html",
@@ -209,6 +210,9 @@ const requiredContent = {
     "https://discord.gg/XtTbKCSKa",
   ],
   "skin-service/questions/index.html": [
+    'id="skin-article-search"',
+    'class="skinArticlePermalink"',
+    "搜索本页全部 Q&amp;A",
     "网易开发者资料导航",
     "上传与发布",
     "定价与等级",
@@ -320,6 +324,7 @@ const requiredContent = {
     "第十四条",
   ],
   "skin-service/updates/index.html": [
+    'id="update-2-20-7"',
     'id="update-2-20-6"',
     'class="skinServiceUpdateHistory"',
     "历史公告",
@@ -478,7 +483,8 @@ const forbiddenContent = {
     "939095145",
     "什么是代发皮肤服务？",
     "写下匿名反馈",
-    "全局搜索",
+    'class="skinServiceSearch"',
+    'class="skinArticleSearch"',
     "捐赠入口预留",
   ],
   "skin-service/communities/index.html": [

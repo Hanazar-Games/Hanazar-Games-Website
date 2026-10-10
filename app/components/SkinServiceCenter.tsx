@@ -132,6 +132,11 @@ function sourceAction(source: DeveloperSource): SkinTextKey {
   return source.format === "article" && source.href.startsWith("https://mc.163.com/") ? "openOfficialDocs" : sourceActions[source.format];
 }
 
+function matchesQuery(text: string, query: string, language: SkinServiceLanguage) {
+  const normalized = text.toLocaleLowerCase(language);
+  return query.trim().toLocaleLowerCase(language).split(/\s+/u).every(word => normalized.includes(word));
+}
+
 const archiveDisclaimerDefinitions: Array<{ title: SkinTextKey; body: SkinTextKey }> = [
   { title: "archiveRightsTitle", body: "archiveRightsBody" },
   { title: "archiveTakedownTitle", body: "archiveTakedownBody" },
@@ -158,6 +163,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.20.7", date: "2026-10-10", title: "update2207Title", body: "update2207Body" },
   { version: "2.20.6", date: "2026-10-09", title: "update2206Title", body: "update2206Body" },
   { version: "2.20.5", date: "2026-10-05", title: "update2205Title", body: "update2205Body" },
   { version: "2.20.4", date: "2026-10-03", title: "update2204Title", body: "update2204Body" },
@@ -458,6 +464,7 @@ export default function SkinServiceCenter({
   const [activeArticleCategory, setActiveArticleCategory] = useState<ArticleCategory>("all");
   const [activeArticleSource, setActiveArticleSource] = useState<ArticleSource>("all");
   const [activeArticleFormat, setActiveArticleFormat] = useState<ArticleFormat>("all");
+  const [articleQuery, setArticleQuery] = useState("");
   const [communityPromptOpen, setCommunityPromptOpen] = useState(false);
   const [enlargedCommunityId, setEnlargedCommunityId] = useState<string | null>(null);
   const [communityNotice, setCommunityNotice] = useState("");
@@ -483,6 +490,8 @@ export default function SkinServiceCenter({
   const communityImagePreviousFocusRef = useRef<HTMLElement | null>(null);
   const pageMainRef = useRef<HTMLElement | null>(null);
   const articleFiltersRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const articleSearchRef = useRef<HTMLInputElement | null>(null);
   const sections = sectionDefinitions.map((section) => ({
     ...section,
     title: skinText(language, section.title),
@@ -786,7 +795,9 @@ export default function SkinServiceCenter({
   }, [reduceAnimations]);
 
   useEffect(() => {
+    let frame = 0;
     const revealHash = () => {
+      window.cancelAnimationFrame(frame);
       let targetId: string;
       try {
         targetId = decodeURIComponent(window.location.hash.slice(1));
@@ -798,13 +809,17 @@ export default function SkinServiceCenter({
           setActiveArticleCategory("all");
           setActiveArticleSource("all");
           setActiveArticleFormat("all");
+          setArticleQuery("");
         }
-        window.requestAnimationFrame(() => revealTarget(targetId, "instant"));
+        frame = window.requestAnimationFrame(() => revealTarget(targetId, "instant"));
       }
     };
     revealHash();
     window.addEventListener("hashchange", revealHash);
-    return () => window.removeEventListener("hashchange", revealHash);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", revealHash);
+    };
   }, [activeSection, revealTarget]);
 
   const searchResults = useMemo(() => {
@@ -932,13 +947,14 @@ export default function SkinServiceCenter({
         targetId: "support-channel",
       },
     ];
-    return entries.filter((entry) => `${entry.title} ${entry.text}`.toLocaleLowerCase(language).includes(normalized)).slice(0, 20);
+    return entries.filter((entry) => matchesQuery(`${entry.title} ${entry.text}`, normalized, language));
   }, [language, query, wall]);
 
   const visibleArticles = articles.filter((article) =>
     (activeArticleCategory === "all" || article.category === activeArticleCategory)
     && (activeArticleSource === "all" || (article.source?.kind ?? "service") === activeArticleSource)
-    && (activeArticleFormat === "all" || (article.source?.format ?? "article") === activeArticleFormat),
+    && (activeArticleFormat === "all" || (article.source?.format ?? "article") === activeArticleFormat)
+    && matchesQuery(`${article.title} ${article.content} ${article.source?.title ?? ""} ${article.source?.publisher ?? ""}`, articleQuery, language),
   );
   const visibleArticleGroups = articleCategories.filter((category) => category.id !== "all")
     .map((category) => ({ ...category, articles: visibleArticles.filter((article) => article.category === category.id) }))
@@ -1185,14 +1201,20 @@ export default function SkinServiceCenter({
           <span className="visuallyHidden">{skinText(language, "searchLabel")}</span>
           <input
             type="search"
+            ref={searchInputRef}
+            maxLength={200}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={skinText(language, "searchPlaceholder")}
           />
-          {query && <button type="button" onClick={() => setQuery("")}>{skinText(language, "clear")}</button>}
+          {query && <button type="button" onClick={() => {
+            setQuery("");
+            searchInputRef.current?.focus();
+          }}>{skinText(language, "clear")}</button>}
         </label>
         {query && (
-          <div className="skinServiceSearchResults" aria-live="polite">
+          <div className="skinServiceSearchResults">
+            <p className="skinSearchCount" role="status">{skinText(language, "searchCount", { count: searchResults.length })}</p>
             {searchResults.length > 0 ? searchResults.map((result, index) => (
               <Link
                 key={`${result.href}-${index}`}
@@ -1203,6 +1225,7 @@ export default function SkinServiceCenter({
                   setActiveArticleCategory("all");
                   setActiveArticleSource("all");
                   setActiveArticleFormat("all");
+                  setArticleQuery("");
                   if (result.section !== activeSection) return;
                   event.preventDefault();
                   window.requestAnimationFrame(() => {
@@ -1292,11 +1315,23 @@ export default function SkinServiceCenter({
             title={skinText(language, "questionsTitle")}
             description={skinText(language, "questionsDescription")}
           />
-          <aside className="skinDeveloperNotice" aria-labelledby="developer-docs-title">
-            <h3 id="developer-docs-title">{skinText(language, "developerDocsTitle")}</h3>
+          <details className="skinDeveloperNotice" aria-labelledby="developer-docs-title" suppressHydrationWarning>
+            <summary id="developer-docs-title">{skinText(language, "developerDocsTitle")}</summary>
             <p>{skinText(language, "developerDocsNotice", { questions: developerResources.length, sources: Object.keys(developerSources).length })}</p>
             <small>{skinText(language, "developerDocsDate")} · <time dateTime={developerResourcesCompiledAt}>{developerResourcesCompiledAt}</time></small>
-          </aside>
+          </details>
+          <div className="skinArticleSearch">
+            <label htmlFor="skin-article-search">{skinText(language, "articleSearchLabel")}</label>
+            <div className="skinServiceSearchField">
+              <input id="skin-article-search" ref={articleSearchRef} type="search" maxLength={200} value={articleQuery}
+                onChange={event => setArticleQuery(event.target.value)} placeholder={skinText(language, "articleSearchPlaceholder")} aria-describedby="skin-article-search-help" />
+              {articleQuery && <button type="button" aria-label={skinText(language, "articleSearchClear")} onClick={() => {
+                setArticleQuery("");
+                articleSearchRef.current?.focus();
+              }}>{skinText(language, "clear")}</button>}
+            </div>
+            <p id="skin-article-search-help">{skinText(language, "articleSearchHelp")}</p>
+          </div>
           <div className="skinArticleFilterLabel">{skinText(language, "questionTopics")}</div>
           <div className="skinArticleFilters" ref={articleFiltersRef} role="group" aria-label={skinText(language, "questionTopics")}>
             {articleCategories.map((category) => (
@@ -1326,7 +1361,7 @@ export default function SkinServiceCenter({
               </button>
             ))}
           </div>
-          <p className="skinArticleCount" role="status">{skinText(language, "articleCount", { count: visibleArticles.length })}</p>
+          <p className="skinArticleCount" role="status">{skinText(language, "articleCount", { count: visibleArticles.length, total: articles.length })}</p>
           <div className="skinArticleTopics">
             {visibleArticleGroups.map((group) => (
               <section className="skinArticleTopic" id={`questions-topic-${group.id}`} key={group.id} tabIndex={-1} aria-labelledby={`questions-topic-${group.id}-title`}>
@@ -1343,6 +1378,7 @@ export default function SkinServiceCenter({
                       </span>
                       <h4 id={`${article.id}-title`}>{article.title}</h4>
                       <p>{article.content}</p>
+                      <a className="skinArticlePermalink" href={`#${article.id}`} aria-label={`${skinText(language, "articlePermalink")}：${article.title}`}>{skinText(language, "articlePermalink")} <span aria-hidden="true">#</span></a>
                       {article.source && <div className="skinArticleSource">
                         <p>{skinText(language, articleFormatDefinitions.find((format) => format.id === article.source?.format)!.title)} · {skinText(language, article.source.language === "en" ? "sourceEnglish" : "sourceChinese")}</p>
                         <p>{skinText(language, "sourceLabel")} · <span lang={article.source.language}>{article.source.title}</span></p>
@@ -1375,6 +1411,7 @@ export default function SkinServiceCenter({
                 setActiveArticleCategory("all");
                 setActiveArticleSource("all");
                 setActiveArticleFormat("all");
+                setArticleQuery("");
                 articleFiltersRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
               }}>{skinText(language, "resetArticleFilters")}</button>
             </div>}
