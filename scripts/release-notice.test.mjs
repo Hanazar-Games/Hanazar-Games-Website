@@ -29,11 +29,11 @@ test("release acknowledgement persists by version without discarding other prefe
   const { currentRelease, hasSeenRelease, markReleaseSeen } = await import("../app/lib/release.ts");
   const entries = new Map([["hanazar-settings-v1", "existing-settings"]]);
   const storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
-  assert.equal(currentRelease.version, "2.20.9");
+  assert.equal(currentRelease.version, "2.20.10");
   assert.equal(hasSeenRelease(storage, currentRelease.version), false);
   markReleaseSeen(storage, currentRelease.version);
   assert.equal(hasSeenRelease(storage, currentRelease.version), true);
-  assert.equal(hasSeenRelease(storage, "2.20.10"), false);
+  assert.equal(hasSeenRelease(storage, "2.20.11"), false);
   assert.equal(entries.get("hanazar-settings-v1"), "existing-settings");
 });
 
@@ -44,19 +44,19 @@ test("blocked browser storage cannot crash the release notice", async () => {
   assert.doesNotThrow(() => markReleaseSeen(storage, "2.19.0"));
 });
 
-test("v2.20.9 retains the preceding illustrated announcement in history", () => {
+test("v2.20.10 retains the preceding illustrated announcement in history", () => {
   const announcement = readFileSync(new URL("../app/components/settings/AnnouncementTab.tsx", import.meta.url), "utf8");
   const notice = readFileSync(new URL("../app/components/ReleaseNotice.tsx", import.meta.url), "utf8");
   const poster = readFileSync(new URL(`../public${release.currentRelease.image}`, import.meta.url), "utf8");
-  assert.match(announcement, /const history = \[\s*\{\s*version: "2\.20\.8"/);
-  assert.match(announcement, /image: "\/updates\/2\.20\.8\.svg"/);
-  assert.match(poster, /v2\.20\.9/);
+  assert.match(announcement, /const history = \[\s*\{\s*version: "2\.20\.9"/);
+  assert.match(announcement, /image: "\/updates\/2\.20\.9\.svg"/);
+  assert.match(poster, /v2\.20\.10/);
   assert.match(notice, /href="\/skin-service"/);
-  const old = { getItem: () => "2.20.8" };
+  const old = { getItem: () => "2.20.9" };
   assert.equal(release.hasSeenRelease(old, release.currentRelease.version), false);
 });
 
-test("current illustrated release accurately describes the published documentation", async () => {
+test("the archived documentation release retains its published statistics", async () => {
   const { getTranslation } = await import("../app/lib/i18n.ts");
   const { skinServiceLanguages, skinText } = await import("../app/lib/skinServiceI18n.ts");
   const { developerResources, developerSources } = await import("../app/lib/skinDeveloperResources.ts");

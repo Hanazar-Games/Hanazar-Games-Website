@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" fill="none">
+  <defs><linearGradient id="bg" x2="1200" y2="600" gradientUnits="userSpaceOnUse"><stop stop-color="#111a30"/><stop offset="1" stop-color="#302959"/></linearGradient></defs>
+  <rect width="1200" height="600" rx="28" fill="url(#bg)"/>
+  <g font-family="system-ui, sans-serif">
+    <text x="60" y="72" fill="#c3baff" font-size="18" letter-spacing="4">HANAZAR GAMES / v2.20.10</text>
+    <text x="60" y="155" fill="#f6f4ff" font-size="50" font-weight="700">Find your way. Keep your place.</text>
+    <text x="62" y="203" fill="#c2cce4" font-size="23">Clear navigation. A quicker return. Your settings stay yours.</text>
+    <g stroke="#9d8feb" stroke-opacity=".5" fill="#1d2945"><rect x="60" y="250" width="340" height="252" rx="22"/><rect x="430" y="250" width="340" height="252" rx="22"/><rect x="800" y="250" width="340" height="252" rx="22"/></g>
+    <g stroke="#c5baff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="92" y="286" width="56" height="44" rx="8"/><path d="M104 296v24M114 296h23M114 308h23M114 320h15M470 289h36M488 335v-35m-13 13 13-13 13 13"/><circle cx="854" cy="307" r="20"/><path d="M854 287a20 20 0 0 1 0 40z" fill="#c5baff"/></g>
+    <g fill="#f4f3ff" font-size="25" font-weight="650"><text x="92" y="393">VISIBLE CATEGORIES</text><text x="462" y="393">BACK TO TOP</text><text x="832" y="393">YOUR PREFERENCES</text></g>
+    <g fill="#b9c7e0" font-size="19"><text x="92" y="433">Resize without losing your tab</text><text x="92" y="466">Scoped keyboard scrolling</text><text x="462" y="433">Focus returns to the title</text><text x="462" y="466">Reduced-motion friendly</text><text x="832" y="433">Independent site / service</text><text x="832" y="466">20 translated return labels</text></g>
+    <text x="60" y="558" fill="#c3baff" font-size="16" letter-spacing="3">UI / UX / KEYBOARD / MOBILE / LONG PAGES</text>
+  </g>
+</svg>

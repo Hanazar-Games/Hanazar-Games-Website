@@ -799,6 +799,13 @@ export default function AnnouncementTab() {
   };
   const history = [
     {
+      version: "2.20.9",
+      date: "2026-10-11",
+      title: tr("release2209Title"),
+      items: ["release2209Archive", "release2209Reading", "release2209Layout", "release2209Controls", "release2209Security"].map(tr),
+      image: "/updates/2.20.9.svg",
+    },
+    {
       version: "2.20.8",
       date: "2026-10-11",
       title: tr("release2208Title"),

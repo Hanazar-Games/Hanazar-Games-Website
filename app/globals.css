@@ -489,6 +489,31 @@ a {
   text-decoration: none;
 }
 
+.pageBackToTop {
+  position: fixed;
+  z-index: 80;
+  right: max(80px, calc(env(safe-area-inset-right) + 58px));
+  bottom: max(22px, env(safe-area-inset-bottom));
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: 0 8px 24px #0002;
+  cursor: pointer;
+  transition: background calc(0.2s * var(--anim-speed, 1)) ease, border-color calc(0.2s * var(--anim-speed, 1)) ease;
+}
+
+.pageBackToTop:hover { background: var(--panel); border-color: var(--accent); }
+.pageBackToTop svg { width: 22px; height: 22px; }
+.pageBackToTop:focus-visible, main h1:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.pageBackToTop[hidden],
+body:has(dialog[open], [role="dialog"][aria-modal="true"], .settingsOverlay) .pageBackToTop { display: none; }
+body:has(.gamesShell) .pageBackToTop { right: max(22px, env(safe-area-inset-right)); }
+
 .settingsFloatingButton {
   position: fixed;
   right: max(22px, env(safe-area-inset-right));
@@ -6421,6 +6446,9 @@ body[data-theme="light"] .releaseNotice { background: #fafbff; }
   flex-direction: column;
   gap: 4px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 .settingsTabBtn {
@@ -7129,6 +7157,15 @@ body[data-theme="light"] .releaseNotice { background: #fafbff; }
     width: 44px;
     height: 44px;
   }
+
+  .pageBackToTop {
+    right: max(72px, calc(env(safe-area-inset-right) + 58px));
+    bottom: max(14px, env(safe-area-inset-bottom));
+    width: 44px;
+    height: 44px;
+  }
+
+  body:has(.gamesShell) .pageBackToTop { right: max(14px, env(safe-area-inset-right)); }
 
   body:has(.gamesShell) .settingsFloatingButton {
     top: max(14px, env(safe-area-inset-top));

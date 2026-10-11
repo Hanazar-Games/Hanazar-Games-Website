@@ -125,17 +125,18 @@ test("terms replace the fifth hub entry while updates remain available in the he
 test("service updates publish the new version and retain the previous announcement", () => {
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "updates");
-    assert.ok(html.indexOf('id="update-2-20-9"') < html.indexOf('id="update-2-20-8"'));
+    assert.ok(html.indexOf('id="update-2-20-10"') < html.indexOf('id="update-2-20-9"'));
+    assert.ok(html.includes(translations.skinText(language, "update22010Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2209Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2208Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2207Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2206Title")));
     assert.ok(html.includes(translations.skinText(language, "update2205Title")));
-    assert.equal([...html.matchAll(/id="update-2-20-9"/g)].length, 1);
+    assert.equal([...html.matchAll(/id="update-2-20-10"/g)].length, 1);
     const [current, history] = html.split('<details class="skinServiceUpdateHistory"');
-    assert.ok(current.includes('id="update-2-20-9"'));
-    assert.ok(!current.includes('id="update-2-20-8"'));
-    assert.ok(history?.includes('id="update-2-20-8"'));
+    assert.ok(current.includes('id="update-2-20-10"'));
+    assert.ok(!current.includes('id="update-2-20-9"'));
+    assert.ok(history?.includes('id="update-2-20-9"'));
     assert.ok(!history.split(">")[0].includes(" open"));
   }
 });

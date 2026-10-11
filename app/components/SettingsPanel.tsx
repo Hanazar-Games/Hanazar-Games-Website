@@ -31,6 +31,17 @@ interface SettingsPanelProps {
   onClose: () => void;
 }
 
+function revealSettingsTab(nav: HTMLElement | null, tab: HTMLElement | null) {
+  if (!nav || !tab) return;
+  const viewport = nav.getBoundingClientRect();
+  const bounds = tab.getBoundingClientRect();
+  const offset = (start: number, end: number, min: number, max: number) =>
+    start < min || end - start > max - min ? start - min : Math.max(0, end - max);
+  const left = offset(bounds.left, bounds.right, viewport.left + 8, viewport.right - 8);
+  const top = offset(bounds.top, bounds.bottom, viewport.top + 8, viewport.bottom - 8);
+  if (left || top) nav.scrollBy({ left, top, behavior: "instant" });
+}
+
 export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const [activeTab, setActiveTab] = useState("style");
   const [visible, setVisible] = useState(false);
@@ -38,6 +49,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const { tr } = useTranslation();
   const { settings } = useSettingsContext();
   const modalTransitionMs = (
@@ -65,6 +77,25 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
       panelRef.current.scrollTop = 0;
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!open || !visible || !nav) return;
+    const tab = nav.querySelector<HTMLElement>('[aria-selected="true"]');
+    let frame = 0;
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => revealSettingsTab(nav, tab));
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(nav);
+    if (tab) observer.observe(tab);
+    schedule();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [open, visible, activeTab, settings.language, settings.font, settings.customFont]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -182,8 +213,8 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     const nextTab = tabs[nextIndex];
     setActiveTab(nextTab.key);
     const tab = document.getElementById(`settings-tab-${nextTab.key}`);
-    tab?.focus();
-    tab?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    tab?.focus({ preventScroll: true });
+    revealSettingsTab(navRef.current, tab);
   };
 
   if (!visible) return null;
@@ -220,6 +251,7 @@ export default function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         <div className="settingsModalBody">
           <nav
             className="settingsTabNav"
+            ref={navRef}
             aria-label={tr("ariaSettingsCategories")}
             role="tablist"
           >

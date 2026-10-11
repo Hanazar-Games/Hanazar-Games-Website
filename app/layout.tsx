@@ -6,6 +6,7 @@ import StyleApplier from "./components/StyleApplier";
 import AudioEngine from "./components/AudioEngine";
 import SettingsLauncher from "./components/SettingsLauncher";
 import ReleaseNotice from "./components/ReleaseNotice";
+import PageBackToTop from "./components/PageBackToTop";
 
 export const metadata: Metadata = {
   title: "Hanazar Games",
@@ -26,6 +27,7 @@ export default function RootLayout({
           <AudioEngine />
           <SettingsLauncher />
           {children}
+          <PageBackToTop />
           <ReleaseNotice />
         </SettingsProvider>
       </body>

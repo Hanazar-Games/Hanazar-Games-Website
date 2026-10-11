@@ -15,6 +15,8 @@ function harness() {
   const effects = [];
   const frames = new Map();
   const timers = new Map();
+  const observers = new Set();
+  const settings = { animationsEnabled: true, animModal: true, animSpeed: 100, language: "en", font: "sans", customFont: "" };
   let cursor = 0;
   let id = 0;
   let open = false;
@@ -57,6 +59,11 @@ function harness() {
   runInNewContext(source, {
     exports, HTMLElement, document, window: { innerWidth: 1020 },
     getComputedStyle: () => ({ paddingRight: "4px" }),
+    ResizeObserver: class {
+      constructor(callback) { this.callback = callback; observers.add(this); }
+      observe() {}
+      disconnect() { observers.delete(this); }
+    },
     requestAnimationFrame(fn) { frames.set(++id, fn); return id; },
     cancelAnimationFrame: key => frames.delete(key),
     setTimeout(fn) { timers.set(++id, fn); return id; },
@@ -65,7 +72,7 @@ function harness() {
       if (name === "react") return react;
       if (name === "react/jsx-runtime") return require(name);
       if (name.endsWith("useTranslation")) return { useTranslation: () => ({ tr: key => key }) };
-      if (name.endsWith("SettingsContext")) return { useSettingsContext: () => ({ settings: { animationsEnabled: true, animModal: true, animSpeed: 100 } }) };
+      if (name.endsWith("SettingsContext")) return { useSettingsContext: () => ({ settings }) };
       return { default: "div" };
     },
   });
@@ -78,7 +85,8 @@ function harness() {
     return tree;
   };
   return {
-    render, document, main, trigger, frames,
+    render, document, main, trigger, frames, observers, settings,
+    flushFrames: () => { const pending = [...frames.values()]; frames.clear(); pending.forEach(fn => fn()); },
     unmount: () => slots.forEach(slot => slot?.cleanup?.()),
   };
 }
@@ -152,5 +160,66 @@ test("closing settings restores the captured scroll, background and focus state"
   assert.equal(app.main.getAttribute("aria-hidden"), "false");
   assert.equal(app.main.hasAttribute("inert"), false);
   assert.equal(app.trigger.focused, true);
+  app.unmount();
+});
+
+function navigationHarness() {
+  const app = harness();
+  app.render(true);
+  const navTree = find(app.render(), node => node.props?.role === "tablist");
+  const tabs = navTree.props.children;
+  let selected = "style";
+  let rect = { left: 10, right: 310, top: 100, bottom: 166 };
+  const bounds = new Map(tabs.map(tab => [tab.props.id, { left: 30, right: 118, top: 110, bottom: 154 }]));
+  const scrolls = [];
+  const nav = {
+    getBoundingClientRect: () => rect,
+    querySelector: () => ({ getBoundingClientRect: () => bounds.get(`settings-tab-${selected}`) }),
+    scrollBy: options => scrolls.push(options),
+  };
+  navTree.props.ref.current = nav;
+  app.document.getElementById = id => ({ focus: () => {}, getBoundingClientRect: () => bounds.get(id) });
+  return {
+    ...app, tabs, scrolls, bounds,
+    resize(next) { rect = next; app.observers.forEach(observer => observer.callback()); app.flushFrames(); },
+    select(key) { selected = key; tabs.find(tab => tab.props.id === `settings-tab-${key}`).props.onClick(); app.render(); app.flushFrames(); },
+  };
+}
+
+test("resizing settings reveals the selected category inside its own navigation", () => {
+  const app = navigationHarness();
+  app.bounds.set("settings-tab-about", { left: 820, right: 908, top: 110, bottom: 154 });
+  app.select("about");
+  assert.equal(app.scrolls.at(-1)?.left, 606);
+  assert.equal(app.scrolls.at(-1)?.behavior, "instant");
+  app.scrolls.length = 0;
+  app.resize({ left: 10, right: 250, top: 100, bottom: 166 });
+  assert.equal(app.scrolls.at(-1)?.left, 666);
+  app.bounds.set("settings-tab-about", { left: 20, right: 108, top: 780, bottom: 824 });
+  app.resize({ left: 10, right: 190, top: 100, bottom: 700 });
+  assert.equal(app.scrolls.at(-1)?.top, 132);
+  app.unmount();
+  assert.equal(app.observers.size, 0);
+  assert.equal(app.frames.size, 0);
+});
+
+test("changing language or font and reopening settings keeps the selected tab visible", () => {
+  const app = navigationHarness();
+  app.bounds.set("settings-tab-language", { left: -130, right: 5, top: 110, bottom: 154 });
+  app.select("language");
+  assert.equal(app.scrolls.at(-1)?.left, -148);
+  for (const [key, value] of [["language", "ja"], ["font", "serif"], ["customFont", "Example Font"]]) {
+    app.scrolls.length = 0;
+    app.settings[key] = value;
+    app.render();
+    app.flushFrames();
+    assert.equal(app.scrolls.at(-1)?.left, -148, key);
+  }
+  app.render(false);
+  assert.equal(app.observers.size, 0);
+  app.scrolls.length = 0;
+  app.render(true);
+  app.flushFrames();
+  assert.equal(app.scrolls.at(-1)?.left, -148);
   app.unmount();
 });
