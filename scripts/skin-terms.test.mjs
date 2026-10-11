@@ -7,6 +7,7 @@ import test from "node:test";
 import ts from "typescript";
 import { serviceTerms, serviceTermsSections } from "../app/lib/skinServiceTerms.ts";
 import * as translations from "../app/lib/skinServiceI18n.ts";
+import * as documentSearch from "../app/lib/documentSearch.ts";
 
 const exports = {};
 runInNewContext(ts.transpileModule(readFileSync(new URL("../app/lib/skinTermsConsent.ts", import.meta.url), "utf8"), {
@@ -42,9 +43,9 @@ test("the mobile text preserves every paragraph of the supplied agreement", () =
   assert.equal(createHash("sha256").update(paragraphs.join("\n")).digest("hex"), "0ea88ea259e25b4500a482fdd0ac865b797a76f6f54cb80198e6ff92108d16ba");
 });
 
-test("the terms surface cannot horizontally scroll its content behind clipped decorations", () => {
+test("document surfaces cannot horizontally scroll their content behind clipped decorations", () => {
   const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
-  assert.match(css, /\.skinServiceDocumentSection#terms\s*\{\s*overflow: clip;/);
+  assert.match(css, /\.skinServiceDocumentSection#questions,\s*\.skinServiceDocumentSection#terms\s*\{\s*overflow: clip;/);
 });
 
 test("large browser text cannot force the agreement grid wider than the viewport", () => {
@@ -120,6 +121,7 @@ function readerHarness(local = storage()) {
   const slots = [];
   const effects = [];
   const listeners = new Map();
+  const navigations = [];
   let cursor = 0;
   const react = {
     useState(value) { const i = cursor++; if (!(i in slots)) slots[i] = value; return [slots[i], value => { slots[i] = typeof value === "function" ? value(slots[i]) : value; }]; },
@@ -129,6 +131,7 @@ function readerHarness(local = storage()) {
   const mocks = {
     react,
     "../lib/paths": { assetPath: value => `/pages-base${value}` },
+    "../lib/documentSearch": documentSearch,
     "../lib/skinServiceTerms": { serviceTerms, serviceTermsSections },
     "../lib/skinTermsConsent": exports,
     "../lib/skinServiceI18n": translations,
@@ -139,8 +142,8 @@ function readerHarness(local = storage()) {
     window: { localStorage: local, addEventListener: (key, fn) => listeners.set(key, fn), removeEventListener: key => listeners.delete(key) },
   });
   return {
-    local, listeners,
-    render(language = "zh-CN") { cursor = 0; const tree = module.default({ language }); effects.splice(0).forEach(fn => fn()); return tree; },
+    local, listeners, navigations,
+    render(language = "zh-CN") { cursor = 0; const tree = module.default({ language, onNavigate: id => navigations.push(id) }); effects.splice(0).forEach(fn => fn()); return tree; },
     unmount() { slots.forEach(slot => slot?.cleanup?.()); },
   };
 }
@@ -152,6 +155,111 @@ function findAll(tree, predicate) {
 const button = tree => findAll(tree, node => node.type === "button" && node.props.type === "submit")[0];
 const form = tree => findAll(tree, node => node.type === "form")[0];
 const fields = tree => findAll(tree, node => node.type === "input" && node.props.type === "checkbox");
+
+test("every internal agreement link schedules target reveal on repeated plain clicks without accepting or clearing search", () => {
+  const app = readerHarness();
+  let tree = app.render();
+  const search = findAll(tree, node => node.props?.id === "terms-search")[0];
+  search.props.onChange({ target: { value: "2.14" } });
+  tree = app.render();
+  const links = findAll(tree, node => node.type === "a" && node.props.href.startsWith("#"));
+  assert.ok(links.some(link => link.props.href === "#terms-subclause-2-14"));
+  for (const link of links) {
+    assert.equal(typeof link.props.onClick, "function", link.props.href);
+    const count = app.navigations.length;
+    for (const properties of [{ metaKey: true }, { ctrlKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) link.props.onClick({ button: 0, ...properties });
+    assert.equal(app.navigations.length, count, link.props.href);
+    for (let i = 0; i < 2; i++) link.props.onClick({ button: 0, preventDefault() { assert.fail("keep native browser history"); } });
+    assert.deepEqual(app.navigations.slice(count), [link.props.href.slice(1), link.props.href.slice(1)]);
+  }
+  assert.equal(findAll(app.render(), node => node.props?.id === "terms-search")[0].props.value, "2.14");
+  assert.ok(fields(app.render()).every(field => !field.props.checked));
+  assert.equal(readTermsConsent(app.local), null);
+  app.unmount();
+});
+
+test("pure clause numbers match exactly, including full-width digits, in every reader language", () => {
+  const app = readerHarness();
+  for (const language of translations.skinServiceLanguages) {
+    const tree = app.render(language);
+    const search = findAll(tree, node => node.props?.id === "terms-search")[0];
+    for (const clause of serviceTermsSections.flatMap(section => section.clauses)) {
+      for (const query of [clause.number, clause.number.replace(/[0-9.]/g, character => String.fromCharCode(character.charCodeAt(0) + 0xfee0))]) {
+        search.props.onChange({ target: { value: ` ${query} ` } });
+        const results = findAll(app.render(language), node => node.props?.id === "terms-search-results")[0];
+        assert.deepEqual(findAll(results, node => node.type === "a").map(node => node.props.href), [`#${clause.id}`], `${language}: ${query}`);
+      }
+    }
+    search.props.onChange({ target: { value: "99.1" } });
+    const results = findAll(app.render(language), node => node.props?.id === "terms-search-results")[0];
+    assert.equal(findAll(results, node => node.type === "a").length, 0);
+  }
+  assert.equal(readTermsConsent(app.local), null);
+  app.unmount();
+});
+
+test("agreement search indexes full-width clause numbers and original wording without changing the reader", () => {
+  const app = readerHarness();
+  app.render();
+  let tree = app.render();
+  const search = findAll(tree, node => node.props?.id === "terms-search")[0];
+  assert.ok(search);
+  assert.ok(search.props.ref);
+  fields(tree)[0].props.onChange({ target: { checked: true } });
+  for (const query of ["２．１４", "核验材料"]) {
+    search.props.onChange({ target: { value: query } });
+    tree = app.render();
+    const results = findAll(tree, node => node.props?.id === "terms-search-results")[0];
+    assert.ok(results);
+    assert.ok(findAll(results, node => node.type === "a" && node.props.href === "#terms-subclause-2-14").length);
+    const original = findAll(tree, node => node.props?.id === "terms-original-text")[0];
+    assert.deepEqual(findAll(original, node => ["h3", "h4", "p"].includes(node.type)).map(node => node.props.children),
+      [serviceTerms.title, serviceTerms.subtitle, serviceTerms.revisionLine, serviceTerms.importantTitle,
+        ...serviceTerms.importantParagraphs, ...serviceTerms.sections.flatMap(section => [section.title, ...section.paragraphs])]);
+    assert.equal(original.props.style.fontSize, "1rem");
+    assert.equal(fields(tree)[0].props.checked, true);
+    assert.equal(fields(tree)[1].props.checked, false);
+    assert.equal(readTermsConsent(app.local), null);
+  }
+  search.props.onChange({ target: { value: "unmatched-query" } });
+  tree = app.render();
+  assert.equal(findAll(findAll(tree, node => node.props?.id === "terms-search-results")[0], node => node.type === "a").length, 0);
+  let focused = false;
+  search.props.ref.current = { focus() { focused = true; } };
+  findAll(tree, node => node.type === "button" && node.props["aria-label"] === translations.skinText("zh-CN", "termsSearchClear"))[0].props.onClick();
+  assert.equal(focused, true);
+  assert.equal(findAll(app.render(), node => node.props?.id === "terms-search")[0].props.value, "");
+  app.unmount();
+});
+
+test("agreement search remains outside the collapsible text and preserves native modified navigation", () => {
+  const app = readerHarness();
+  let tree = app.render();
+  const search = findAll(tree, node => node.props?.id === "terms-search")[0];
+  assert.ok(search);
+  assert.equal(findAll(findAll(tree, node => node.props?.id === "terms-full-text")[0], node => node.props?.id === "terms-search").length, 0);
+  search.props.onChange({ target: { value: "2.14" } });
+  tree = app.render();
+  const text = findAll(tree, node => node.props?.id === "terms-full-text")[0];
+  let focused = false;
+  text.props.ref.current = { open: false, querySelector: () => ({ focus() { focused = true; } }) };
+  const result = findAll(findAll(tree, node => node.props?.id === "terms-search-results")[0], node => node.type === "a")[0];
+  for (const properties of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
+    result.props.onClick({ button: 0, ...properties });
+    assert.equal(text.props.ref.current.open, false);
+    assert.equal(focused, false);
+  }
+  result.props.onClick({ button: 0 });
+  assert.equal(text.props.ref.current.open, true);
+  assert.equal(focused, true);
+  assert.equal(readTermsConsent(app.local), null);
+  for (const language of translations.skinServiceLanguages) {
+    tree = app.render(language);
+    assert.equal(findAll(tree, node => node.type === "label" && node.props.htmlFor === "terms-search")[0].props.children, translations.skinText(language, "termsSearchLabel"));
+    assert.equal(findAll(tree, node => node.props?.id === "terms-search")[0].props.value, "2.14");
+  }
+  app.unmount();
+});
 
 test("the read-only article renders only the original paragraphs, including internal spaces", () => {
   const app = readerHarness();
@@ -194,10 +302,31 @@ test("reading shortcuts expose the directory, inline PDF and confirmation withou
   const shortcuts = findAll(tree, node => node.type === "nav" && node.props.className === "skinTermsReadingNav")[0];
   assert.ok(shortcuts);
   const links = findAll(shortcuts, node => node.type === "a");
-  assert.deepEqual(links.map(link => link.props.href), ["#terms-contents", "#terms-pdf", "#terms-consent"]);
+  assert.deepEqual(links.map(link => link.props.href), ["#terms-search", "#terms-contents", "#terms-pdf", "#terms-consent"]);
   for (const link of links) assert.equal(findAll(tree, node => node.props?.id === link.props.href.slice(1)).length, 1);
   assert.equal(form(tree).props.tabIndex, -1);
   assert.ok(fields(tree).every(field => !field.props.checked));
+  assert.equal(readTermsConsent(app.local), null);
+  app.unmount();
+});
+
+test("the reading search shortcut restores input focus without clearing the query or accepting terms", () => {
+  const app = readerHarness();
+  let tree = app.render();
+  const search = findAll(tree, node => node.props?.id === "terms-search")[0];
+  search.props.onChange({ target: { value: "2.14" } });
+  tree = app.render();
+  const shortcut = findAll(tree, node => node.type === "a" && node.props.href === "#terms-search")[0];
+  assert.ok(shortcut);
+  let focused = false;
+  search.props.ref.current = { focus() { focused = true; } };
+  for (const properties of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }, { defaultPrevented: true }]) {
+    shortcut.props.onClick({ button: 0, ...properties });
+    assert.equal(focused, false);
+  }
+  shortcut.props.onClick({ button: 0 });
+  assert.equal(focused, true);
+  assert.equal(findAll(app.render(), node => node.props?.id === "terms-search")[0].props.value, "2.14");
   assert.equal(readTermsConsent(app.local), null);
   app.unmount();
 });

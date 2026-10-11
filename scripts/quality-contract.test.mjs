@@ -532,6 +532,14 @@ test("settings dialog launchers avoid dangling control references", async () => 
   assert.doesNotMatch(launcher, /aria-expanded=\{open\}/);
 });
 
+test("announcement cards wrap long project names and metadata at enlarged mobile text sizes", async () => {
+  const css = await read("app/globals.css");
+  const entry = css.match(/^\.changelogEntry \{([^}]+)\}/m)?.[1] ?? "";
+  const header = css.match(/^\.changelogHeader \{([^}]+)\}/m)?.[1] ?? "";
+  assert.match(entry, /overflow-wrap: anywhere/);
+  assert.match(header, /flex-wrap: wrap/);
+});
+
 test("release metadata stays synchronized", async () => {
   const [packageText, lockText, center, copy, announcement, verifier] = await Promise.all([
     read("package.json"),
@@ -545,7 +553,7 @@ test("release metadata stays synchronized", async () => {
   const lockData = JSON.parse(lockText);
 
   const { currentRelease } = await import("../app/lib/release.ts");
-  assert.equal(packageData.version, "2.20.8");
+  assert.equal(packageData.version, "2.20.9");
   assert.equal(lockData.version, currentRelease.version);
   assert.equal(lockData.packages[""].version, currentRelease.version);
   assert.equal(currentRelease.version, packageData.version);

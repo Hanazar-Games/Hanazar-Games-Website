@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type FormEvent, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSettingsContext } from "./SettingsContext";
 import { assetPath } from "../lib/paths";
+import { documentClauseNumber, matchesDocumentQuery } from "../lib/documentSearch";
 import { reviewBatches, type ReviewBatch } from "../lib/reviewBatches";
 import SkinTermsReader from "./SkinTermsReader";
 import { serviceTerms, serviceTermsSections } from "../lib/skinServiceTerms";
@@ -42,6 +43,7 @@ type WallState = "loading" | "ready" | "unavailable" | "failed";
 type ArticleCategory = "all" | SkinArticleCategory;
 type ArticleSource = "all" | "service" | DeveloperSourceKind;
 type ArticleFormat = "all" | DeveloperSourceFormat;
+type ArticleLink = { href: string; label: SkinTextKey };
 type SectionIconName = "communities" | "questions" | "feedback" | "notices" | "updates" | "terms" | "support";
 type CommunityPlatform = "qq" | "discord";
 export type SkinServiceSection = "communities" | "questions" | "feedback" | "review-notices" | "updates" | "terms" | "support";
@@ -132,10 +134,15 @@ function sourceAction(source: DeveloperSource): SkinTextKey {
   return source.format === "article" && source.href.startsWith("https://mc.163.com/") ? "openOfficialDocs" : sourceActions[source.format];
 }
 
-function matchesQuery(text: string, query: string, language: SkinServiceLanguage) {
-  const normalized = text.toLocaleLowerCase(language);
-  return query.trim().toLocaleLowerCase(language).split(/\s+/u).every(word => normalized.includes(word));
+function sourceHostname(source: DeveloperSource) {
+  return new URL(source.href).hostname;
 }
+
+const sourceReadingSteps: Array<{ title: SkinTextKey; body: SkinTextKey }> = [
+  { title: "sourceReadEditionTitle", body: "sourceReadEditionBody" },
+  { title: "sourceReadAuthorityTitle", body: "sourceReadAuthorityBody" },
+  { title: "sourceReadDateTitle", body: "sourceReadDateBody" },
+];
 
 const archiveDisclaimerDefinitions: Array<{ title: SkinTextKey; body: SkinTextKey }> = [
   { title: "archiveRightsTitle", body: "archiveRightsBody" },
@@ -148,13 +155,28 @@ const articleDefinitions: Array<{
   category: SkinArticleCategory;
   title: SkinTextKey;
   content: SkinTextKey;
+  links: ArticleLink[];
 }> = [
-  { id: "service-introduction", category: "introduction", title: "article1Title", content: "article1Body" },
-  { id: "submission-preparation", category: "preparation", title: "article2Title", content: "article2Body" },
-  { id: "review-status", category: "review", title: "article3Title", content: "article3Body" },
-  { id: "returned-materials", category: "review", title: "article4Title", content: "article4Body" },
-  { id: "change-submission", category: "review", title: "article5Title", content: "article5Body" },
-  { id: "privacy-protection", category: "privacy", title: "article6Title", content: "article6Body" },
+  { id: "service-introduction", category: "introduction", title: "article1Title", content: "article1Body", links: [{ href: "/skin-service/terms", label: "archiveTermsLink" }, { href: "#questions-guide-publishing", label: "guidePublishingTitle" }] },
+  { id: "submission-preparation", category: "preparation", title: "article2Title", content: "article2Body", links: [{ href: "#questions-guide-publishing", label: "guidePublishingTitle" }, { href: "/skin-service/terms", label: "archiveTermsLink" }] },
+  { id: "review-status", category: "review", title: "article3Title", content: "article3Body", links: [{ href: "/skin-service/review-notices", label: "noticesTitle" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "returned-materials", category: "review", title: "article4Title", content: "article4Body", links: [{ href: "#questions-guide-troubleshooting", label: "guideTroubleshootingTitle" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "change-submission", category: "review", title: "article5Title", content: "article5Body", links: [{ href: "/skin-service/terms#terms-subclause-8-1", label: "termsChangesLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "privacy-protection", category: "privacy", title: "article6Title", content: "article6Body", links: [{ href: "/skin-service/terms#terms-subclause-12-1", label: "termsPrivacyLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "private-skin-publication", category: "privacy", title: "privateSkinTitle", content: "privateSkinBody", links: [{ href: "/skin-service/terms#terms-clause-7", label: "termsPrivateSkinLink" }, { href: "/skin-service/terms#terms-subclause-8-2", label: "termsExceptionsLink" }] },
+  { id: "service-fees-reading", category: "pricing", title: "serviceFeesTitle", content: "serviceFeesBody", links: [{ href: "/skin-service/terms#terms-subclause-4-2", label: "termsFeesLink" }, { href: "/skin-service/support", label: "supportTitle" }] },
+  { id: "service-authorization-proof", category: "preparation", title: "authorizationProofTitle", content: "authorizationProofBody", links: [{ href: "/skin-service/terms#terms-clause-2", label: "termsAuthorizationLink" }, { href: "/skin-service/terms#terms-subclause-2-14", label: "termsEvidenceLink" }] },
+  { id: "service-review-timing", category: "review", title: "reviewTimingTitle", content: "reviewTimingBody", links: [{ href: "/skin-service/terms#terms-clause-5", label: "termsTimingLink" }, { href: "/skin-service/review-notices", label: "noticesTitle" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "service-publisher-handover", category: "review", title: "publisherHandoverTitle", content: "publisherHandoverBody", links: [{ href: "/skin-service/terms#terms-subclause-6-1", label: "termsHandoverLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "service-cancellation-settlement", category: "pricing", title: "cancellationSettlementTitle", content: "cancellationSettlementBody", links: [{ href: "/skin-service/terms#terms-clause-8", label: "termsSettlementLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
+  { id: "service-minor-consent", category: "introduction", title: "minorConsentTitle", content: "minorConsentBody", links: [{ href: "/skin-service/terms#terms-subclause-14-2", label: "termsMinorLink" }, { href: "/skin-service/terms#terms-subclause-14-1", label: "termsNewCommissionLink" }] },
+];
+
+const articleGuideDefinitions: Array<{ id: string; title: SkinTextKey; description: SkinTextKey; articleIds: string[] }> = [
+  { id: "mobile", title: "guideMobileTitle", description: "guideMobileDescription", articleIds: ["developer-skinseed-mobile", "developer-video-skinseed-export", "developer-missing-alpha", "developer-preview-check"] },
+  { id: "publishing", title: "guidePublishingTitle", description: "guidePublishingDescription", articleIds: ["developer-authorized-materials", "developer-skin-format", "developer-cover-fields", "developer-save-submit"] },
+  { id: "troubleshooting", title: "guideTroubleshootingTitle", description: "guideTroubleshootingDescription", articleIds: ["developer-review-delay", "developer-review-appeal", "developer-resubmit-cooldown", "developer-listing-interface-failure"] },
+  { id: "service", title: "guideServiceTitle", description: "guideServiceDescription", articleIds: ["service-introduction", "service-minor-consent", "service-authorization-proof", "service-fees-reading", "private-skin-publication", "service-review-timing", "service-publisher-handover", "service-cancellation-settlement"] },
 ];
 
 const serviceUpdateDefinitions: Array<{
@@ -163,6 +185,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.20.9", date: "2026-10-11", title: "update2209Title", body: "update2209Body" },
   { version: "2.20.8", date: "2026-10-11", title: "update2208Title", body: "update2208Body" },
   { version: "2.20.7", date: "2026-10-10", title: "update2207Title", body: "update2207Body" },
   { version: "2.20.6", date: "2026-10-09", title: "update2206Title", body: "update2206Body" },
@@ -494,6 +517,7 @@ export default function SkinServiceCenter({
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const articleSearchRef = useRef<HTMLInputElement | null>(null);
   const targetFrameRef = useRef(0);
+  const nativeHashTargetRef = useRef<string | null>(null);
   const sections = sectionDefinitions.map((section) => ({
     ...section,
     title: skinText(language, section.title),
@@ -519,6 +543,7 @@ export default function SkinServiceCenter({
     title: string;
     content: string;
     source?: DeveloperSource;
+    links?: ArticleLink[];
   }> = [
     ...developerResources.map((article) => ({
       id: article.id,
@@ -533,6 +558,22 @@ export default function SkinServiceCenter({
       content: skinText(language, article.content),
     })),
   ];
+  const articleSearchContext = (article: typeof articles[number]) => [
+    article.content,
+    articleCategories.find(category => category.id === article.category)?.title,
+    article.source?.title,
+    article.source?.publisher,
+    article.source ? sourceHostname(article.source) : "",
+    skinText(language, articleSourceDefinitions.find(source => source.id === (article.source?.kind ?? "service"))!.title),
+    skinText(language, articleFormatDefinitions.find(format => format.id === (article.source?.format ?? "article"))!.title),
+    article.source ? skinText(language, article.source.language === "en" ? "sourceEnglish" : "sourceChinese") : "",
+  ].join(" ");
+  const articleGuides = articleGuideDefinitions.map(guide => ({
+    id: `questions-guide-${guide.id}`,
+    title: skinText(language, guide.title),
+    description: skinText(language, guide.description),
+    articles: guide.articleIds.map(id => articles.find(article => article.id === id)!),
+  }));
   const serviceUpdates = serviceUpdateDefinitions.map((update) => ({
     ...update,
     title: skinText(language, update.title),
@@ -795,37 +836,55 @@ export default function SkinServiceCenter({
     if (target instanceof HTMLDetailsElement) target.querySelector("summary")?.focus({ preventScroll: true });
     else if (target instanceof HTMLElement && target.hasAttribute("tabindex")) target.focus({ preventScroll: true });
   }, [reduceAnimations]);
+  const queueTargetReveal = useCallback((targetId: string) => {
+    window.cancelAnimationFrame(targetFrameRef.current);
+    if (activeSection === "questions" && !document.getElementById(targetId)
+      && (developerResources.some(article => article.id === targetId) || articleDefinitions.some(article => article.id === targetId))) {
+      setActiveArticleCategory("all");
+      setActiveArticleSource("all");
+      setActiveArticleFormat("all");
+      setArticleQuery("");
+    }
+    targetFrameRef.current = window.requestAnimationFrame(() => revealTarget(targetId, "instant"));
+  }, [activeSection, revealTarget]);
+  const queueNativeReveal = (targetId: string) => {
+    nativeHashTargetRef.current = window.location.hash === `#${targetId}` ? null : targetId;
+    queueTargetReveal(targetId);
+  };
+  const navigateDocument = (event: MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    if (!event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) queueNativeReveal(targetId);
+  };
 
   useEffect(() => {
-    const revealHash = () => {
-      window.cancelAnimationFrame(targetFrameRef.current);
+    const revealHash = (event?: HashChangeEvent) => {
+      if (event && event.newURL !== window.location.href) return;
       let targetId: string;
       try {
         targetId = decodeURIComponent(window.location.hash.slice(1));
       } catch {
+        nativeHashTargetRef.current = null;
+        window.cancelAnimationFrame(targetFrameRef.current);
         return;
       }
-      if (targetId) {
-        if (activeSection === "questions") {
-          setActiveArticleCategory("all");
-          setActiveArticleSource("all");
-          setActiveArticleFormat("all");
-          setArticleQuery("");
-        }
-        targetFrameRef.current = window.requestAnimationFrame(() => revealTarget(targetId, "instant"));
-      }
+      const handled = targetId && targetId === nativeHashTargetRef.current;
+      nativeHashTargetRef.current = null;
+      if (handled) return;
+      window.cancelAnimationFrame(targetFrameRef.current);
+      if (targetId) queueTargetReveal(targetId);
     };
     revealHash();
     window.addEventListener("hashchange", revealHash);
     return () => {
+      nativeHashTargetRef.current = null;
       window.cancelAnimationFrame(targetFrameRef.current);
       window.removeEventListener("hashchange", revealHash);
     };
-  }, [activeSection, revealTarget]);
+  }, [queueTargetReveal]);
 
   const searchResults = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase(language);
+    const normalized = query.trim();
     if (!normalized) return [];
+    const clauseNumber = documentClauseNumber(query);
     const entries = [
       ...sections.map((section) => ({
         title: section.title,
@@ -857,11 +916,30 @@ export default function SkinServiceCenter({
       },
       ...articles.map((article) => ({
         title: article.title,
-        text: `${articleCategories.find((category) => category.id === article.category)?.title ?? ""} ${article.content} ${article.source?.title ?? ""} ${article.source?.publisher ?? ""} ${skinText(language, articleSourceDefinitions.find((source) => source.id === (article.source?.kind ?? "service"))!.title)} ${skinText(language, articleFormatDefinitions.find((format) => format.id === (article.source?.format ?? "article"))!.title)}`,
+        text: articleSearchContext(article),
         href: `/skin-service/questions#${article.id}`,
         section: "questions" as const,
         targetId: article.id,
       })),
+      ...articleGuides.map(guide => ({
+        title: guide.title,
+        text: `${guide.description} ${guide.articles.map(article => article.title).join(" ")}`,
+        href: `/skin-service/questions#${guide.id}`,
+        section: "questions" as const,
+        targetId: guide.id,
+      })),
+      {
+        title: skinText(language, "developerDocsTitle"),
+        text: [
+          skinText(language, "developerDocsNotice", { questions: developerResources.length, sources: Object.keys(developerSources).length }),
+          ...sourceReadingSteps.map(step => `${skinText(language, step.title)} ${skinText(language, step.body)}`),
+          skinText(language, "sourceUnavailableBody"),
+          `${skinText(language, "developerDocsDate")} ${developerResourcesCompiledAt}`,
+        ].join(" "),
+        href: "/skin-service/questions#developer-docs-guide",
+        section: "questions" as const,
+        targetId: "developer-docs-guide",
+      },
       {
         title: skinText(language, "archiveDisclaimerTitle"),
         text: archiveDisclaimers.map((notice) => `${notice.title} ${notice.body}`).join(" "),
@@ -935,6 +1013,7 @@ export default function SkinServiceCenter({
         targetId: section.id,
       }, ...section.clauses.map((clause) => ({
         title: `${section.title} · ${clause.number}`,
+        clauseNumber: clause.number,
         text: clause.text,
         href: `/skin-service/terms#${clause.id}`,
         section: "terms" as const,
@@ -948,18 +1027,46 @@ export default function SkinServiceCenter({
         targetId: "support-channel",
       },
     ];
-    return entries.filter((entry) => matchesQuery(`${entry.title} ${entry.text}`, normalized, language));
+    return entries.filter(entry => clauseNumber !== null && "clauseNumber" in entry
+      ? entry.clauseNumber === clauseNumber
+      : matchesDocumentQuery(`${entry.title} ${entry.text}`, normalized, language));
   }, [language, query, wall]);
 
-  const visibleArticles = articles.filter((article) =>
-    (activeArticleCategory === "all" || article.category === activeArticleCategory)
-    && (activeArticleSource === "all" || (article.source?.kind ?? "service") === activeArticleSource)
-    && (activeArticleFormat === "all" || (article.source?.format ?? "article") === activeArticleFormat)
-    && matchesQuery(`${article.title} ${article.content} ${article.source?.title ?? ""} ${article.source?.publisher ?? ""}`, articleQuery, language),
+  const matchingArticles = articleQuery.trim()
+    ? articles.filter(article => matchesDocumentQuery(`${article.title} ${articleSearchContext(article)}`, articleQuery, language))
+    : articles;
+  const filterArticles = (category: ArticleCategory, source: ArticleSource, format: ArticleFormat, candidates = matchingArticles) => candidates.filter(article =>
+    (category === "all" || article.category === category)
+    && (source === "all" || (article.source?.kind ?? "service") === source)
+    && (format === "all" || (article.source?.format ?? "article") === format),
   );
+  const visibleArticles = filterArticles(activeArticleCategory, activeArticleSource, activeArticleFormat);
+  const articleFacetMatchCount = filterArticles(activeArticleCategory, activeArticleSource, activeArticleFormat, articles).length;
+  const articleTopicOptions = articleCategories.map(category => ({ ...category, count: filterArticles(category.id, activeArticleSource, activeArticleFormat).length }));
+  const articleSourceOptions = articleSourceDefinitions.map(source => ({ ...source, title: skinText(language, source.title), count: filterArticles(activeArticleCategory, source.id, activeArticleFormat).length }));
+  const articleFormatOptions = articleFormatDefinitions.map(format => ({ ...format, title: skinText(language, format.title), count: filterArticles(activeArticleCategory, activeArticleSource, format.id).length }));
   const visibleArticleGroups = articleCategories.filter((category) => category.id !== "all")
     .map((category) => ({ ...category, articles: visibleArticles.filter((article) => article.category === category.id) }))
     .filter((category) => category.articles.length > 0);
+  const articleReadingLinks: Array<{ id: string; label: SkinTextKey; title: SkinTextKey }> = [
+    ...(visibleArticleGroups.length ? [{ id: "questions-contents", label: "termsJumpContents", title: "articleDirectory" }] as const : []),
+    { id: "questions-guides", label: "articleJumpGuides", title: "articleGuidesTitle" },
+    { id: "questions-disclaimer", label: "articleJumpDisclaimer", title: "archiveDisclaimerTitle" },
+  ];
+  const hasArticleFacetFilters = activeArticleCategory !== "all" || activeArticleSource !== "all" || activeArticleFormat !== "all";
+  const hasArticleFilters = hasArticleFacetFilters || articleQuery !== "";
+  const activeArticleFilters = [
+    { id: "topic", value: activeArticleCategory, label: `${skinText(language, "questionTopics")}: ${articleCategories.find(category => category.id === activeArticleCategory)!.title}`, reset: () => setActiveArticleCategory("all"), selector: ".skinArticleFilters button" },
+    { id: "source", value: activeArticleSource, label: `${skinText(language, "sourceTypes")}: ${skinText(language, articleSourceDefinitions.find(source => source.id === activeArticleSource)!.title)}`, reset: () => setActiveArticleSource("all"), selector: ".skinArticleSourceFilters button" },
+    { id: "format", value: activeArticleFormat, label: `${skinText(language, "archiveFormats")}: ${skinText(language, articleFormatDefinitions.find(format => format.id === activeArticleFormat)!.title)}`, reset: () => setActiveArticleFormat("all"), selector: ".skinArticleFormatFilters button" },
+  ].filter(filter => filter.value !== "all");
+  const resetArticleFilters = () => {
+    setActiveArticleCategory("all");
+    setActiveArticleSource("all");
+    setActiveArticleFormat("all");
+    setArticleQuery("");
+    articleFiltersRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+  };
 
   const copyGroup = async (value: string) => {
     try {
@@ -1207,13 +1314,15 @@ export default function SkinServiceCenter({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={skinText(language, "searchPlaceholder")}
+            aria-describedby="skin-search-help"
           />
           {query && <button type="button" onClick={() => {
             setQuery("");
             searchInputRef.current?.focus();
           }}>{skinText(language, "clear")}</button>}
         </label>
-        {query && (
+        <p className="skinServiceSearchHelp" id="skin-search-help">{skinText(language, "searchHelp")}</p>
+        {query.trim() && (
           <div className="skinServiceSearchResults">
             <p className="skinSearchCount" role="status">{skinText(language, "searchCount", { count: searchResults.length })}</p>
             {searchResults.length > 0 ? searchResults.map((result, index) => (
@@ -1317,9 +1426,34 @@ export default function SkinServiceCenter({
             title={skinText(language, "questionsTitle")}
             description={skinText(language, "questionsDescription")}
           />
-          <details className="skinDeveloperNotice" aria-labelledby="developer-docs-title" suppressHydrationWarning>
+          <nav className="skinArticleReadingNav" aria-label={skinText(language, "articleReadingNavigation")}>
+            <a href="#skin-article-search" aria-label={skinText(language, "articleSearchLabel")} onClick={event => {
+              if (!event.defaultPrevented && event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) articleSearchRef.current?.focus({ preventScroll: true });
+            }}>{skinText(language, "termsJumpSearch")}</a>
+            {articleReadingLinks.map(link => <a href={`#${link.id}`} key={link.id} aria-label={skinText(language, link.title)} onClick={event => navigateDocument(event, link.id)}>{skinText(language, link.label)}</a>)}
+          </nav>
+          <p className="skinArticleReadingGuide">{skinText(language, "articleReadingGuide")}</p>
+          <details className="skinArticleGuides" id="questions-guides" suppressHydrationWarning>
+            <summary>{skinText(language, "articleGuidesTitle")}</summary>
+            <p>{skinText(language, "articleGuidesHelp")}</p>
+            <div className="skinArticleGuideGrid">
+              {articleGuides.map(guide => <div className="skinArticleGuide" id={guide.id} key={guide.id} tabIndex={-1} aria-labelledby={`${guide.id}-title`}>
+                <h3 id={`${guide.id}-title`}>{guide.title}</h3>
+                <p>{guide.description}</p>
+                <ol>{guide.articles.map(article => <li key={article.id}><a className="skinArticleGuideQuestionLink" href={`#${article.id}`} onClick={event => navigateDocument(event, article.id)}><span>{article.title}</span></a></li>)}</ol>
+              </div>)}
+            </div>
+            <Link className="skinArticleGuideTerms" href="/skin-service/terms">{skinText(language, "archiveTermsLink")} →</Link>
+          </details>
+          <details className="skinDeveloperNotice" id="developer-docs-guide" aria-labelledby="developer-docs-title" suppressHydrationWarning>
             <summary id="developer-docs-title">{skinText(language, "developerDocsTitle")}</summary>
             <p>{skinText(language, "developerDocsNotice", { questions: developerResources.length, sources: Object.keys(developerSources).length })}</p>
+            <ol className="skinSourceReadingSteps">{sourceReadingSteps.map(step => <li key={step.title}>
+              <h3>{skinText(language, step.title)}</h3>
+              <p>{skinText(language, step.body)}</p>
+            </li>)}</ol>
+            <p>{skinText(language, "sourceUnavailableBody")}</p>
+            <Link className="skinArticleSourceReport" href="/skin-service/feedback#wechat-feedback-reply">{skinText(language, "articleReportIssue")} →</Link>
             <small>{skinText(language, "developerDocsDate")} · <time dateTime={developerResourcesCompiledAt}>{developerResourcesCompiledAt}</time></small>
           </details>
           <div className="skinArticleSearch">
@@ -1334,42 +1468,73 @@ export default function SkinServiceCenter({
             </div>
             <p id="skin-article-search-help">{skinText(language, "articleSearchHelp")}</p>
           </div>
+          <p className="skinArticleFiltersHelp" id="skin-article-filters-help">{skinText(language, "articleFiltersHelp")}</p>
           <div className="skinArticleFilterLabel">{skinText(language, "questionTopics")}</div>
-          <div className="skinArticleFilters" ref={articleFiltersRef} role="group" aria-label={skinText(language, "questionTopics")}>
-            {articleCategories.map((category) => (
+          <div className="skinArticleFilters" ref={articleFiltersRef} role="group" aria-label={skinText(language, "questionTopics")} aria-describedby="skin-article-filters-help">
+            {articleTopicOptions.map((category) => (
               <button
                 key={category.id}
                 type="button"
                 aria-pressed={activeArticleCategory === category.id}
+                aria-label={skinText(language, "articleFilterCount", { name: category.title, count: category.count })}
                 onClick={() => setActiveArticleCategory(category.id)}
               >
-                {category.title}
+                <span>{category.title}</span><span className="skinArticleFilterCount" aria-hidden="true">{category.count}</span>
               </button>
             ))}
           </div>
           <div className="skinArticleFilterLabel">{skinText(language, "sourceTypes")}</div>
-          <div className="skinArticleSourceFilters" role="group" aria-label={skinText(language, "sourceTypes")}>
-            {articleSourceDefinitions.map((source) => (
-              <button key={source.id} type="button" aria-pressed={activeArticleSource === source.id} onClick={() => setActiveArticleSource(source.id)}>
-                {skinText(language, source.title)}
+          <div className="skinArticleSourceFilters" role="group" aria-label={skinText(language, "sourceTypes")} aria-describedby="skin-article-filters-help">
+            {articleSourceOptions.map((source) => (
+              <button key={source.id} type="button" aria-pressed={activeArticleSource === source.id} aria-label={skinText(language, "articleFilterCount", { name: source.title, count: source.count })} onClick={() => setActiveArticleSource(source.id)}>
+                <span>{source.title}</span><span className="skinArticleFilterCount" aria-hidden="true">{source.count}</span>
               </button>
             ))}
           </div>
           <div className="skinArticleFilterLabel">{skinText(language, "archiveFormats")}</div>
-          <div className="skinArticleFormatFilters" role="group" aria-label={skinText(language, "archiveFormats")}>
-            {articleFormatDefinitions.map((format) => (
-              <button key={format.id} type="button" aria-pressed={activeArticleFormat === format.id} onClick={() => setActiveArticleFormat(format.id)}>
-                {skinText(language, format.title)}
+          <div className="skinArticleFormatFilters" role="group" aria-label={skinText(language, "archiveFormats")} aria-describedby="skin-article-filters-help">
+            {articleFormatOptions.map((format) => (
+              <button key={format.id} type="button" aria-pressed={activeArticleFormat === format.id} aria-label={skinText(language, "articleFilterCount", { name: format.title, count: format.count })} onClick={() => setActiveArticleFormat(format.id)}>
+                <span>{format.title}</span><span className="skinArticleFilterCount" aria-hidden="true">{format.count}</span>
               </button>
             ))}
           </div>
-          <p className="skinArticleCount" role="status">{skinText(language, "articleCount", { count: visibleArticles.length, total: articles.length })}</p>
+          {activeArticleFilters.length > 0 && <div className="skinArticleActiveFilters" role="group" aria-label={skinText(language, "activeArticleFilters")}>
+            {activeArticleFilters.map(filter => <button type="button" key={filter.id} data-filter={filter.id} aria-label={skinText(language, "removeArticleFilter", { name: filter.label })} onClick={() => {
+              filter.reset();
+              pageMainRef.current?.querySelector<HTMLButtonElement>(filter.selector)?.focus();
+            }}><span>{filter.label}</span><span aria-hidden="true">×</span></button>)}
+          </div>}
+          <div className="skinArticleResultTools">
+            <p className="skinArticleCount" role="status">{skinText(language, "articleCount", { count: visibleArticles.length, total: articles.length })}</p>
+            {hasArticleFilters && <button type="button" onClick={resetArticleFilters}>{skinText(language, "resetArticleFilters")}</button>}
+          </div>
+          {visibleArticleGroups.length > 0 && <details className="skinArticleDirectory" id="questions-contents" suppressHydrationWarning>
+            <summary>{skinText(language, "articleDirectory")}</summary>
+            <p>{skinText(language, "articleDirectoryHelp")}</p>
+            <nav aria-label={skinText(language, "articleDirectory")}>
+              <ul className="skinArticleDirectoryTopics">
+                {visibleArticleGroups.map(group => <li key={group.id}>
+                  <details className="skinArticleDirectoryTopic" id={`questions-directory-${group.id}`} suppressHydrationWarning>
+                    <summary aria-label={skinText(language, "articleFilterCount", { name: group.title, count: group.articles.length })}>
+                      <span>{group.title}</span><span className="skinArticleFilterCount" aria-hidden="true">{group.articles.length}</span>
+                    </summary>
+                    <a className="skinArticleDirectoryTopicLink" href={`#questions-topic-${group.id}`} onClick={event => navigateDocument(event, `questions-topic-${group.id}`)}>{skinText(language, "articleReadTopic")} →</a>
+                    <ol>{group.articles.map(article => <li key={article.id}>
+                      <a className="skinArticleDirectoryQuestionLink" href={`#${article.id}`} onClick={event => navigateDocument(event, article.id)}>{article.title}</a>
+                    </li>)}</ol>
+                  </details>
+                </li>)}
+              </ul>
+            </nav>
+          </details>}
           <div className="skinArticleTopics">
             {visibleArticleGroups.map((group) => (
               <section className="skinArticleTopic" id={`questions-topic-${group.id}`} key={group.id} tabIndex={-1} aria-labelledby={`questions-topic-${group.id}-title`}>
                 <header className="skinArticleTopicHeader">
                   <h3 id={`questions-topic-${group.id}-title`}>{group.title}<span>{group.articles.length}</span></h3>
                   <p>{group.description}</p>
+                  <a className="skinArticleBackToDirectory" href="#questions-contents" onClick={event => navigateDocument(event, "questions-contents")}>{skinText(language, "articleBackToDirectory")} ↑</a>
                 </header>
                 <div className="skinArticleGrid">
                   {group.articles.map((article) => (
@@ -1380,8 +1545,8 @@ export default function SkinServiceCenter({
                       </span>
                       <h4 id={`${article.id}-title`}>{article.title}</h4>
                       <p>{article.content}</p>
-                      <a className="skinArticlePermalink" href={`#${article.id}`} aria-label={`${skinText(language, "articlePermalink")}：${article.title}`}>{skinText(language, "articlePermalink")} <span aria-hidden="true">#</span></a>
                       {article.source && <div className="skinArticleSource">
+                        <p className="skinArticleSourceDomain">{skinText(language, "sourceWebsite")} · <bdi lang="en">{sourceHostname(article.source)}</bdi></p>
                         <p>{skinText(language, articleFormatDefinitions.find((format) => format.id === article.source?.format)!.title)} · {skinText(language, article.source.language === "en" ? "sourceEnglish" : "sourceChinese")}</p>
                         <p>{skinText(language, "sourceLabel")} · <span lang={article.source.language}>{article.source.title}</span></p>
                         <a
@@ -1402,6 +1567,16 @@ export default function SkinServiceCenter({
                           aria-label={`${skinText(language, "sourceRecommendation")} · ${skinText(language, "opensNewTab")}`}
                         >{skinText(language, "sourceRecommendation")} <span aria-hidden="true">↗</span></a>}
                       </div>}
+                      {article.links && <div className="skinArticleRelatedLinks" role="group" aria-label={`${skinText(language, "articleNextSteps")}: ${article.title}`}>
+                        <span>{skinText(language, "articleNextSteps")}</span>
+                        {article.links.map(link => <Link href={link.href} key={link.href} onClick={event => {
+                          if (link.href.startsWith("#")) navigateDocument(event, link.href.slice(1));
+                        }}>{skinText(language, link.label)} <span aria-hidden="true">→</span></Link>)}
+                      </div>}
+                      <div className="skinArticleActions">
+                        <a className="skinArticlePermalink" href={`#${article.id}`} aria-label={`${skinText(language, "articlePermalink")}：${article.title}`} onClick={event => navigateDocument(event, article.id)}>{skinText(language, "articlePermalink")} <span aria-hidden="true">#</span></a>
+                        <a className="skinArticleReturnToTopic" href={`#questions-directory-${group.id}`} aria-label={`${skinText(language, "articleBackToDirectory")}：${group.title}`} onClick={event => navigateDocument(event, `questions-directory-${group.id}`)}>{skinText(language, "articleBackToDirectory")} ↑</a>
+                      </div>
                     </article>
                   ))}
                 </div>
@@ -1409,13 +1584,21 @@ export default function SkinServiceCenter({
             ))}
             {visibleArticles.length === 0 && <div className="skinArticleEmpty">
               <p>{skinText(language, "noArticleMatches")}</p>
-              <button type="button" onClick={() => {
-                setActiveArticleCategory("all");
-                setActiveArticleSource("all");
-                setActiveArticleFormat("all");
-                setArticleQuery("");
-                articleFiltersRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
-              }}>{skinText(language, "resetArticleFilters")}</button>
+              <p className="skinArticleRecoveryHint">{skinText(language, matchingArticles.length ? "articleMatchesOutsideFilters" : "articleNoKeywordMatches", { count: matchingArticles.length })}</p>
+              <div className="skinArticleRecoveryActions">
+                {hasArticleFacetFilters && matchingArticles.length > 0 && <button type="button" data-article-recovery="filters" onClick={() => {
+                  setActiveArticleCategory("all");
+                  setActiveArticleSource("all");
+                  setActiveArticleFormat("all");
+                  articleFiltersRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+                }}>{skinText(language, "articleRelaxFilters", { count: matchingArticles.length })}</button>}
+                {articleQuery.trim() && articleFacetMatchCount > 0 && <button type="button" data-article-recovery="query" onClick={() => {
+                  setArticleQuery("");
+                  articleSearchRef.current?.focus();
+                }}>{skinText(language, "articleClearQueryKeepFilters", { count: articleFacetMatchCount })}</button>}
+                <a href="#questions-guides" onClick={event => navigateDocument(event, "questions-guides")}>{skinText(language, "articleGuidesTitle")} →</a>
+                <Link href="/skin-service/feedback#wechat-feedback-reply">{skinText(language, "articleReportIssue")} →</Link>
+              </div>
             </div>}
           </div>
           <aside className="skinArchiveDisclaimer" id="questions-disclaimer" tabIndex={-1} aria-labelledby="questions-disclaimer-title">
@@ -1598,7 +1781,7 @@ export default function SkinServiceCenter({
 
         {activeSection === "terms" && <section className="skinServiceDocumentSection" id="terms" tabIndex={-1}>
           <SectionHeader icon="terms" title={skinText(language, "termsTitle")} description={skinText(language, "termsDescription")} />
-          <SkinTermsReader language={language} />
+          <SkinTermsReader language={language} onNavigate={queueNativeReveal} />
         </section>}
 
         {activeSection === "updates" && <section className="skinServiceDocumentSection" id="updates" tabIndex={-1}>
