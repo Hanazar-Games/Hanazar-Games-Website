@@ -31,7 +31,7 @@ const localArticleCases = [
 
 function assertSourceUrl(source) {
   const url = new URL(source.href);
-  assert.ok(["https://mc.163.com", "https://mcwiki.easecation.net", "https://github.com", "https://blockbench.net", "https://web.blockbench.net", "https://www.youtube.com", "https://www.bilibili.com"].includes(url.origin));
+  assert.ok(["https://mc.163.com", "https://mcwiki.easecation.net", "https://github.com", "https://blockbench.net", "https://web.blockbench.net", "https://docs.gimp.org", "https://www.youtube.com", "https://www.bilibili.com"].includes(url.origin));
   assert.equal(url.hash + url.username + url.password, "");
   assert.ok(!decodeURI(url.pathname).includes("_catalog"));
   if (source.format === "video" && url.origin === "https://www.youtube.com") {
@@ -173,7 +173,8 @@ test("terms replace the fifth hub entry while updates remain available in the he
 test("service updates publish the new version and retain the previous announcement", () => {
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "updates");
-    assert.ok(html.indexOf('id="update-2-20-11"') < html.indexOf('id="update-2-20-10"'));
+    assert.ok(html.indexOf('id="update-2-20-12"') < html.indexOf('id="update-2-20-11"'));
+    assert.ok(html.includes(translations.skinText(language, "update22012Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update22011Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update22010Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2209Title").replaceAll("&", "&amp;")));
@@ -181,11 +182,11 @@ test("service updates publish the new version and retain the previous announceme
     assert.ok(html.includes(translations.skinText(language, "update2207Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2206Title")));
     assert.ok(html.includes(translations.skinText(language, "update2205Title")));
-    assert.equal([...html.matchAll(/id="update-2-20-11"/g)].length, 1);
+    assert.equal([...html.matchAll(/id="update-2-20-12"/g)].length, 1);
     const [current, history] = html.split('<details class="skinServiceUpdateHistory"');
-    assert.ok(current.includes('id="update-2-20-11"'));
-    assert.ok(!current.includes('id="update-2-20-10"'));
-    assert.ok(history?.includes('id="update-2-20-10"'));
+    assert.ok(current.includes('id="update-2-20-12"'));
+    assert.ok(!current.includes('id="update-2-20-11"'));
+    assert.ok(history?.includes('id="update-2-20-11"'));
     assert.ok(!history.split(">")[0].includes(" open"));
   }
 });
@@ -251,8 +252,8 @@ const troubleshootingIds = [
 ];
 
 test("Chinese video references and official troubleshooting render with original source attribution", () => {
-  assert.equal(developerDocs.developerResources.length, 87);
-  assert.equal(Object.keys(developerDocs.developerSources).length, 57);
+  assert.equal(developerDocs.developerResources.length, 103);
+  assert.equal(Object.keys(developerDocs.developerSources).length, 71);
   assert.equal(developerDocs.developerResourcesCompiledAt, "2026-10-13");
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "questions");
@@ -342,6 +343,121 @@ test("newly checked video sources retain clean links, dates, attribution and sea
   assert.equal(developerDocs.developerSources.videoChinaUpload.checkedAt, undefined, "old links must not inherit a fresh check date");
 });
 
+test("new official creation references retain checked dates, clean destinations and localized navigation", () => {
+  for (const [id, category, title] of [
+    ["developer-mcskin3d-workshop", "tools", "软件学习：MCskin3D软件教程"],
+    ["developer-color-uv-basics", "creation", "了解基础"],
+    ["developer-outer-layer-design", "creation", "独特设计"],
+    ["developer-study-skin-styles", "creation", "分析优秀作品"],
+    ["developer-pos-layout", "preparation", "展示图（pos图）设计"],
+  ]) {
+    const resource = developerDocs.developerResources.find(resource => resource.id === id);
+    assert.ok(resource, id);
+    const source = developerDocs.developerSources[resource.sourceId];
+    assertSourceUrl(source);
+    assert.equal(resource.category, category);
+    assert.equal(new URL(source.href).hostname, "mc.163.com");
+    assert.equal(source.title, title);
+    assert.equal(source.checkedAt, "2026-10-13");
+    assert.equal(source.publishedAt, undefined);
+    for (const language of translations.skinServiceLanguages) {
+      const html = render(language, "questions", ["", category, source.kind, "article", resource.title[language]]);
+      const card = html.match(new RegExp(`<article id="${id}"[^]*?</article>`))?.[0];
+      assert.ok(card?.includes(source.href));
+      assert.ok(card.includes('dateTime="2026-10-13"'));
+      searchClickHarness("terms", resource.title[language], `/skin-service/questions#${id}`, {}, language);
+    }
+  }
+});
+
+test("presentation and Blockbench help references are attributed, dated, classified and searchable", () => {
+  for (const [id, category, sourceId, title, path, publisher] of [
+    ["developer-key-art-layout", "preparation", "keyArtLayout", "关键艺术作品（Key Art）设计", "/3-关键艺术作品.html", "网易《我的世界》开发者官网"],
+    ["developer-carousel-layout", "preparation", "carouselLayout", "轮播图设计与排列", "/4-轮播图设计.html", "网易《我的世界》开发者官网"],
+    ["developer-blockbench-web-preview", "tools", "blockbenchFaq", "Blockbench FAQ", "/wiki/blockbench/faq/", "Blockbench · JannisX11"],
+    ["developer-blockbench-mobile-pwa", "tools", "blockbenchFaq", "Blockbench FAQ", "/wiki/blockbench/faq/", "Blockbench · JannisX11"],
+    ["developer-blockbench-backups", "tools", "blockbenchOverview", "Blockbench Overview & Tips", "/wiki/guides/blockbench-overview-tips/", "Blockbench · MasterianoX"],
+    ["developer-blockbench-paint-tools", "creation", "blockbenchOverview", "Blockbench Overview & Tips", "/wiki/guides/blockbench-overview-tips/", "Blockbench · MasterianoX"],
+  ]) {
+    const resource = developerDocs.developerResources.find(item => item.id === id);
+    assert.ok(resource, id);
+    assert.equal(resource.sourceId, sourceId);
+    assert.equal(resource.category, category);
+    const source = developerDocs.developerSources[sourceId];
+    assertSourceUrl(source);
+    assert.ok(decodeURI(new URL(source.href).pathname).endsWith(path));
+    assert.equal(source.title, title);
+    assert.equal(source.publisher, publisher);
+    assert.equal(source.checkedAt, "2026-10-13");
+    assert.equal(source.publishedAt, undefined, "a check date is not a publication date");
+    assert.equal(source.kind, sourceId.startsWith("blockbench") ? "tools" : "tutorial");
+    for (const language of translations.skinServiceLanguages) {
+      const html = render(language, "questions", ["", category, source.kind, "article", resource.title[language]]);
+      const card = html.match(new RegExp(`<article id="${id}"[^]*?</article>`))?.[0];
+      assert.ok(card?.includes(source.href), `${language}: ${id}`);
+      assert.ok(card.includes('dateTime="2026-10-13"'));
+      assert.ok(card.includes(`lang="${source.language}"`));
+      searchClickHarness("terms", resource.title[language], `/skin-service/questions#${id}`, {}, language);
+    }
+  }
+  for (const [id, terms] of [
+    ["developer-key-art-layout", ["Key Art"]],
+    ["developer-blockbench-web-preview", ["WebGL"]],
+    ["developer-blockbench-mobile-pwa", ["PWA", "APK"]],
+    ["developer-blockbench-backups", ["10", "Help", "Open Backup Folder"]],
+    ["developer-blockbench-paint-tools", ["Paint Mode", "Lock Alpha Channel"]],
+  ]) {
+    const resource = developerDocs.developerResources.find(item => item.id === id);
+    for (const language of translations.skinServiceLanguages) {
+      for (const term of terms) assert.ok(resource.summary[language].includes(term), `${language}: ${id}: ${term}`);
+    }
+  }
+});
+
+test("desktop PNG and publishing checks retain official sources and searchable localized guidance", () => {
+  for (const [id, category, sourceId, title, path] of [
+    ["developer-gimp-project-export", "tools", "gimpProjectExport", "Getting Images out of GIMP", "/3.0/en/gimp-images-out.html"],
+    ["developer-gimp-pixel-size", "preparation", "gimpPixelSize", "Scale Image", "/3.0/en/gimp-image-scale.html"],
+    ["developer-gimp-add-alpha", "tools", "gimpAddAlpha", "Add Alpha Channel", "/3.0/en/gimp-layer-alpha-add.html"],
+    ["developer-gimp-transparent-export", "preparation", "gimpTransparentExport", "Saving Images with Transparency", "/3.0/en/gimp-using-web-transparency.html"],
+    ["developer-publishing-image-check", "publishing", "publishingImageCheck", "发布与优化", "/6-发布与优化.html"],
+  ]) {
+    const resource = developerDocs.developerResources.find(item => item.id === id);
+    assert.ok(resource, id);
+    assert.equal(resource.sourceId, sourceId);
+    assert.equal(resource.category, category);
+    const source = developerDocs.developerSources[sourceId];
+    assert.ok(decodeURI(new URL(source.href).pathname).endsWith(path));
+    assert.equal(source.title, title);
+    assert.equal(source.checkedAt, "2026-10-13");
+    assert.equal(source.publishedAt, undefined);
+    assert.equal(source.format, "article");
+    assert.equal(source.kind, sourceId.startsWith("gimp") ? "tools" : "tutorial");
+    assert.equal(source.publisher, sourceId.startsWith("gimp") ? "GIMP 官方用户手册" : "网易《我的世界》开发者官网");
+    for (const language of translations.skinServiceLanguages) {
+      const html = render(language, "questions", ["", category, source.kind, "article", resource.title[language]]);
+      const card = html.match(new RegExp(`<article id="${id}"[^]*?</article>`))?.[0];
+      assert.ok(card?.includes(source.href));
+      assert.ok(card.includes('dateTime="2026-10-13"'));
+      assert.ok(card.includes(`lang="${source.language}"`));
+      searchClickHarness("terms", resource.title[language], `/skin-service/questions#${id}`, {}, language);
+      const byUrl = render(language, "questions", ["", "all", "all", "all", `${source.href}?utm_source=share#reading`]);
+      assert.deepEqual([...byUrl.matchAll(/<article id="([^"]+)"/g)].map(match => match[1]), [id]);
+    }
+  }
+  for (const [id, words] of [
+    ["developer-gimp-project-export", ["XCF", "PNG", "undo"]],
+    ["developer-gimp-pixel-size", ["DPI"]],
+    ["developer-gimp-add-alpha", ["Alpha", "Layer", "Transparency"]],
+    ["developer-gimp-transparent-export", ["Alpha", "PNG"]],
+  ]) {
+    const resource = developerDocs.developerResources.find(item => item.id === id);
+    for (const language of translations.skinServiceLanguages) {
+      for (const word of words) assert.ok(resource.summary[language].includes(word), `${id}: ${language} ${word}`);
+    }
+  }
+});
+
 test("format filters compose with topic and source filters while keeping the disclaimer visible", () => {
   for (const format of ["all", "article", "video", "tool", "repository", "news"]) {
     const count = developerDocs.developerResources.filter(resource => format === "all" || developerDocs.developerSources[resource.sourceId].format === format).length + (format === "all" || format === "article" ? localArticleCases.length : 0);
@@ -411,6 +527,123 @@ test("Q&A and global search find the same resources by destination hostname", ()
       const results = global.match(/<div class="skinServiceSearchResults">([^]*?)<\/div>/)?.[1] ?? "";
       const globalIds = [...results.matchAll(/href="\/skin-service\/questions#(developer-[^"]+)"/g)].map(match => match[1]).sort();
       assert.deepEqual(globalIds, expected);
+    }
+  }
+});
+
+test("Q&A and global search index source URLs, video identifiers and documented dates", () => {
+  const { developerResources: resources, developerSources: sources } = developerDocs;
+  const queries = [
+    "BV1sLg46VEJF",
+    sources.videoEthanUpload.href,
+    sources.planning.href,
+    decodeURI(sources.planning.href),
+    "2026-07-23",
+    "2026-10-13",
+  ];
+  for (const language of translations.skinServiceLanguages) {
+    for (const query of queries) {
+      const expected = resources.filter(resource => {
+        const source = sources[resource.sourceId];
+        return documentSearch.matchesDocumentQuery([
+          resource.title[language], resource.summary[language], source.href,
+          decodeURI(source.href), source.publishedAt, source.checkedAt,
+        ].join(" "), query, language);
+      }).map(resource => resource.id).sort();
+      assert.ok(expected.length, query);
+      const local = render(language, "questions", ["", "all", "all", "all", query]);
+      const localIds = [...local.matchAll(/<article id="([^"]+)"/g)].map(match => match[1]).sort();
+      assert.deepEqual(localIds, expected, `${language} local ${query}`);
+      const global = render(language, "questions", [query]);
+      const results = global.match(/<div class="skinServiceSearchResults">([^]*?)<\/div>/)?.[1] ?? "";
+      const globalIds = [...results.matchAll(/href="\/skin-service\/questions#(developer-[^"]+)"/g)].map(match => match[1]).filter(id => resources.some(resource => resource.id === id)).sort();
+      assert.deepEqual(globalIds, expected, `${language} global ${query}`);
+    }
+  }
+});
+
+test("both document search inputs accept the complete encoded official URLs", () => {
+  const html = render("zh-CN", "questions");
+  const longestUrl = Math.max(...Object.values(developerDocs.developerSources).map(source => source.href.length));
+  const global = html.match(/<input type="search" maxLength="(\d+)"/);
+  const local = html.match(/<input id="skin-article-search"[^>]*maxLength="(\d+)"/);
+  assert.ok(global && local);
+  assert.ok(longestUrl > 200, "fixture must reproduce the old truncation limit");
+  for (const input of [global, local]) {
+    assert.ok(Number(input[1]) >= longestUrl);
+    assert.ok(Number(input[1]) <= 2048, "keep a bounded query input");
+  }
+});
+
+test("source search shows readable summaries without exposing its encoded URL index", () => {
+  const resource = developerDocs.developerResources.find(resource => resource.id === "developer-mcskin3d-workshop");
+  const source = developerDocs.developerSources[resource.sourceId];
+  for (const language of translations.skinServiceLanguages) {
+    const html = render(language, "questions", [source.href]);
+    const results = html.match(/<div class="skinServiceSearchResults">([^]*?)<\/div>/)?.[1] ?? "";
+    assert.ok(results.includes(renderToStaticMarkup(createElement("span", null, resource.summary[language]))));
+    assert.ok(!results.includes(source.href), "source URL belongs to the index, not the summary");
+  }
+});
+
+test("copied source URLs remain searchable with tracking parameters and time fragments", () => {
+  for (const sourceId of ["planning", "videoEthanUpload", "videoSkin", "blockbenchFaq", "blockbenchOverview"]) {
+    const source = developerDocs.developerSources[sourceId];
+    const query = `${source.href}${source.href.includes("?") ? "&" : "?"}utm_source=share&spm_id_from=333.337&t=30#reading`;
+    const expected = developerDocs.developerResources.filter(resource => resource.sourceId === sourceId).map(resource => resource.id).sort();
+    for (const language of translations.skinServiceLanguages) {
+      const local = render(language, "questions", ["", "all", "all", "all", query]);
+      const localIds = [...local.matchAll(/<article id="([^"]+)"/g)].map(match => match[1]).sort();
+      assert.deepEqual(localIds, expected, `${language} local ${sourceId}`);
+      const global = render(language, "questions", [query]);
+      const results = global.match(/<div class="skinServiceSearchResults">([^]*?)<\/div>/)?.[1] ?? "";
+      const globalIds = [...results.matchAll(/href="\/skin-service\/questions#(developer-[^"]+)"/g)].map(match => match[1]).sort();
+      assert.deepEqual(globalIds, expected, `${language} global ${sourceId}`);
+    }
+  }
+});
+
+test("source URL normalization stays inside the registered destinations and preserves video IDs", () => {
+  const normalize = developerDocs.developerSourceQuery;
+  assert.equal(typeof normalize, "function");
+  const youtube = developerDocs.developerSources.videoSkin.href;
+  assert.equal(normalize(`${youtube}&si=share#t=30`), youtube);
+  const official = developerDocs.developerSources.planning.href;
+  assert.equal(normalize(`${decodeURI(official)}?catalog=1#section`), official);
+  const bili = developerDocs.developerSources.videoEthanUpload.href;
+  assert.equal(normalize(`${bili.slice(0, -1)}?share_source=copy`), bili);
+  for (const query of [
+    "2.1", "2.1 授权", "PNG Alpha", "<script>alert(1)</script>",
+    "https://mc.163.com/unknown?catalog=1",
+    "https://www.bilibili.com.evil.test/video/BV1sLg46VEJF/?share=1",
+    "https://user:password@www.bilibili.com/video/BV1sLg46VEJF/",
+    "http://www.bilibili.com/video/BV1sLg46VEJF/",
+    "https://www.youtube.com/watch?v=unknown&si=share",
+    `${youtube}&v=other&si=share`,
+    "https://mc.163.com/%ZZ?catalog=1",
+  ]) assert.equal(normalize(query), query, query);
+});
+
+test("source URL normalization never discards extra search terms or embedded control characters", () => {
+  const { developerSources: sources, developerSourceQuery: normalize } = developerDocs;
+  const queries = [
+    `${sources.videoEthanUpload.href}?utm_source=share absent-search-keyword`,
+    `${sources.videoSkin.href}#t=30 absent-search-keyword`,
+    `${sources.planning.href}?catalog=1\u3000absent-search-keyword`,
+    `${sources.blockbenchFaq.href}#section\nabsent-search-keyword`,
+    sources.videoEthanUpload.href.replace("/video/", "/vi\tdeo/"),
+  ];
+  for (const query of queries) assert.equal(normalize(query), query, query);
+  const officialWithSpaces = sources.head.href;
+  assert.ok(decodeURI(officialWithSpaces).includes(" "), "registered paths may legitimately contain spaces");
+  assert.equal(normalize(`${decodeURI(officialWithSpaces)}?utm_source=share#reading`), officialWithSpaces);
+  for (const language of translations.skinServiceLanguages) {
+    for (const query of queries.slice(0, 4)) {
+      const local = render(language, "questions", ["", "all", "all", "all", query]);
+      assert.equal([...local.matchAll(/<article id=/g)].length, 0, `${language}: local`);
+      const global = render(language, "questions", [query]);
+      const results = global.match(/<div class="skinServiceSearchResults">([^]*?)<\/div>/)?.[1] ?? "";
+      assert.ok(!results.includes("developer-"), `${language}: global`);
     }
   }
 });
@@ -932,6 +1165,7 @@ test("expanded directory topics use the available width and scale badge spacing 
 test("reading routes group existing questions into translated workflows without duplicating articles", () => {
   const expected = [
     ["mobile", "developer-skinseed-mobile", "developer-video-skinseed-export", "developer-missing-alpha", "developer-preview-check"],
+    ["desktop", "developer-gimp-project-export", "developer-gimp-pixel-size", "developer-gimp-add-alpha", "developer-gimp-transparent-export", "developer-skin-format", "developer-preview-check"],
     ["publishing", "developer-authorized-materials", "developer-skin-format", "developer-cover-fields", "developer-save-submit"],
     ["troubleshooting", "developer-review-delay", "developer-review-appeal", "developer-resubmit-cooldown", "developer-listing-interface-failure"],
     ["service", "service-introduction", "service-minor-consent", "service-authorization-proof", "service-fees-reading", "private-skin-publication", "service-review-timing", "service-publisher-handover", "service-cancellation-settlement"],
@@ -961,7 +1195,7 @@ test("reading routes group existing questions into translated workflows without 
 });
 
 test("reading routes are indexed by global search and deep links open without clearing filters", () => {
-  for (const [key, id] of [["guideMobileTitle", "mobile"], ["guidePublishingTitle", "publishing"], ["guideTroubleshootingTitle", "troubleshooting"], ["guideServiceTitle", "service"]]) {
+  for (const [key, id] of [["guideMobileTitle", "mobile"], ["guideDesktopTitle", "desktop"], ["guidePublishingTitle", "publishing"], ["guideTroubleshootingTitle", "troubleshooting"], ["guideServiceTitle", "service"]]) {
     for (const language of translations.skinServiceLanguages) {
       searchClickHarness("questions", translations.skinText(language, key), `/skin-service/questions#questions-guide-${id}`, {}, language);
     }
@@ -976,6 +1210,12 @@ test("the longer service reading route spans the guide grid with responsive step
   const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.ok(/#questions-guide-service\s*\{[^}]*grid-column: 1 \/ -1;/.test(css), "the service route must span all guide columns");
   assert.ok(/#questions-guide-service ol\s*\{[^}]*display: grid;[^}]*grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, 280px\), 1fr\)\);/.test(css), "service steps must fit narrow viewports without fixed columns");
+});
+
+test("the expanded reading routes keep comfortable columns without changing the direct-link grid", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.ok(/\.skinArticleGuides \.skinArticleGuideGrid\s*\{[^}]*grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, 360px\), 1fr\)\);/.test(css));
+  assert.ok(/\.skinArticleQuickLinks \.skinArticleGuideGrid\s*\{[^}]*grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, 320px\), 1fr\)\);/.test(css));
 });
 
 test("reading-route links restore only a known hidden question on each plain click, including the same hash", () => {

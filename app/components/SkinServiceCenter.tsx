@@ -10,7 +10,7 @@ import { documentClauseNumber, matchesDocumentQuery } from "../lib/documentSearc
 import { reviewBatches, type ReviewBatch } from "../lib/reviewBatches";
 import SkinTermsReader from "./SkinTermsReader";
 import { serviceTerms, serviceTermsSections } from "../lib/skinServiceTerms";
-import { developerResources, developerResourcesCompiledAt, developerSources, type DeveloperSource, type DeveloperSourceFormat, type DeveloperSourceKind, type SkinArticleCategory } from "../lib/skinDeveloperResources";
+import { developerResources, developerResourcesCompiledAt, developerSources, developerSourceQuery, type DeveloperSource, type DeveloperSourceFormat, type DeveloperSourceKind, type SkinArticleCategory } from "../lib/skinDeveloperResources";
 import {
   skinServiceLanguage,
   skinText,
@@ -186,6 +186,7 @@ const articleQuickLinkDefinitions: Array<{ articleId: string; description: SkinT
 
 const articleGuideDefinitions: Array<{ id: string; title: SkinTextKey; description: SkinTextKey; articleIds: string[] }> = [
   { id: "mobile", title: "guideMobileTitle", description: "guideMobileDescription", articleIds: ["developer-skinseed-mobile", "developer-video-skinseed-export", "developer-missing-alpha", "developer-preview-check"] },
+  { id: "desktop", title: "guideDesktopTitle", description: "guideDesktopDescription", articleIds: ["developer-gimp-project-export", "developer-gimp-pixel-size", "developer-gimp-add-alpha", "developer-gimp-transparent-export", "developer-skin-format", "developer-preview-check"] },
   { id: "publishing", title: "guidePublishingTitle", description: "guidePublishingDescription", articleIds: ["developer-authorized-materials", "developer-skin-format", "developer-cover-fields", "developer-save-submit"] },
   { id: "troubleshooting", title: "guideTroubleshootingTitle", description: "guideTroubleshootingDescription", articleIds: ["developer-review-delay", "developer-review-appeal", "developer-resubmit-cooldown", "developer-listing-interface-failure"] },
   { id: "service", title: "guideServiceTitle", description: "guideServiceDescription", articleIds: ["service-introduction", "service-minor-consent", "service-authorization-proof", "service-fees-reading", "private-skin-publication", "service-review-timing", "service-publisher-handover", "service-cancellation-settlement"] },
@@ -197,6 +198,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.20.12", date: "2026-10-13", title: "update22012Title", body: "update22012Body" },
   { version: "2.20.11", date: "2026-10-13", title: "update22011Title", body: "update22011Body" },
   { version: "2.20.10", date: "2026-10-11", title: "update22010Title", body: "update22010Body" },
   { version: "2.20.9", date: "2026-10-11", title: "update2209Title", body: "update2209Body" },
@@ -583,6 +585,10 @@ export default function SkinServiceCenter({
     article.source?.title,
     article.source?.publisher,
     article.source ? sourceHostname(article.source) : "",
+    article.source?.href,
+    article.source ? decodeURI(article.source.href) : "",
+    article.source?.publishedAt,
+    article.source?.checkedAt,
     skinText(language, articleSourceDefinitions.find(source => source.id === (article.source?.kind ?? "service"))!.title),
     skinText(language, articleFormatDefinitions.find(format => format.id === (article.source?.format ?? "article"))!.title),
     article.source ? skinText(language, article.source.language === "en" ? "sourceEnglish" : "sourceChinese") : "",
@@ -901,10 +907,10 @@ export default function SkinServiceCenter({
   }, [queueTargetReveal]);
 
   const searchResults = useMemo(() => {
-    const normalized = query.trim();
+    const normalized = developerSourceQuery(query).trim();
     if (!normalized) return [];
     const clauseNumber = documentClauseNumber(query);
-    const entries = [
+    const entries: Array<{ title: string; text: string; preview?: string; clauseNumber?: string; href: string; section: SkinServiceSection; targetId: string }> = [
       ...sections.map((section) => ({
         title: section.title,
         text: section.summary,
@@ -936,6 +942,7 @@ export default function SkinServiceCenter({
       ...articles.map((article) => ({
         title: article.title,
         text: articleSearchContext(article),
+        preview: article.content,
         href: `/skin-service/questions#${article.id}`,
         section: "questions" as const,
         targetId: article.id,
@@ -1058,8 +1065,9 @@ export default function SkinServiceCenter({
       : matchesDocumentQuery(`${entry.title} ${entry.text}`, normalized, language));
   }, [language, query, wall]);
 
-  const matchingArticles = articleQuery.trim()
-    ? articles.filter(article => matchesDocumentQuery(`${article.title} ${articleSearchContext(article)}`, articleQuery, language))
+  const articleSearchQuery = developerSourceQuery(articleQuery);
+  const matchingArticles = articleSearchQuery.trim()
+    ? articles.filter(article => matchesDocumentQuery(`${article.title} ${articleSearchContext(article)}`, articleSearchQuery, language))
     : articles;
   const filterArticles = (category: ArticleCategory, source: ArticleSource, format: ArticleFormat, candidates = matchingArticles) => candidates.filter(article =>
     (category === "all" || article.category === category)
@@ -1337,7 +1345,7 @@ export default function SkinServiceCenter({
           <input
             type="search"
             ref={searchInputRef}
-            maxLength={200}
+            maxLength={2048}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={skinText(language, "searchPlaceholder")}
@@ -1373,7 +1381,7 @@ export default function SkinServiceCenter({
                 }}
               >
                 <strong>{result.title}</strong>
-                <span>{result.text}</span>
+                <span>{result.preview ?? result.text}</span>
               </Link>
             )) : <p>{skinText(language, "noResults")}</p>}
           </div>
@@ -1502,7 +1510,7 @@ export default function SkinServiceCenter({
           <div className="skinArticleSearch">
             <label htmlFor="skin-article-search">{skinText(language, "articleSearchLabel")}</label>
             <div className="skinServiceSearchField">
-              <input id="skin-article-search" ref={articleSearchRef} type="search" maxLength={200} value={articleQuery}
+              <input id="skin-article-search" ref={articleSearchRef} type="search" maxLength={2048} value={articleQuery}
                 onChange={event => setArticleQuery(event.target.value)} placeholder={skinText(language, "articleSearchPlaceholder")} aria-describedby="skin-article-search-help" />
               {articleQuery && <button type="button" aria-label={skinText(language, "articleSearchClear")} onClick={() => {
                 setArticleQuery("");

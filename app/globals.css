@@ -4516,6 +4516,7 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 .skinArticleGuides > summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 600; }
 .skinArticleGuides > p { margin: 8px 0 16px; color: var(--skin-muted); font-size: 0.85rem; line-height: 1.8; }
 .skinArticleGuideGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.skinArticleGuides .skinArticleGuideGrid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); }
 .skinArticleGuide { min-width: 0; padding: 16px; border: 1px solid var(--skin-border); border-radius: 12px; scroll-margin-top: calc(6rem + 8px); overflow-wrap: anywhere; }
 .skinArticleGuide:focus-visible { outline: 2px solid var(--skin-tone); outline-offset: 3px; }
 .skinArticleGuide h3 { margin: 0 0 8px; font-size: 1rem; line-height: 1.5; }

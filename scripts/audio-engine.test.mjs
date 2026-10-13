@@ -24,7 +24,7 @@ function harness(overrides = {}) {
     useCallback(fn, deps) { const i = cursor++; if (!slots[i] || deps.some((v, j) => v !== slots[i].deps[j])) slots[i] = { fn, deps }; return slots[i].fn; },
     useEffect(fn, deps) {
       const i = cursor++;
-      if (!slots[i] || deps.some((v, j) => v !== slots[i].deps[j])) effects.push(() => { slots[i]?.cleanup?.(); slots[i] = { deps, cleanup: fn() }; });
+      if (!slots[i] || deps.some((v, j) => v !== slots[i].deps[j])) effects.push(() => { slots[i]?.cleanup?.(); slots[i] = { deps, effect: fn, cleanup: fn() }; });
     },
   };
   const param = () => ({ setValueAtTime() {}, setTargetAtTime() {}, exponentialRampToValueAtTime() {}, cancelScheduledValues() {} });
@@ -75,6 +75,11 @@ function harness(overrides = {}) {
     async fire(type, properties = {}) { await Promise.all([...listeners.get(type) ?? []].map(fn => fn({type, target: new Element(), button: 0, isPrimary: true, ...properties}))); },
     flushTimers() { const pending = [...timers.values()]; timers.clear(); pending.forEach(fn => fn()); },
     unmount() { slots.forEach(slot => slot?.cleanup?.()); },
+    replayEffects() {
+      const active = slots.filter(slot => slot?.effect);
+      active.forEach(slot => slot.cleanup?.());
+      active.forEach(slot => { slot.cleanup = slot.effect(); });
+    },
     count() { return contexts.reduce((sum, ctx) => sum + ctx.oscillators.length, 0); },
   };
 }
@@ -313,4 +318,81 @@ test("a rejected audio resume stays silent and a later user gesture can recover 
   assert.equal(app.count(), 10);
   app.unmount();
   app.flushTimers();
+});
+
+test("a closed audio context is replaced on the next eligible interaction", async () => {
+  for (const bgmEnabled of [false, true]) {
+    const app = harness({ bgmEnabled, sfxEnabled: !bgmEnabled });
+    await app.fire(bgmEnabled ? "pointerdown" : "click");
+    const previous = app.contexts[0];
+    await previous.close();
+    await app.fire(bgmEnabled ? "pointerdown" : "click");
+    assert.equal(app.contexts.length, 2);
+    assert.equal(app.contexts[1].state, "running");
+    assert.equal(app.contexts[1].oscillators.length, bgmEnabled ? 5 : 1);
+    assert.equal(previous.onstatechange, null);
+    app.unmount();
+    app.flushTimers();
+    assert.ok(app.contexts.every(context => context.oscillators.every(node => node.disconnected)));
+  }
+});
+
+test("audio effects can restart after a cleanup/setup replay without reusing closed nodes", async () => {
+  const app = harness({ bgmEnabled: true, sfxEnabled: false });
+  await app.fire("pointerdown");
+  app.replayEffects();
+  await app.fire("pointerdown");
+  assert.equal(app.contexts.length, 2);
+  assert.equal(app.contexts[0].state, "closed");
+  assert.equal(app.contexts[1].oscillators.length, 5);
+  app.unmount();
+  app.flushTimers();
+  assert.ok(app.contexts.every(context => context.oscillators.every(node => node.disconnected)));
+});
+
+test("pending audio recovery cannot recreate nodes or publish state after unmount", async () => {
+  for (const rejected of [false, true]) {
+    const app = harness();
+    await app.fire("pointerdown");
+    const context = app.contexts[0];
+    context.state = "suspended";
+    let finish;
+    context.resume = () => new Promise((resolve, reject) => { finish = () => rejected ? reject(new Error("Closed during resume")) : resolve(); });
+    const pending = app.fire("click");
+    const states = [];
+    app.environment.addEventListener("hanazar:bgm-state", event => states.push(event.detail.state));
+    app.unmount();
+    finish();
+    await pending;
+    assert.deepEqual(states, []);
+    assert.equal(app.contexts.length, 1);
+    assert.equal(app.count(), 0);
+  }
+});
+
+test("an obsolete resume cannot restart audio or overwrite playback state after an effect replay", async () => {
+  for (const rejected of [false, true]) {
+    for (const restarted of [false, true]) {
+      const app = harness({ bgmEnabled: true });
+      await app.fire("pointerdown");
+      const previous = app.contexts[0];
+      previous.state = "suspended";
+      let finish;
+      previous.resume = () => new Promise((resolve, reject) => { finish = () => rejected ? reject(new Error("Obsolete context")) : resolve(); });
+      const pending = app.fire("click");
+      app.replayEffects();
+      if (restarted) await app.fire("pointerdown");
+      const contextCount = app.contexts.length;
+      const nodeCount = app.count();
+      const states = [];
+      app.environment.addEventListener("hanazar:bgm-state", event => states.push(event.detail.state));
+      finish();
+      await pending;
+      assert.equal(app.contexts.length, contextCount);
+      assert.equal(app.count(), nodeCount);
+      assert.deepEqual(states, []);
+      app.unmount();
+      app.flushTimers();
+    }
+  }
 });

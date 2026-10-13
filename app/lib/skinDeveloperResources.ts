@@ -49,6 +49,38 @@ export const developerSources = {
   toolBasics: officialSource("MCSkin3D功能简介", "mconline/5-游戏入门与基础讲解/20-关于开发者账号和工具/4-安装与了解皮肤工具/3-MCSkin3D功能简介", "tools"),
   toolMobile: officialSource("Skinseed简介", "mconline/5-游戏入门与基础讲解/20-关于开发者账号和工具/4-安装与了解皮肤工具/1-Skinseed简介", "tools"),
   toolWeb: officialSource("PMCSkin3D简介", "mconline/5-游戏入门与基础讲解/20-关于开发者账号和工具/4-安装与了解皮肤工具/4-PMCSkin3D简介", "tools"),
+  mcskin3dWorkshop: {
+    ...officialSource("软件学习：MCskin3D软件教程", "mconline/60-我的世界创造营教程/皮肤制作基础教程/5-软件学习：MCskin3D软件教程", "tools"),
+    checkedAt: "2026-10-13",
+  },
+  colorUvBasics: {
+    ...officialSource("了解基础", "mconline/5-游戏入门与基础讲解/21-皮肤设计/2-了解基础", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
+  outerLayerDesign: {
+    ...officialSource("独特设计", "mconline/5-游戏入门与基础讲解/21-皮肤设计/4-独特设计", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
+  studySkinStyles: {
+    ...officialSource("分析优秀作品", "mconline/5-游戏入门与基础讲解/21-皮肤设计/5-分析优秀作品", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
+  posLayout: {
+    ...officialSource("展示图（pos图）设计", "mconline/5-游戏入门与基础讲解/23-作品发布、品牌建立/5-展示图（pos图）设计", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
+  keyArtLayout: {
+    ...officialSource("关键艺术作品（Key Art）设计", "mconline/5-游戏入门与基础讲解/23-作品发布、品牌建立/3-关键艺术作品", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
+  carouselLayout: {
+    ...officialSource("轮播图设计与排列", "mconline/5-游戏入门与基础讲解/23-作品发布、品牌建立/4-轮播图设计", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
+  publishingImageCheck: {
+    ...officialSource("发布与优化", "mconline/5-游戏入门与基础讲解/23-作品发布、品牌建立/6-发布与优化", "tutorial"),
+    checkedAt: "2026-10-13",
+  },
   planning: officialSource("制作皮肤的步骤和规范", "mconline/60-我的世界创造营教程/皮肤制作基础教程/3-制作皮肤的步骤和规范", "tutorial"),
   head: officialSource("MCskin3d 绘制皮肤－新建及头部的绘制", "mconline/40-美术教程/1.皮肤教程/03.MCskin3d 绘制皮肤.新建及头部的绘制", "tutorial"),
   body: officialSource("MCskin3d 绘制皮肤－身体的绘制", "mconline/40-美术教程/1.皮肤教程/04.MCskin3d 绘制皮肤.身体的绘制", "tutorial"),
@@ -85,6 +117,32 @@ export const developerSources = {
   blockbenchQuickstart: {
     title: "Blockbench Quickstart Wizard", href: "https://blockbench.net/quickstart/",
     kind: "tools", format: "article", publisher: "Blockbench", language: "en",
+  },
+  blockbenchFaq: {
+    title: "Blockbench FAQ", href: "https://blockbench.net/wiki/blockbench/faq/",
+    kind: "tools", format: "article", publisher: "Blockbench · JannisX11", language: "en",
+    checkedAt: "2026-10-13",
+  },
+  blockbenchOverview: {
+    title: "Blockbench Overview & Tips", href: "https://blockbench.net/wiki/guides/blockbench-overview-tips/",
+    kind: "tools", format: "article", publisher: "Blockbench · MasterianoX", language: "en",
+    checkedAt: "2026-10-13",
+  },
+  gimpProjectExport: {
+    title: "Getting Images out of GIMP", href: "https://docs.gimp.org/3.0/en/gimp-images-out.html",
+    kind: "tools", format: "article", publisher: "GIMP 官方用户手册", language: "en", checkedAt: "2026-10-13",
+  },
+  gimpPixelSize: {
+    title: "Scale Image", href: "https://docs.gimp.org/3.0/en/gimp-image-scale.html",
+    kind: "tools", format: "article", publisher: "GIMP 官方用户手册", language: "en", checkedAt: "2026-10-13",
+  },
+  gimpAddAlpha: {
+    title: "Add Alpha Channel", href: "https://docs.gimp.org/3.0/en/gimp-layer-alpha-add.html",
+    kind: "tools", format: "article", publisher: "GIMP 官方用户手册", language: "en", checkedAt: "2026-10-13",
+  },
+  gimpTransparentExport: {
+    title: "Saving Images with Transparency", href: "https://docs.gimp.org/3.0/en/gimp-using-web-transparency.html",
+    kind: "tools", format: "article", publisher: "GIMP 官方用户手册", language: "en", checkedAt: "2026-10-13",
   },
   videoSkin: {
     title: "This is how you upgrade to a HD minecraft skin", href: "https://www.youtube.com/watch?v=xC81Q3HGraE",
@@ -141,6 +199,22 @@ export const developerSources = {
   },
 } satisfies Record<string, DeveloperSource>;
 
+const sourceUrls = Object.values(developerSources).map(source => new URL(source.href));
+
+export function developerSourceQuery(query: string) {
+  const input = query.trim();
+  if (/[\t\r\n]/.test(input) || /[?#][^]*\s/u.test(input)) return query;
+  try {
+    const url = new URL(input);
+    if (url.protocol !== "https:" || url.username || url.password) return query;
+    const path = decodeURI(url.pathname).replace(/\/$/, "");
+    const source = sourceUrls.find(source => source.origin === url.origin
+      && decodeURI(source.pathname).replace(/\/$/, "") === path
+      && [...source.searchParams].every(([key, value]) => url.searchParams.getAll(key).length === 1 && url.searchParams.get(key) === value));
+    return source?.href ?? query;
+  } catch { return query; }
+}
+
 export const developerResources: Array<{
   id: string;
   category: SkinArticleCategory;
@@ -148,6 +222,134 @@ export const developerResources: Array<{
   title: LocalizedText;
   summary: LocalizedText;
 }> = [
+  {
+    id: "developer-gimp-project-export", category: "tools", sourceId: "gimpProjectExport",
+    title: localized("GIMP 保存为什么得到 XCF？怎样另导出投稿用 PNG？", "Why does GIMP save XCF, and how do I export a submission PNG?", "GIMPで保存するとXCFになるのはなぜ？投稿用PNGを書き出すには？"),
+    summary: localized(
+      "GIMP 3.0 官方手册说明：“保存”保留 XCF 工程，包含图层等编辑信息，但不保存撤销（undo）历史；PNG 等其他格式使用“导出”。先留一份工程，再单独导出投稿用纹理，不要只把 .xcf 后缀改成 .png，也不要用工程截图代替纹理。导出不会改变当前工程，普通图片预览软件通常不能读取 XCF。本文是工具操作说明，不是网易上传规格；导出后仍需按目标端的现行规则检查格式、像素尺寸和透明度。",
+      "The GIMP 3.0 manual distinguishes Save, which retains an XCF project with layers but no undo history, from Export for PNG and other formats. Keep an editable project and separately export the submission texture; renaming .xcf to .png or taking a screenshot does not produce a texture. Export does not change the current project, and ordinary image viewers generally cannot read XCF. This is tool guidance, not NetEase upload specifications. Check the exported format, pixel dimensions and transparency against current rules for the target edition.",
+      "GIMP 3.0公式マニュアルでは「保存」はレイヤーなどを含むXCF制作ファイルを残しますが、取り消し（undo）履歴は保存しません。PNGなどは「エクスポート」を使います。編集用ファイルを保管し、投稿用テクスチャを別に書き出してください。.xcfを.pngに改名したり、画面のスクリーンショットで代用したりしないでください。書き出しても現在の制作ファイルは変わらず、一般的な画像ビューアはXCFを通常読めません。これは操作説明であり、NetEaseの投稿仕様ではありません。対象版の現行規則に従って形式・ピクセル寸法・透明度を確認してください。"),
+  },
+  {
+    id: "developer-gimp-pixel-size", category: "preparation", sourceId: "gimpPixelSize",
+    title: localized("修改 DPI 能改变皮肤像素尺寸吗？GIMP 缩放要检查什么？", "Does changing DPI resize a skin's pixels, and what should I check when scaling in GIMP?", "DPIの変更でスキンのピクセル寸法は変わる？GIMPの拡大縮小で何を確認しますか？"),
+    summary: localized(
+      "官方 Scale Image 说明可通过 Image → Scale Image 修改整个图像和画布的像素数量，不只是当前图层；宽高链条用于保持比例，解除后独立修改可能使图像变形。打印分辨率 DPI 与像素宽高是不同设置，单改 DPI 不能把纹理变成所需像素尺寸。放大通过插值计算像素，不会补出原图没有的细节；过度缩小也可能让小图层消失。先备份工程，按目标格式确认宽高，再导出并检查像素、UV 对齐及预览，不把任意拉伸后的图片当作可直接投稿的皮肤。",
+      "The official Scale Image page uses Image → Scale Image to change the pixel count of the entire image and canvas, not just the active layer. The width/height chain preserves proportions; unlinking it may distort the image. Printing resolution in DPI is separate from pixel dimensions: changing DPI alone does not create the required texture size. Upscaling interpolates pixels without recovering detail absent from the original; excessive downscaling can remove small layers. Back up the project, confirm dimensions for the target format, then export and inspect pixels, UV alignment and the preview. Arbitrary stretching is not a submission-ready skin conversion.",
+      "公式のScale ImageではImage → Scale Imageで現在のレイヤーだけでなく画像全体とキャンバスのピクセル数を変更します。幅と高さの鎖は縦横比を保ち、解除して別々に変えると歪む場合があります。印刷解像度DPIとピクセル寸法は別で、DPIだけ変えても必要なテクスチャ寸法にはなりません。拡大は補間でピクセルを計算し、元画像にない細部は復元しません。縮小しすぎると小さなレイヤーが消える場合もあります。制作ファイルをバックアップし、対象形式の寸法を確認してから書き出し、ピクセル・UVの位置・プレビューを点検してください。単に引き伸ばした画像を投稿用スキンと考えないでください。"),
+  },
+  {
+    id: "developer-gimp-add-alpha", category: "tools", sourceId: "gimpAddAlpha",
+    title: localized("GIMP 图层没有 Alpha 透明通道，应该从哪里添加？", "Where do I add an Alpha channel to a GIMP layer?", "GIMPのレイヤーにAlpha透明チャンネルを追加するには？"),
+    summary: localized(
+      "GIMP 3.0 官方手册给出 Layer → Transparency → Add Alpha Channel，也可从图层右键菜单操作。Alpha 表示透明度，多数非背景图层已具备，但部分导入格式可能没有；没有 Alpha 的图层名称在图层面板中以粗体显示。为选中图层添加通道后，再检查实际像素和背景，不要把“添加通道”等同于自动去背景或恢复丢失内容。此文解释工具操作，不许可任意隐形皮肤；最终 PNG 是否符合网易要求，仍需查阅官方格式与审核规定。",
+      "The GIMP 3.0 manual provides Layer → Transparency → Add Alpha Channel, also available from the layer context menu. Alpha represents transparency. Most non-background layers already have it, but some imported formats may not; layer names without Alpha are bold in the Layers dialog. After adding it to the selected layer, inspect actual pixels and backgrounds. Adding a channel does not automatically remove a background or restore lost content. This tool operation does not authorize arbitrary invisible skins; check official format and review rules for the exported PNG.",
+      "GIMP 3.0公式マニュアルはLayer → Transparency → Add Alpha Channelを案内し、レイヤーの右クリックメニューからも操作できます。Alphaは透明度を表します。背景以外の多くのレイヤーにはありますが、一部の読み込み形式にはなく、Alphaのないレイヤー名はレイヤーパネルで太字になります。選択レイヤーへ追加した後、実際のピクセルと背景を確認してください。追加だけで背景を自動削除したり失われた内容を復元したりはできません。操作説明は自由な透明スキンを許可するものではなく、最終PNGには公式の形式・審査規則を確認してください。"),
+  },
+  {
+    id: "developer-gimp-transparent-export", category: "preparation", sourceId: "gimpTransparentExport",
+    title: localized("GIMP 如何导出保留透明度的 PNG？棋盘格需要画进去吗？", "How do I export a PNG with transparency in GIMP, and should I paint the checkerboard?", "GIMPで透明度を保つPNGを書き出すには？市松模様を描く必要はありますか？"),
+    summary: localized(
+      "官方透明图像教程说明 PNG 用 Alpha 通道保存透明度。可在通道面板确认除红、绿、蓝之外是否存在 Alpha；没有时先添加。检查是否有背景图层遮住本应透明的区域，再导出 PNG；编辑器中的棋盘格只是透明区域提示，不是要画进皮肤的纹理。请保留原工程，重新打开导出文件检查透明度，不用截图、JPEG 或仅改后缀代替真正的 PNG。教程以普通图片演示透明导出，不代表皮肤允许任意半透明、隐形或其他审核限制之外的设计，最终以网易现行规则为准。",
+      "The official transparency tutorial explains that PNG stores transparency in an Alpha channel. Check for Alpha alongside red, green and blue in the Channels dialog and add it if missing. Inspect background layers covering intended transparent areas before exporting PNG. The editor's checkerboard indicates transparency; it is not texture artwork to paint into a skin. Keep the project and reopen the exported file to inspect transparency. Screenshots, JPEG or merely renaming a suffix do not replace a real PNG. The tutorial uses a general image, not permission for arbitrary translucent or invisible skins; current NetEase rules still apply.",
+      "公式の透明画像チュートリアルではPNGがAlphaチャンネルに透明度を保存すると説明します。チャンネルパネルで赤・緑・青に加えてAlphaがあるか確認し、なければ追加します。透明にしたい部分を背景レイヤーが覆っていないか点検してPNGを書き出してください。編集画面の市松模様は透明部分の表示で、スキンに描き込む模様ではありません。制作ファイルを保管し、書き出した画像を開き直して透明度を確認します。スクリーンショット、JPEG、拡張子の改名だけでは本物のPNGの代用になりません。一般画像の例であり、自由な半透明・不可視スキンなどを認める説明ではありません。NetEaseの現行規則に従ってください。"),
+  },
+  {
+    id: "developer-publishing-image-check", category: "publishing", sourceId: "publishingImageCheck",
+    title: localized("宣传图上传后，还要检查裁切和手机／电脑展示吗？", "After uploading promotional images, should I check cropping and mobile/desktop display?", "紹介画像のアップロード後に切り抜きとスマートフォン・PC表示も確認しますか？"),
+    summary: localized(
+      "网易“发布与优化”教程提醒在组件后台对应图片字段核对文件格式和尺寸，上传后查看裁切预览，避免角色、标题或关键细节被裁掉，并检查电脑和手机展示是否清晰。原文的 JPEG／PNG 说明针对宣传图片，不表示皮肤纹理可使用 JPEG。封面与纹理是不同文件，不能互相替代；图片字段、数量、规格与展示范围以当前后台为准。本文已核对，可作为上传后的自检入口，但不保证图片通过审核或替代原创、授权证明。",
+      "NetEase's publishing and optimization lesson asks you to check format and dimensions for the appropriate image field, inspect the upload's crop preview so characters, titles and important details are not cut off, and check clarity on desktop and mobile. Its JPEG/PNG guidance concerns promotional images, not permission to submit a JPEG skin texture. Covers and textures are different files and cannot replace each other. Follow current portal fields, counts, specifications and visible areas. We checked this lesson as a post-upload checklist; it does not guarantee approval or replace evidence of originality or authorization.",
+      "網易の「发布与优化」講座は管理画面の該当画像欄で形式・寸法を確認し、アップロード後の切り抜きプレビューでキャラクター・題名・重要な細部が切れないか点検し、PCとスマートフォンで鮮明さを確認するよう案内します。原文のJPEG／PNGは紹介画像の説明で、スキンのテクスチャにJPEGを使えるという意味ではありません。表紙とテクスチャは別ファイルで代用できません。欄・枚数・仕様・表示範囲は現行管理画面に従ってください。本文を確認した投稿後の点検資料ですが、審査通過の保証や独創性・許諾の証明の代わりにはなりません。"),
+  },
+  {
+    id: "developer-key-art-layout", category: "preparation", sourceId: "keyArtLayout",
+    title: localized("皮肤封面怎么安排主体、标题和裁切范围？", "How should I arrange the subject, title and crop of a skin cover?", "スキンの表紙で主役・題名・切り抜き範囲をどう配置しますか？"),
+    summary: localized(
+      "网易 Key Art 教程从构思、草图到成图，提醒先考虑不同尺寸的裁切，再安排核心角色、标题与辅助元素，避免文字遮挡关键细节，并保留适当留白、统一字体和画面风格。可用于规划皮肤封面，但原文的玩法场景示例不是皮肤必填要求。本文已核对；实际图片尺寸与展示范围以当前后台预览为准，锐化或放大不能替代原始细节，也不代表获得他人素材的使用权。",
+      "NetEase's Key Art lesson moves from ideas and sketches to final layout: plan for different crops, then place the subject, title and supporting elements without covering important detail. Keep whitespace and a consistent visual style. Apply these principles to skin covers; gameplay examples are not mandatory skin fields. We checked the text. Confirm dimensions and visible areas in the current portal. Sharpening or scaling cannot replace original detail or grant rights to someone else's assets.",
+      "網易のKey Art講座は構想・下描き・仕上げを扱い、サイズ別の切り抜きを先に考え、主役・題名・補助要素を配置し、文字で重要な細部を隠さず余白と統一感を保つよう勧めます。スキンの表紙にも参考になりますが、ゲーム場面の例はスキンの必須項目ではありません。本文を確認しました。寸法と表示範囲は現行管理画面で確認し、拡大やシャープ化を元の細部や他者の素材の利用許諾の代わりにしないでください。"),
+  },
+  {
+    id: "developer-carousel-layout", category: "preparation", sourceId: "carouselLayout",
+    title: localized("多张皮肤展示图怎么选择和排序，避免重复？", "How do I select and order skin showcase images without repetition?", "複数のスキン紹介画像を重複なく選び、並べるには？"),
+    summary: localized(
+      "官方轮播图教程强调用多张图片补充主图没有展示的亮点，每张图保持清晰、重点不同，并统一色调和视觉风格；原文包含皮肤案例。可据此选择不同角度、外层和局部细节，按理解顺序呈现，避免只换背景重复同一个画面。原文的背景、任务、系统、场景排序是可调整的玩法组件示例，不是皮肤投稿硬性规则。本次已核对正文，图片数量、尺寸和字段要求仍以当前网易后台为准。",
+      "The official carousel lesson uses clear, visually consistent images to show highlights missing from the main cover, with skin examples included. Choose distinct views, outer-layer details and close-ups in a useful order instead of repeating the same pose against new backgrounds. The article's background/task/system/scene sequence is an adjustable gameplay example, not a mandatory skin-submission rule. We checked the text; the current NetEase portal determines image counts, sizes and required fields.",
+      "公式の輪播画像講座は、主画像にない特徴を明瞭な複数画像で補い、色調とスタイルを統一する方法を説明し、スキンの例も掲載しています。別の角度・外層・細部を理解しやすい順で見せ、背景だけ変えた同じ構図の繰り返しを避ける参考になります。背景・任務・システム・場面の順は変更可能なゲーム向けの例で、スキン投稿の必須規則ではありません。本文を確認しました。枚数・寸法・必須項目は現在の網易管理画面を優先します。"),
+  },
+  {
+    id: "developer-blockbench-web-preview", category: "tools", sourceId: "blockbenchFaq",
+    title: localized("Blockbench 网页版的 3D 预览打不开，怎么排查？", "How do I troubleshoot a missing 3D preview in Blockbench's web app?", "Blockbenchウェブ版の3D表示が開かない場合は？"),
+    summary: localized(
+      "Blockbench 官方 FAQ 建议先检查浏览器是否支持 WebGL，必要时更新或更换浏览器；仍有问题时可能与显卡驱动有关。文档也说明网页环境受浏览器安全限制，部分导入／导出需要额外步骤，纹理有时必须手动加载。原页提供错误信息查看和问题报告入口，适合区分网页渲染故障与网易投稿失败。本次核对了正文；不建议关闭浏览器安全防护，分享报错截图前应遮住路径、账号和私密工程信息。",
+      "Blockbench's official FAQ recommends checking WebGL support and updating or switching browsers; graphics drivers can also be involved. Browser security restrictions may require extra import/export steps and manually loading textures. The page explains error messages and bug reporting, helping distinguish editor rendering problems from NetEase submission failures. We checked the text. Do not disable browser security; redact paths, accounts and private-project information before sharing error screenshots.",
+      "Blockbench公式FAQはWebGL対応を確認し、必要に応じてブラウザーを更新・変更するよう案内します。解決しなければGPUドライバーも原因になり得ます。ウェブ版では安全制限により入出力に追加操作やテクスチャの手動読み込みが必要な場合があります。エラー表示と報告方法も載っており、編集画面の故障と網易への投稿失敗を区別できます。本文を確認しました。安全機能を無効にせず、報告画像のパス・アカウント・非公開制作物は隠してください。"),
+  },
+  {
+    id: "developer-blockbench-mobile-pwa", category: "tools", sourceId: "blockbenchFaq",
+    title: localized("手机用 Blockbench 必须下载 APK 吗？", "Do I need to download an APK to use Blockbench on a phone?", "スマートフォンでBlockbenchを使うにはAPKが必要ですか？"),
+    summary: localized(
+      "官方 FAQ 说明 Blockbench 可作为 PWA 从浏览器安装，无需从第三方获取 APK，具体安装操作指向官网 Downloads 页面。可先使用已收录的官方网页入口，再按设备与浏览器实际提供的菜单操作；不同系统的安装和文件选择方式可能不同。FAQ 同时提醒网页端导入纹理有时需要手动处理。本次已核对原文，没有验证所有手机环境；添加到主屏幕不是工程备份，制作后仍应自行保存工程与 PNG，再按网易规则投稿。",
+      "The official FAQ says Blockbench can be installed from a browser as a PWA, without a third-party APK, and points to its Downloads page for instructions. Start from the official web editor already linked here and use the options available on your device; installation and file selection differ by browser and OS. Web imports may need textures loaded manually. We checked the text, not every phone environment. Adding the app to your home screen is not a project backup: save the project and PNG before following NetEase submission rules.",
+      "公式FAQはブラウザーからPWAとして導入でき、外部のAPKは不要と説明し、手順は公式Downloadsへ案内します。本ページの公式ウェブ版から始め、端末とブラウザーに実際にあるメニューを利用してください。導入やファイル選択はOSによって異なり、テクスチャを手動で読み込む場合もあります。本文の確認であり、全スマートフォンでの動作検証ではありません。ホーム画面への追加は制作物のバックアップではないため、プロジェクトとPNGを保存してから網易規則に従って投稿してください。"),
+  },
+  {
+    id: "developer-blockbench-backups", category: "tools", sourceId: "blockbenchOverview",
+    title: localized("Blockbench 工程丢失后，哪里查看自动备份？", "Where can I look for automatic backups after losing a Blockbench project?", "Blockbenchのプロジェクトを失ったら自動バックアップはどこで確認しますか？"),
+    summary: localized(
+      "官方操作指南的 Backups 一节写明默认每10分钟创建自动备份，可在设置中调整间隔，并通过 Help → Open Backup Folder 查找文件。在提供该菜单的桌面环境中，可先复制备份再检查是否为所需版本，保留独立的工程和 PNG 导出。本次核对了正文，不代表已经验证恢复操作；网页／手机环境不应假定有相同文件夹入口，自动备份也不保证保存最新修改或永久留存，不要用截图代替纹理原件。",
+      "The official guide's Backups section describes a default 10-minute interval, adjustable in settings, and Help → Open Backup Folder to locate files. In desktop environments with that menu, copy a candidate before checking it and keep separate project and PNG exports. We checked the text, not a recovery procedure. Do not assume the web/mobile app exposes the same folder. Automatic backups do not guarantee the latest edits or permanent retention, and screenshots do not replace original textures.",
+      "公式ガイドのBackups節では初期間隔が10分で設定から変更でき、Help → Open Backup Folderでファイルを探すと説明しています。このメニューがあるデスクトップ環境では候補をコピーしてから内容を確認し、プロジェクトとPNGも別に保存してください。本文の確認であり復元操作の検証ではありません。ウェブ・スマートフォンにも同じフォルダーがあると想定しないでください。最新変更や永続保存は保証されず、画面写真はテクスチャ原本の代わりになりません。"),
+  },
+  {
+    id: "developer-blockbench-paint-tools", category: "creation", sourceId: "blockbenchOverview",
+    title: localized("Blockbench 的取色、镜像画笔和 Alpha 锁定怎么学？", "Where can I learn Blockbench's color picker, mirror painting and alpha lock?", "Blockbenchの色選択・鏡像描画・Alpha固定はどこで学べますか？"),
+    summary: localized(
+      "官方指南的 Paint Mode 章节介绍模型表面和 UV 贴图绘画、取色、油漆桶、渐变及复制粘贴，并解释 Mirror Painting、像素网格和 Lock Alpha Channel。后者防止在透明部分绘画，并不自动补齐缺失的底层像素；工具的可用项取决于工程格式和软件版本。本次核对了正文，可用于理解画笔行为、减少误涂，导出后仍需检查 PNG、透明区域、外层与体型匹配，不能把编辑器预览当作网易审核结果。",
+      "The official Paint Mode chapter covers painting on models and UV textures, picking colors, fills, gradients and copy/paste, plus Mirror Painting, the pixel grid and Lock Alpha Channel. Alpha lock prevents painting on transparent areas; it does not fill missing base-layer pixels. Available controls depend on the project format and version. We checked the text. Use it to understand tools and avoid mistakes, then check the exported PNG, alpha, outer layer and body model. An editor preview is not a NetEase review result.",
+      "公式ガイドのPaint Mode章はモデル表面・UVでの描画、色選択・塗りつぶし・グラデーション・コピーと、Mirror Painting、ピクセル格子、Lock Alpha Channelを説明します。Alpha固定は透明部分への描画を防ぐ機能で、欠けた下層の画素を自動で補いません。利用できる操作は形式と版によります。本文を確認しました。誤描画を減らす参考にし、出力PNG・透明領域・外層・体型を別に確認してください。編集画面の表示は網易の審査結果ではありません。"),
+  },
+  {
+    id: "developer-mcskin3d-workshop", category: "tools", sourceId: "mcskin3dWorkshop",
+    title: localized("MCSkin3D 的面板、画笔和双层模型怎么用？", "How do I use MCSkin3D panels, brushes and two-layer models?", "MCSkin3Dのパネル・ブラシ・二層モデルの使い方は？"),
+    summary: localized(
+      "网易创造营教程逐项介绍菜单、工具栏、项目面板、2D 贴图、调色板和 3D 预览，并演示铅笔、橡皮擦、取色管、亮度刷及油漆桶。新建模型一节区分 Alex／Steve 双层模型与带 minimal 标签的旧单层模型，适合先认识界面再练习绘制。本次已核对正文；教程界面不代表当前软件版本，本站不提供第三方安装包，导出后仍需按目标端检查纹理与模型。",
+      "NetEase's workshop explains menus, tools, projects, 2D textures, palettes and 3D preview, then introduces pencil, eraser, eyedropper, brightness brush and fill. Its model section distinguishes two-layer Alex/Steve models from older single-layer models labelled minimal. Read it before practising. We checked the article text; its screenshots do not establish the current software version. We host no third-party installers. Check the exported texture and model for your target edition.",
+      "網易の講座はメニュー・ツール・プロジェクト・2Dテクスチャ・パレット・3D表示と、鉛筆・消しゴム・スポイト・明度ブラシ・塗りつぶしを説明します。モデル作成ではAlex／Steveの二層モデルとminimal表示の旧単層モデルを区別します。まず画面を学んでから練習できます。本文を確認しましたが、画像は現行版の保証ではありません。当サイトは外部インストーラーを配布しません。出力後も対象版のテクスチャとモデルを確認してください。"),
+  },
+  {
+    id: "developer-color-uv-basics", category: "creation", sourceId: "colorUvBasics",
+    title: localized("皮肤配色和 UV 展开图，入门从哪里学？", "Where can I learn skin color theory and UV layouts?", "スキンの配色とUV展開図はどこから学べますか？"),
+    summary: localized(
+      "官方“了解基础”讲解色相、饱和度、明度、UV 展开图，以及 64×64／128×128 和 3／4 像素手臂的区别；配色建议从适中饱和度开始，明暗变化也可结合色相调整。适合在绘制之前理解贴图像素如何对应身体区域。本次核对了正文，没有把教程中的尺寸说明当作所有客户端的通用支持承诺；投稿时仍要核对目标端规则、透明通道和模型匹配。",
+      "The official basics lesson explains hue, saturation, value and UV layouts, plus 64×64 versus 128×128 textures and three- versus four-pixel arms. It recommends moderate saturation and hue changes alongside shading. Use it to understand how texture pixels map to body regions before painting. We checked the text; the lesson's size examples do not promise support in every client. Check target-edition rules, alpha and model matching before submission.",
+      "公式の基礎講座は色相・彩度・明度・UV展開図、64×64／128×128と3／4ピクセル腕の違いを説明します。配色は適度な彩度から始め、明暗と色相を併せて調整する考え方です。描画前に各ピクセルと身体領域の対応を学べます。本文を確認しましたが、サイズ例は全クライアントの対応保証ではありません。投稿時は対象版の規則・アルファ・モデルとの一致を確認してください。"),
+  },
+  {
+    id: "developer-outer-layer-design", category: "creation", sourceId: "outerLayerDesign",
+    title: localized("帽子、袖口和背包怎样用外层做得更立体？", "How can outer layers add depth to hats, cuffs and backpacks?", "帽子・袖口・リュックを外層で立体的に見せるには？"),
+    summary: localized(
+      "官方“独特设计”分别用头发与帽子、袖口褶皱、背包和裤子说明外层细节，还讨论手表、腰带等小零件与角色故事感。重点是适量、有目的地增加层次，不是装饰越多越好。已核对正文，可配合本区导入与测试教程检查外层开启后的实际效果；设计建议不等于网易审核标准，也不保证添加某种配件就能过审，使用他人素材仍需授权。",
+      "The official Unique Design lesson illustrates outer-layer hair, hats, cuff folds, backpacks and trousers, then discusses accessories and character storytelling. Add purposeful detail rather than filling every space. We checked the text. Pair it with the import/testing guide to inspect the actual enabled-layer result. These are design suggestions, not review rules or guaranteed approval through particular accessories; third-party material still requires permission.",
+      "公式の独特なデザイン講座は髪・帽子・袖口のしわ・リュック・ズボンの外層と、小物や人物の物語性を説明します。装飾を増やし続けるのではなく、目的に合う適度な細部が重要です。本文を確認しました。読み込み・テスト講座も併用し、外層を有効にした実際の表示を確認してください。制作の助言は審査基準や特定の小物による通過保証ではなく、他者素材には許可が必要です。"),
+  },
+  {
+    id: "developer-study-skin-styles", category: "creation", sourceId: "studySkinStyles",
+    title: localized("如何分析不同皮肤画风，而不是照搬别人的作品？", "How can I study skin styles without copying another work?", "他者の作品を丸写しせずに画風を学ぶには？"),
+    summary: localized(
+      "官方“分析优秀作品”比较低对比度、强调明暗结构与强个人风格的案例，说明配色、层次错位和外层细节各自的作用，并建议观察像素艺术、整理色板和练习不同思路。正文明确区分学习风格与复制具体作品；本站也不授予案例作品的转载或投稿许可。已核对原文，可先归纳想学习的技法，再独立设计并保留自己的创作记录，不把练习临摹标成原创上架。",
+      "The official study compares low-contrast, structural-shading and strongly personal styles, discussing palettes, layer offsets and outer details. It suggests observing pixel art, collecting palettes and practising approaches. The text distinguishes studying a style from copying a specific work; this site grants no rights to repost or submit examples. We checked the original. Identify techniques, design independently and retain your process records; do not list a copied practice piece as original.",
+      "公式の作品分析は低コントラスト・明暗構造・個性的な画風を比較し、配色・層のずれ・外層細部を説明します。ピクセルアートの観察、パレット整理、考え方の練習も勧めています。本文は画風の学習と具体的な作品のコピーを区別し、当サイトも例の転載・投稿権を与えません。原文を確認しました。技法を整理して独自に制作し、制作記録を残してください。模写練習をオリジナルとして公開しないでください。"),
+  },
+  {
+    id: "developer-pos-layout", category: "preparation", sourceId: "posLayout",
+    title: localized("POS 展示图怎样排版，才不会在小界面看不清？", "How should I lay out a POS image for a small interface?", "小さい画面でも読めるPOS画像の配置は？"),
+    summary: localized(
+      "官方“展示图（pos图）设计”说明 POS 图用于购买付款界面的视觉展示，建议精简并放大元素，把核心信息放在中央或偏下、留出空白，保持与前端风格一致，也可表达对玩家的感谢。已核对正文；这篇讲的是展示图设计，不是皮肤 PNG 或投稿包体规范。具体尺寸、遮挡区域和是否需要该字段，请以当前后台预览与提示为准，不照搬旧截图，也不要添加未经核实的促销承诺。",
+      "The official POS-image guide places the image in the purchase/payment interface. It recommends fewer, larger elements, central or lower key information, whitespace and consistent styling, with an optional thank-you message. We checked the text. This is presentation design, not skin-PNG or package rules. Confirm current dimensions, overlays and whether the field is required in the portal preview; do not copy old screenshots or invent promotional promises.",
+      "公式のPOS画像講座は購入・支払い画面での表示を説明し、要素を減らして大きくする、重要情報を中央か下側に置く、余白と画面の統一感を保つ、感謝を伝える方法を紹介します。本文を確認しました。これは展示画像の制作であり、スキンPNGやパッケージの規則ではありません。寸法・重なる領域・項目の要否は現行管理画面のプレビューで確認し、旧画像の丸写しや未確認の販売約束を避けてください。"),
+  },
   {
     id: "developer-video-register", category: "introduction", sourceId: "videoRegister",
     title: localized("注册开发者之前，有社区视频可以参考吗？", "Is there a community video to consult before developer registration?", "開発者登録の前に参考にできるコミュニティ動画は？"),

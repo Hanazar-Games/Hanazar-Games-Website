@@ -68,8 +68,10 @@ export default function AudioEngine() {
   const ambientRef = useRef<AmbientNodes | null>(null);
   const settingsRef = useRef(settings);
   const lastSfxTimeRef = useRef(-Infinity);
+  const activeRef = useRef(true);
 
   const publishBgmState = useCallback((state: BgmPlaybackState) => {
+    if (!activeRef.current) return;
     window.dispatchEvent(new CustomEvent("hanazar:bgm-state", { detail: { state } }));
   }, []);
 
@@ -78,7 +80,7 @@ export default function AudioEngine() {
   }, [settings]);
 
   const getContext = useCallback(() => {
-    if (typeof window === "undefined") return null;
+    if (typeof window === "undefined" || !activeRef.current) return null;
     const audioWindow = window as Window &
       typeof globalThis & { webkitAudioContext?: typeof AudioContext };
     const AudioContextClass = audioWindow.AudioContext || audioWindow.webkitAudioContext;
@@ -86,7 +88,8 @@ export default function AudioEngine() {
       publishBgmState("unavailable");
       return null;
     }
-    if (!audioRef.current) {
+    if (!audioRef.current || audioRef.current.state === "closed") {
+      if (audioRef.current) audioRef.current.onstatechange = null;
       try {
         audioRef.current = new AudioContextClass();
         audioRef.current.onstatechange = () => {
@@ -128,6 +131,7 @@ export default function AudioEngine() {
   }, []);
 
   const syncAmbient = useCallback(() => {
+    if (!activeRef.current) return;
     const ctx = audioRef.current;
     const currentSettings = settingsRef.current;
 
@@ -230,16 +234,19 @@ export default function AudioEngine() {
   }, [publishBgmState, stopAmbient]);
 
   const unlock = useCallback(async () => {
+    if (audioRef.current?.state === "closed") stopAmbient();
     const ctx = getContext();
-    if (!ctx) return;
+    if (!ctx) return false;
     try {
       if (ctx.state !== "running" && ctx.state !== "closed") await ctx.resume();
     } catch {
-      publishBgmState("waiting");
-      return;
+      if (audioRef.current === ctx) publishBgmState("waiting");
+      return false;
     }
+    if (!activeRef.current || audioRef.current !== ctx) return false;
     syncAmbient();
-  }, [getContext, publishBgmState, syncAmbient]);
+    return true;
+  }, [getContext, publishBgmState, stopAmbient, syncAmbient]);
 
   const playSfx = useCallback((kind: SfxKind = "click", style?: string) => {
     const current = settingsRef.current;
@@ -291,6 +298,20 @@ export default function AudioEngine() {
   }, [getContext]);
 
   useEffect(() => {
+    activeRef.current = true;
+    return () => {
+      activeRef.current = false;
+      stopAmbient();
+      const ctx = audioRef.current;
+      audioRef.current = null;
+      if (ctx) {
+        ctx.onstatechange = null;
+        if (ctx.state !== "closed") void ctx.close().catch(() => {});
+      }
+    };
+  }, [stopAmbient]);
+
+  useEffect(() => {
     syncAmbient();
   }, [settings.bgmEnabled, settings.bgmVolume, settings.masterVolume, syncAmbient]);
 
@@ -316,7 +337,7 @@ export default function AudioEngine() {
       if (!target.closest(interactiveSelector) || target.closest("[data-sfx-preview], :disabled, [aria-disabled='true']")) return;
       const current = settingsRef.current;
       if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
-      await unlock();
+      if (!(await unlock())) return;
       playSfx(getSfxKind(target));
     };
 
@@ -329,14 +350,14 @@ export default function AudioEngine() {
         if (document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) return;
         const current = settingsRef.current;
         if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
-        await unlock();
+        if (!(await unlock())) return;
         playSfx("click");
         return;
       }
       if (event.key === "Escape" && document.querySelector('.settingsModal[aria-modal="true"]')) {
         const current = settingsRef.current;
         if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
-        await unlock();
+        if (!(await unlock())) return;
         playSfx("close");
         return;
       }
@@ -358,7 +379,7 @@ export default function AudioEngine() {
     const handlePreview = async (event: Event) => {
       const current = settingsRef.current;
       if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
-      await unlock();
+      if (!(await unlock())) return;
       const style = (event as CustomEvent<{ style?: string }>).detail?.style;
       playSfx("navigate", style);
     };
@@ -386,16 +407,6 @@ export default function AudioEngine() {
       document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [playSfx, syncAmbient, unlock]);
-
-  useEffect(() => {
-    return () => {
-      stopAmbient();
-      if (audioRef.current) {
-        audioRef.current.onstatechange = null;
-        audioRef.current.close();
-      }
-    };
-  }, [stopAmbient]);
 
   return null;
 }
