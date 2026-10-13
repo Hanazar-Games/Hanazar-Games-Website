@@ -86,6 +86,20 @@ test("right and middle clicks do not start audio or play activation sounds", asy
   assert.equal(app.contexts.length, 0);
 });
 
+test("disabled controls and their descendants cannot unlock BGM or emit SFX", async () => {
+  for (const selector of [":disabled", "[aria-disabled='true']"]) {
+    for (const type of ["pointerdown", "keydown", "click"]) {
+      const app = harness({ bgmEnabled: true });
+      const target = new app.Element();
+      target.closest = query => query.includes(selector) || query.includes("button:not(:disabled)") ? target : null;
+      await app.fire(type, { target, key: "Enter" });
+      assert.equal(app.contexts.length, 0, `${selector}: ${type}`);
+      assert.equal(app.count(), 0, `${selector}: ${type}`);
+      app.unmount();
+    }
+  }
+});
+
 test("pointer press and canceled drag stay silent; committed click plays once", async () => {
   const app = harness();
   await app.fire("pointerdown");

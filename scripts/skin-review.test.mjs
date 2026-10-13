@@ -110,6 +110,54 @@ function render(language = "zh-CN", activeSection = "review-notices", filters = 
   return renderToStaticMarkup(createElement(exports.default, { activeSection, serviceUrl: null }));
 }
 
+test("common resource shortcuts open existing sources directly in every language even with empty filters", () => {
+  const ids = ["developer-video-register", "developer-video-ethan-upload", "developer-video-ethan-publish", "developer-blockbench-web", "developer-video-skinseed-export", "developer-video-blockbench-export", "developer-skin-format", "developer-save-submit", "developer-review-appeal"];
+  for (const language of translations.skinServiceLanguages) {
+    for (const filters of [undefined, ["", "privacy", "official", "video"]]) {
+      const html = render(language, "questions", filters);
+      const shortcuts = html.match(/<div class="skinArticleQuickLinks"[^>]*>([^]*?)<\/div><\/div>/)?.[1];
+      assert.ok(shortcuts);
+      assert.equal([...shortcuts.matchAll(/class="skinArticleGuide"/g)].length, 9);
+      for (const id of ids) {
+        const resource = developerDocs.developerResources.find(resource => resource.id === id);
+        const source = developerDocs.developerSources[resource.sourceId];
+        assert.ok(shortcuts.includes(`href="${source.href}" target="_blank" rel="noopener noreferrer"`), id);
+        assert.ok(shortcuts.includes(renderToStaticMarkup(createElement("h4", null, resource.title[language]))), id);
+      }
+      assert.ok(shortcuts.includes('href="/skin-service/terms#terms-subclause-4-2"'));
+      assert.ok(html.includes('href="#questions-quick-links"'));
+      assert.equal([...html.matchAll(/<article id=/g)].length, filters ? 0 : developerDocs.developerResources.length + localArticleCases.length);
+    }
+  }
+});
+
+test("fee guidance links to both V5 pricing and separate fee consent without changing official sources", () => {
+  for (const language of translations.skinServiceLanguages) {
+    const html = render(language, "questions");
+    const fees = html.match(/<article id="service-fees-reading"[^]*?<\/article>/)?.[0] ?? "";
+    assert.ok(fees.includes('href="/skin-service/terms#terms-subclause-4-2"'));
+    assert.ok(fees.includes('href="/skin-service/terms#terms-subclause-4-3"'));
+    assert.ok(translations.skinText(language, "serviceFeesBody").includes("4.3"));
+    for (const price of [300, 600, 900, 1000, 2000, 5000, 10000, 20000]) assert.ok(translations.skinText(language, "serviceFeesBody").includes(String(price)));
+  }
+});
+
+test("common link navigation is globally searchable in all service languages", () => {
+  for (const language of translations.skinServiceLanguages) {
+    searchClickHarness("questions", translations.skinText(language, "articleQuickLinksTitle"), "/skin-service/questions#questions-quick-links", {}, language);
+  }
+});
+
+test("common link cards form balanced desktop rows and fit narrow screens", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.ok(/\.skinArticleQuickLinks \.skinArticleGuideGrid\s*\{\s*grid-template-columns: repeat\(auto-fit, minmax\(min\(100%, 320px\), 1fr\)\);/.test(css));
+});
+
+test("resource publication and check dates stay intact when narrow-screen text wraps", () => {
+  const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.ok(/\.skinArticleQuickLinks time,\s*\.skinArticleSource time\s*\{\s*white-space: nowrap;/.test(css), "resource dates must not split across lines");
+});
+
 test("terms replace the fifth hub entry while updates remain available in the header", () => {
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, null);
@@ -125,18 +173,19 @@ test("terms replace the fifth hub entry while updates remain available in the he
 test("service updates publish the new version and retain the previous announcement", () => {
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "updates");
-    assert.ok(html.indexOf('id="update-2-20-10"') < html.indexOf('id="update-2-20-9"'));
+    assert.ok(html.indexOf('id="update-2-20-11"') < html.indexOf('id="update-2-20-10"'));
+    assert.ok(html.includes(translations.skinText(language, "update22011Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update22010Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2209Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2208Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2207Title").replaceAll("&", "&amp;")));
     assert.ok(html.includes(translations.skinText(language, "update2206Title")));
     assert.ok(html.includes(translations.skinText(language, "update2205Title")));
-    assert.equal([...html.matchAll(/id="update-2-20-10"/g)].length, 1);
+    assert.equal([...html.matchAll(/id="update-2-20-11"/g)].length, 1);
     const [current, history] = html.split('<details class="skinServiceUpdateHistory"');
-    assert.ok(current.includes('id="update-2-20-10"'));
-    assert.ok(!current.includes('id="update-2-20-9"'));
-    assert.ok(history?.includes('id="update-2-20-9"'));
+    assert.ok(current.includes('id="update-2-20-11"'));
+    assert.ok(!current.includes('id="update-2-20-10"'));
+    assert.ok(history?.includes('id="update-2-20-10"'));
     assert.ok(!history.split(">")[0].includes(" open"));
   }
 });
@@ -202,9 +251,9 @@ const troubleshootingIds = [
 ];
 
 test("Chinese video references and official troubleshooting render with original source attribution", () => {
-  assert.equal(developerDocs.developerResources.length, 83);
-  assert.equal(Object.keys(developerDocs.developerSources).length, 53);
-  assert.equal(developerDocs.developerResourcesCompiledAt, "2026-10-11");
+  assert.equal(developerDocs.developerResources.length, 87);
+  assert.equal(Object.keys(developerDocs.developerSources).length, 57);
+  assert.equal(developerDocs.developerResourcesCompiledAt, "2026-10-13");
   for (const language of translations.skinServiceLanguages) {
     const html = render(language, "questions");
     for (const id of [...chineseVideoIds, ...troubleshootingIds]) {
@@ -260,6 +309,37 @@ test("new export and troubleshooting references preserve authors, dates and appl
     assert.match(paths.summary[language], /NameOverSizeError/);
     assert.match(paths.summary[language], /PNG/);
   }
+});
+
+test("newly checked video sources retain clean links, dates, attribution and searchable translations", () => {
+  const references = [
+    ["developer-video-ethan-upload", "BV1sLg46VEJF", "一只Ethan", "2026-07-23", "publishing"],
+    ["developer-video-ethan-publish", "BV1C3ge6FEfi", "一只Ethan", "2026-07-24", "publishing"],
+    ["developer-video-jiang-upload", "BV1yubK6aEX7", "Minecraft_江弦月", "2026-09-07", "publishing"],
+    ["developer-video-register", "BV1WtzrBXE3q", "好小的石头人", "2026-01-24", "introduction"],
+  ];
+  for (const [id, bv, author, publishedAt, category] of references) {
+    const resource = developerDocs.developerResources.find(item => item.id === id);
+    assert.ok(resource, id);
+    const source = developerDocs.developerSources[resource.sourceId];
+    assertSourceUrl(source);
+    assert.equal(source.href, `https://www.bilibili.com/video/${bv}/`);
+    assert.equal(source.publisher, `${author} · 哔哩哔哩`);
+    assert.equal(source.publishedAt, publishedAt);
+    assert.equal(source.checkedAt, "2026-10-13");
+    assert.equal(source.kind, "community");
+    assert.equal(resource.category, category);
+    for (const language of translations.skinServiceLanguages) {
+      assert.ok(resource.summary[language].includes(author));
+      assert.ok(resource.summary[language].includes(publishedAt));
+      const html = render(language, "questions", ["", "all", "community", "video", resource.title[language]]);
+      const card = html.match(new RegExp(`<article id="${id}"[^]*?</article>`))?.[0];
+      assert.ok(card?.includes(`dateTime="${publishedAt}"`));
+      assert.ok(card.includes('dateTime="2026-10-13"'));
+      searchClickHarness("terms", resource.title[language], `/skin-service/questions#${id}`, {}, language);
+    }
+  }
+  assert.equal(developerDocs.developerSources.videoChinaUpload.checkedAt, undefined, "old links must not inherit a fresh check date");
 });
 
 test("format filters compose with topic and source filters while keeping the disclaimer visible", () => {
@@ -486,7 +566,7 @@ test("local service questions link to relevant existing guides, notices and orig
     "change-submission": ["/skin-service/terms#terms-subclause-8-1", "/skin-service/feedback#wechat-feedback-reply"],
     "privacy-protection": ["/skin-service/terms#terms-subclause-12-1", "/skin-service/feedback#wechat-feedback-reply"],
     "private-skin-publication": ["/skin-service/terms#terms-clause-7", "/skin-service/terms#terms-subclause-8-2"],
-    "service-fees-reading": ["/skin-service/terms#terms-subclause-4-2", "/skin-service/support"],
+    "service-fees-reading": ["/skin-service/terms#terms-subclause-4-2", "/skin-service/terms#terms-subclause-4-3", "/skin-service/support"],
     "service-authorization-proof": ["/skin-service/terms#terms-clause-2", "/skin-service/terms#terms-subclause-2-14"],
     "service-review-timing": ["/skin-service/terms#terms-clause-5", "/skin-service/review-notices", "/skin-service/feedback#wechat-feedback-reply"],
     "service-publisher-handover": ["/skin-service/terms#terms-subclause-6-1", "/skin-service/feedback#wechat-feedback-reply"],
@@ -792,7 +872,7 @@ test("Q&A reading shortcuts link only existing targets, including when no questi
       const nav = html.match(/<nav class="skinArticleReadingNav"[^>]*>([^]*?)<\/nav>/)?.[1];
       assert.ok(nav, language);
       const links = [...nav.matchAll(/href="#([^"]+)"/g)].map(match => match[1]);
-      assert.deepEqual(links, ["skin-article-search", ...(query ? [] : ["questions-contents"]), "questions-guides", "questions-disclaimer"]);
+      assert.deepEqual(links, ["skin-article-search", "questions-quick-links", ...(query ? [] : ["questions-contents"]), "questions-guides", "questions-disclaimer"]);
       for (const id of links) assert.ok(html.includes(`id="${id}"`), id);
     }
   }

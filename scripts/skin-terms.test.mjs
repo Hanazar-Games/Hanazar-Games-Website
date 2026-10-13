@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { runInNewContext } from "node:vm";
@@ -21,14 +22,18 @@ function storage() {
 }
 
 test("the supplied PDF and Word originals retain their exact fingerprints", () => {
-  for (const [path, expected] of [[serviceTerms.pdf, serviceTerms.pdfSha256], [serviceTerms.word, serviceTerms.wordSha256]]) {
+  for (const [path, fingerprint, expected] of [[serviceTerms.pdf, serviceTerms.pdfSha256, "432589e81523119b52987f8acf37f99370a2bd8156a2c590532ac4aac7dfb9cc"], [serviceTerms.word, serviceTerms.wordSha256, "cf107501c4257935529719df45f9ea60f45cda5b85355856c1988273193bbdda"]]) {
+    assert.equal(fingerprint, expected);
     const bytes = readFileSync(new URL(`../public${path}`, import.meta.url));
     assert.equal(createHash("sha256").update(bytes).digest("hex"), expected);
   }
-  assert.equal(serviceTerms.version, "2026.10.07 V4");
+  assert.equal(serviceTerms.version, "2026.10.12 V5");
+  assert.equal(serviceTerms.revisionDate, "2026-10-12");
   assert.equal(serviceTerms.pageCount, 4);
   assert.equal(serviceTerms.sections.length, 14);
-  assert.equal(serviceTerms.importantParagraphs.length, 2);
+  assert.equal(serviceTerms.importantParagraphs.length, 3);
+  assert.ok(serviceTerms.sections[3].paragraphs.some(text => text.startsWith("4.3")));
+  assert.ok(serviceTerms.sections[6].paragraphs.some(text => text.startsWith("7.3")));
   assert.ok(serviceTerms.sections[1].paragraphs.some(text => text.startsWith("2.14")));
   assert.ok(serviceTerms.sections[13].paragraphs.some(text => text.startsWith("14.3")));
 });
@@ -37,10 +42,24 @@ test("the mobile text preserves every paragraph of the supplied agreement", () =
   const text = [serviceTerms.title, serviceTerms.subtitle, serviceTerms.revisionLine, serviceTerms.importantTitle,
     ...serviceTerms.importantParagraphs, ...serviceTerms.sections.flatMap(section => [section.title, ...section.paragraphs]),
   ].join("").replace(/\s/g, "");
-  assert.equal(createHash("sha256").update(text).digest("hex"), "43d37b797e1c49cb536d5479ef3be5264104000a7f21ca46f711c7d8522da5a1");
+  assert.equal(createHash("sha256").update(text).digest("hex"), "a37c370d1b9ea37fe92c3fdd57d28dd498f8bb4572e4c5b4693d1bda063c9ae9");
   const paragraphs = [serviceTerms.title, serviceTerms.subtitle, serviceTerms.revisionLine, serviceTerms.importantTitle,
     ...serviceTerms.importantParagraphs, ...serviceTerms.sections.flatMap(section => [section.title, ...section.paragraphs])];
-  assert.equal(createHash("sha256").update(paragraphs.join("\n")).digest("hex"), "0ea88ea259e25b4500a482fdd0ac865b797a76f6f54cb80198e6ff92108d16ba");
+  assert.equal(createHash("sha256").update(paragraphs.join("\n")).digest("hex"), "f5b958538d06577e6d2aa5ee4879c5b50560db7bb613b2bcd1f8128b14cb3cef");
+  const xml = execFileSync("unzip", ["-p", new URL(`../public${serviceTerms.word}`, import.meta.url).pathname, "word/document.xml"], { encoding: "utf8" });
+  const decode = value => value.replace(/&#x([a-f0-9]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16)))
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+  const original = [...xml.matchAll(/<w:p(?:\s[^>]*)?>[\s\S]*?<\/w:p>/g)]
+    .map(([paragraph]) => [...paragraph.matchAll(/<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/g)].map(match => decode(match[1])).join(""))
+    .filter(Boolean);
+  assert.deepEqual(paragraphs, original);
+});
+
+test("V4 confirmation cannot accept the V5 agreement", () => {
+  const local = storage();
+  local.setItem(consentStorageKey, JSON.stringify({ version: "2026.10.07 V4", documentSha256: "0c9bf9af81c31c9cac45fd5d5d0df11217df4159b8de1588df63976af07cbb98", acceptedAt: 1000 }));
+  assert.equal(readTermsConsent(local, 2000), null);
 });
 
 test("document surfaces cannot horizontally scroll their content behind clipped decorations", () => {

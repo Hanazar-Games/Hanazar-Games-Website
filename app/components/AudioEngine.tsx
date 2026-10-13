@@ -301,7 +301,7 @@ export default function AudioEngine() {
     const handlePointerDown = async (event: PointerEvent) => {
       if (event.button !== 0 || !event.isPrimary) return;
       const target = event.target;
-      if (!(target instanceof Element)) return;
+      if (!(target instanceof Element) || target.closest(":disabled, [aria-disabled='true']")) return;
       const current = settingsRef.current;
       const wantsSfx = current.sfxEnabled && current.masterVolume > 0 && current.sfxVolume > 0;
       const wantsBgm = current.bgmEnabled && current.masterVolume > 0 && current.bgmVolume > 0;
@@ -313,7 +313,7 @@ export default function AudioEngine() {
     const handleClick = async (event: MouseEvent) => {
       const target = event.target;
       if (event.button !== 0 || !(target instanceof Element)) return;
-      if (!target.closest(interactiveSelector) || target.closest("[data-sfx-preview], [aria-disabled='true']")) return;
+      if (!target.closest(interactiveSelector) || target.closest("[data-sfx-preview], :disabled, [aria-disabled='true']")) return;
       const current = settingsRef.current;
       if (!current.sfxEnabled || current.masterVolume <= 0 || current.sfxVolume <= 0) return;
       await unlock();
@@ -342,7 +342,7 @@ export default function AudioEngine() {
       }
       if (event.key !== "Enter" && event.key !== " ") return;
       const target = event.target;
-      if (!(target instanceof Element)) return;
+      if (!(target instanceof Element) || target.closest(":disabled, [aria-disabled='true']")) return;
       const interactive = target.closest(interactiveSelector);
       if (!interactive) return;
       if (event.key === " " && interactive.matches("a")) return;

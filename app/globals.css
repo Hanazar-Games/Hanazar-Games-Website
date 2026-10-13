@@ -4527,6 +4527,17 @@ body[data-theme="light"] .skinServiceQuickToggle button[aria-pressed="true"] {
 #questions-guide-service ol { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); column-gap: 28px; }
 .skinArticleGuide a, .skinArticleGuideTerms { display: inline-flex; align-items: center; min-height: 44px; padding-block: 8px; color: var(--skin-tone); font-size: 0.85rem; line-height: 1.7; text-underline-offset: 4px; }
 .skinArticleGuideTerms { margin-top: 12px; }
+.skinArticleQuickLinks { min-width: 0; margin-bottom: 24px; scroll-margin-top: calc(6rem + 8px); overflow-wrap: anywhere; }
+.skinArticleQuickLinks:focus-visible { outline: 2px solid var(--skin-tone); outline-offset: 3px; }
+.skinArticleQuickLinks > h3, .skinArticleQuickLinks h4 { margin: 0 0 8px; font-size: 1rem; line-height: 1.6; }
+.skinArticleQuickLinks > p { margin: 0 0 16px; color: var(--skin-muted); font-size: 0.85rem; line-height: 1.8; }
+.skinArticleQuickLinks > p a { color: var(--skin-tone); text-underline-offset: 4px; }
+.skinArticleQuickLinks .skinArticleGuideGrid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.skinArticleQuickLinks .skinArticleGuide { display: flex; flex-direction: column; }
+.skinArticleQuickLinks small { display: block; margin-top: auto; color: var(--skin-muted); line-height: 1.7; }
+.skinArticleQuickLinks small + small { margin-top: 4px; }
+.skinArticleQuickLinks time, .skinArticleSource time { white-space: nowrap; }
+.skinArticleQuickLinks .skinArticleGuide > a { align-self: flex-start; }
 .skinArticleActiveFilters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .skinArticleActiveFilters button { display: inline-flex; align-items: center; gap: 12px; min-width: 0; max-width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--skin-border); border-radius: 12px; background: var(--skin-tone-soft); color: var(--skin-text); font-size: 0.85rem; cursor: pointer; }
 .skinArticleActiveFilters button span:first-child { min-width: 0; text-align: start; overflow-wrap: anywhere; }

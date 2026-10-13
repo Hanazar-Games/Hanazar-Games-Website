@@ -164,12 +164,24 @@ const articleDefinitions: Array<{
   { id: "change-submission", category: "review", title: "article5Title", content: "article5Body", links: [{ href: "/skin-service/terms#terms-subclause-8-1", label: "termsChangesLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
   { id: "privacy-protection", category: "privacy", title: "article6Title", content: "article6Body", links: [{ href: "/skin-service/terms#terms-subclause-12-1", label: "termsPrivacyLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
   { id: "private-skin-publication", category: "privacy", title: "privateSkinTitle", content: "privateSkinBody", links: [{ href: "/skin-service/terms#terms-clause-7", label: "termsPrivateSkinLink" }, { href: "/skin-service/terms#terms-subclause-8-2", label: "termsExceptionsLink" }] },
-  { id: "service-fees-reading", category: "pricing", title: "serviceFeesTitle", content: "serviceFeesBody", links: [{ href: "/skin-service/terms#terms-subclause-4-2", label: "termsFeesLink" }, { href: "/skin-service/support", label: "supportTitle" }] },
+  { id: "service-fees-reading", category: "pricing", title: "serviceFeesTitle", content: "serviceFeesBody", links: [{ href: "/skin-service/terms#terms-subclause-4-2", label: "termsPricingLink" }, { href: "/skin-service/terms#terms-subclause-4-3", label: "termsFeesLink" }, { href: "/skin-service/support", label: "supportTitle" }] },
   { id: "service-authorization-proof", category: "preparation", title: "authorizationProofTitle", content: "authorizationProofBody", links: [{ href: "/skin-service/terms#terms-clause-2", label: "termsAuthorizationLink" }, { href: "/skin-service/terms#terms-subclause-2-14", label: "termsEvidenceLink" }] },
   { id: "service-review-timing", category: "review", title: "reviewTimingTitle", content: "reviewTimingBody", links: [{ href: "/skin-service/terms#terms-clause-5", label: "termsTimingLink" }, { href: "/skin-service/review-notices", label: "noticesTitle" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
   { id: "service-publisher-handover", category: "review", title: "publisherHandoverTitle", content: "publisherHandoverBody", links: [{ href: "/skin-service/terms#terms-subclause-6-1", label: "termsHandoverLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
   { id: "service-cancellation-settlement", category: "pricing", title: "cancellationSettlementTitle", content: "cancellationSettlementBody", links: [{ href: "/skin-service/terms#terms-clause-8", label: "termsSettlementLink" }, { href: "/skin-service/feedback#wechat-feedback-reply", label: "articleContactLink" }] },
   { id: "service-minor-consent", category: "introduction", title: "minorConsentTitle", content: "minorConsentBody", links: [{ href: "/skin-service/terms#terms-subclause-14-2", label: "termsMinorLink" }, { href: "/skin-service/terms#terms-subclause-14-1", label: "termsNewCommissionLink" }] },
+];
+
+const articleQuickLinkDefinitions: Array<{ articleId: string; description: SkinTextKey }> = [
+  { articleId: "developer-video-register", description: "quickLinkRegistrationDescription" },
+  { articleId: "developer-video-ethan-upload", description: "quickLinkSeriesOneDescription" },
+  { articleId: "developer-video-ethan-publish", description: "quickLinkSeriesTwoDescription" },
+  { articleId: "developer-blockbench-web", description: "quickLinkToolDescription" },
+  { articleId: "developer-video-skinseed-export", description: "quickLinkSkinseedDescription" },
+  { articleId: "developer-video-blockbench-export", description: "quickLinkBlockbenchDescription" },
+  { articleId: "developer-skin-format", description: "quickLinkUploadDescription" },
+  { articleId: "developer-save-submit", description: "quickLinkSubmitDescription" },
+  { articleId: "developer-review-appeal", description: "quickLinkReviewDescription" },
 ];
 
 const articleGuideDefinitions: Array<{ id: string; title: SkinTextKey; description: SkinTextKey; articleIds: string[] }> = [
@@ -185,6 +197,7 @@ const serviceUpdateDefinitions: Array<{
   title: SkinTextKey;
   body: SkinTextKey;
 }> = [
+  { version: "2.20.11", date: "2026-10-13", title: "update22011Title", body: "update22011Body" },
   { version: "2.20.10", date: "2026-10-11", title: "update22010Title", body: "update22010Body" },
   { version: "2.20.9", date: "2026-10-11", title: "update2209Title", body: "update2209Body" },
   { version: "2.20.8", date: "2026-10-11", title: "update2208Title", body: "update2208Body" },
@@ -559,6 +572,11 @@ export default function SkinServiceCenter({
       content: skinText(language, article.content),
     })),
   ];
+  const articleQuickLinks = articleQuickLinkDefinitions.map(link => {
+    const article = developerResources.find(article => article.id === link.articleId)!;
+    const source: DeveloperSource = developerSources[article.sourceId];
+    return { title: article.title[language], description: skinText(language, link.description), source };
+  });
   const articleSearchContext = (article: typeof articles[number]) => [
     article.content,
     articleCategories.find(category => category.id === article.category)?.title,
@@ -930,6 +948,13 @@ export default function SkinServiceCenter({
         targetId: guide.id,
       })),
       {
+        title: skinText(language, "articleQuickLinksTitle"),
+        text: [skinText(language, "articleQuickLinksHelp"), skinText(language, "servicePricingNotice"), ...articleQuickLinks.map(link => `${link.title} ${link.description} ${link.source.title} ${sourceHostname(link.source)}`)].join(" "),
+        href: "/skin-service/questions#questions-quick-links",
+        section: "questions" as const,
+        targetId: "questions-quick-links",
+      },
+      {
         title: skinText(language, "developerDocsTitle"),
         text: [
           skinText(language, "developerDocsNotice", { questions: developerResources.length, sources: Object.keys(developerSources).length }),
@@ -1050,6 +1075,7 @@ export default function SkinServiceCenter({
     .map((category) => ({ ...category, articles: visibleArticles.filter((article) => article.category === category.id) }))
     .filter((category) => category.articles.length > 0);
   const articleReadingLinks: Array<{ id: string; label: SkinTextKey; title: SkinTextKey }> = [
+    { id: "questions-quick-links", label: "articleJumpQuickLinks", title: "articleQuickLinksTitle" },
     ...(visibleArticleGroups.length ? [{ id: "questions-contents", label: "termsJumpContents", title: "articleDirectory" }] as const : []),
     { id: "questions-guides", label: "articleJumpGuides", title: "articleGuidesTitle" },
     { id: "questions-disclaimer", label: "articleJumpDisclaimer", title: "archiveDisclaimerTitle" },
@@ -1434,6 +1460,22 @@ export default function SkinServiceCenter({
             {articleReadingLinks.map(link => <a href={`#${link.id}`} key={link.id} aria-label={skinText(language, link.title)} onClick={event => navigateDocument(event, link.id)}>{skinText(language, link.label)}</a>)}
           </nav>
           <p className="skinArticleReadingGuide">{skinText(language, "articleReadingGuide")}</p>
+          <div className="skinArticleQuickLinks" id="questions-quick-links" tabIndex={-1} aria-labelledby="questions-quick-links-title">
+            <h3 id="questions-quick-links-title">{skinText(language, "articleQuickLinksTitle")}</h3>
+            <p>{skinText(language, "articleQuickLinksHelp")}</p>
+            <p>{skinText(language, "servicePricingNotice")} <Link href="/skin-service/terms#terms-subclause-4-2">{skinText(language, "termsPricingLink")} →</Link></p>
+            <div className="skinArticleGuideGrid">
+              {articleQuickLinks.map(link => <div className="skinArticleGuide" key={link.source.href}>
+                <h4>{link.title}</h4>
+                <p>{link.description}</p>
+                <small>{link.source.publisher} · {sourceHostname(link.source)}</small>
+                {link.source.checkedAt && <small>{skinText(language, "sourceCheckedOn")} · <time dateTime={link.source.checkedAt}>{link.source.checkedAt}</time></small>}
+                <a href={link.source.href} target="_blank" rel="noopener noreferrer" aria-label={`${skinText(language, sourceAction(link.source))}：${link.source.title} · ${skinText(language, "opensNewTab")}`}>
+                  {skinText(language, sourceAction(link.source))} <span aria-hidden="true">↗</span>
+                </a>
+              </div>)}
+            </div>
+          </div>
           <details className="skinArticleGuides" id="questions-guides" suppressHydrationWarning>
             <summary>{skinText(language, "articleGuidesTitle")}</summary>
             <p>{skinText(language, "articleGuidesHelp")}</p>
@@ -1550,6 +1592,8 @@ export default function SkinServiceCenter({
                         <p className="skinArticleSourceDomain">{skinText(language, "sourceWebsite")} · <bdi lang="en">{sourceHostname(article.source)}</bdi></p>
                         <p>{skinText(language, articleFormatDefinitions.find((format) => format.id === article.source?.format)!.title)} · {skinText(language, article.source.language === "en" ? "sourceEnglish" : "sourceChinese")}</p>
                         <p>{skinText(language, "sourceLabel")} · <span lang={article.source.language}>{article.source.title}</span></p>
+                        {article.source.publishedAt && <p>{skinText(language, "sourcePublishedOn")} · <time dateTime={article.source.publishedAt}>{article.source.publishedAt}</time></p>}
+                        {article.source.checkedAt && <p>{skinText(language, "sourceCheckedOn")} · <time dateTime={article.source.checkedAt}>{article.source.checkedAt}</time></p>}
                         <a
                           className="skinArticleSourceLink"
                           href={article.source.href}

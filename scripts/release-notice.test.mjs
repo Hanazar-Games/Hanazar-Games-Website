@@ -29,11 +29,11 @@ test("release acknowledgement persists by version without discarding other prefe
   const { currentRelease, hasSeenRelease, markReleaseSeen } = await import("../app/lib/release.ts");
   const entries = new Map([["hanazar-settings-v1", "existing-settings"]]);
   const storage = { getItem: key => entries.get(key) ?? null, setItem: (key, value) => entries.set(key, value) };
-  assert.equal(currentRelease.version, "2.20.10");
+  assert.equal(currentRelease.version, "2.20.11");
   assert.equal(hasSeenRelease(storage, currentRelease.version), false);
   markReleaseSeen(storage, currentRelease.version);
   assert.equal(hasSeenRelease(storage, currentRelease.version), true);
-  assert.equal(hasSeenRelease(storage, "2.20.11"), false);
+  assert.equal(hasSeenRelease(storage, "2.20.12"), false);
   assert.equal(entries.get("hanazar-settings-v1"), "existing-settings");
 });
 
@@ -44,25 +44,21 @@ test("blocked browser storage cannot crash the release notice", async () => {
   assert.doesNotThrow(() => markReleaseSeen(storage, "2.19.0"));
 });
 
-test("v2.20.10 retains the preceding illustrated announcement in history", () => {
+test("v2.20.11 retains the preceding illustrated announcement in history", () => {
   const announcement = readFileSync(new URL("../app/components/settings/AnnouncementTab.tsx", import.meta.url), "utf8");
   const notice = readFileSync(new URL("../app/components/ReleaseNotice.tsx", import.meta.url), "utf8");
   const poster = readFileSync(new URL(`../public${release.currentRelease.image}`, import.meta.url), "utf8");
-  assert.match(announcement, /const history = \[\s*\{\s*version: "2\.20\.9"/);
-  assert.match(announcement, /image: "\/updates\/2\.20\.9\.svg"/);
-  assert.match(poster, /v2\.20\.10/);
+  assert.match(announcement, /const history = \[\s*\{\s*version: "2\.20\.10"/);
+  assert.match(announcement, /image: "\/updates\/2\.20\.10\.svg"/);
+  assert.match(poster, /v2\.20\.11/);
   assert.match(notice, /href="\/skin-service"/);
-  const old = { getItem: () => "2.20.9" };
+  const old = { getItem: () => "2.20.10" };
   assert.equal(release.hasSeenRelease(old, release.currentRelease.version), false);
 });
 
 test("the archived documentation release retains its published statistics", async () => {
   const { getTranslation } = await import("../app/lib/i18n.ts");
   const { skinServiceLanguages, skinText } = await import("../app/lib/skinServiceI18n.ts");
-  const { developerResources, developerSources } = await import("../app/lib/skinDeveloperResources.ts");
-  assert.equal(developerResources.length, 83);
-  assert.equal(Object.keys(developerSources).length, 53);
-  assert.equal(Object.values(developerSources).filter(source => source.format === "video").length, 20);
   for (const language of skinServiceLanguages) {
     const copy = getTranslation(language, "release2209Archive");
     for (const count of [96, 83, 13, 53, 20]) assert.ok(copy.includes(String(count)), `${language}: ${count}`);
@@ -70,6 +66,21 @@ test("the archived documentation release retains its published statistics", asyn
   }
   const oldPoster = readFileSync(new URL("../public/updates/2.20.8.svg", import.meta.url), "utf8");
   assert.ok(oldPoster.includes("89 Q&amp;As"), "history must retain the old published statistics");
+});
+
+test("the current documentation announcement matches the live archive and agreement", async () => {
+  const { getTranslation } = await import("../app/lib/i18n.ts");
+  const { skinServiceLanguages, skinText } = await import("../app/lib/skinServiceI18n.ts");
+  const { developerResources, developerSources } = await import("../app/lib/skinDeveloperResources.ts");
+  assert.equal(developerResources.length, 87);
+  assert.equal(Object.keys(developerSources).length, 57);
+  assert.equal(Object.values(developerSources).filter(source => source.format === "video").length, 24);
+  for (const language of skinServiceLanguages) {
+    for (const copy of [getTranslation(language, "release22011Resources"), skinText(language, "update22011Body")]) {
+      for (const count of [100, 87, 13, 57, 24]) assert.ok(copy.includes(String(count)), `${language}: ${count}`);
+    }
+    assert.ok(skinText(language, "update22011Body").includes("V5"));
+  }
 });
 
 test("current release artwork labels follow the live version and translated title", async () => {

@@ -11,11 +11,13 @@ export interface DeveloperSource {
   publisher: string;
   language: "zh-CN" | "en";
   referenceHref?: string;
+  publishedAt?: string;
+  checkedAt?: string;
 }
 type LocalizedText = Record<SkinServiceLanguage, string>;
 const localized = (zhCN: string, en: string, ja: string): LocalizedText => ({ "zh-CN": zhCN, en, ja });
 
-export const developerResourcesCompiledAt = "2026-10-11";
+export const developerResourcesCompiledAt = "2026-10-13";
 
 const officialSource = (title: string, path: string, kind: DeveloperSourceKind = "official"): DeveloperSource => ({
   title,
@@ -116,6 +118,22 @@ export const developerSources = {
   videoSkinseedExport: communityVideo("如何在skinseed中导出皮肤文件", "BV1FY411Q7Rq", "TAC_两小伙"),
   videoBlockbenchExport: communityVideo("Blockbench导出png图片皮肤我的世界", "BV1iVGyzvEfB", "小夜禾"),
   videoSkinseedIosAlpha: communityVideo("一招解决skinseed在ios端无法导出透明底的问题", "BV1t2r2YpEPw", "StrSpring-13"),
+  videoEthanUpload: {
+    ...communityVideo("如何将自己的皮肤上传至网易-第一期 ETHAN工作室", "BV1sLg46VEJF", "一只Ethan"),
+    publishedAt: "2026-07-23", checkedAt: "2026-10-13",
+  },
+  videoEthanPublish: {
+    ...communityVideo("如何在网易我的世界发布自己的皮肤-第二期", "BV1C3ge6FEfi", "一只Ethan"),
+    publishedAt: "2026-07-24", checkedAt: "2026-10-13",
+  },
+  videoJiangUpload: {
+    ...communityVideo("教你网易我的世界上传皮肤", "BV1yubK6aEX7", "Minecraft_江弦月"),
+    publishedAt: "2026-09-07", checkedAt: "2026-10-13",
+  },
+  videoRegister: {
+    ...communityVideo("我的世界如何注册开发者", "BV1WtzrBXE3q", "好小的石头人"),
+    publishedAt: "2026-01-24", checkedAt: "2026-10-13",
+  },
   update37: {
     title: "开发者月刊 | Mod SDK 3.7 功能前瞻",
     href: "https://mc.163.com/dev/developer_cn/news/renew/20251128/37047_1273647.html",
@@ -130,6 +148,38 @@ export const developerResources: Array<{
   title: LocalizedText;
   summary: LocalizedText;
 }> = [
+  {
+    id: "developer-video-register", category: "introduction", sourceId: "videoRegister",
+    title: localized("注册开发者之前，有社区视频可以参考吗？", "Is there a community video to consult before developer registration?", "開発者登録の前に参考にできるコミュニティ動画は？"),
+    summary: localized(
+      "好小的石头人于 2026-01-24 发布的“我的世界如何注册开发者”。本次核对了原页标题、作者和发布日期，未逐帧核验视频步骤；可先观看了解作者介绍的注册操作，再对照本区官方注册教程与当前后台。实名认证、账号密码及验证码只在网易官方页面填写，不要发给本站或视频作者；注册成功也不等于作品已通过审核。",
+      "好小的石头人 published this developer-registration video on 2026-01-24. We checked its original title, author and date, not every video step. Consult it alongside the official registration guide and current portal. Enter identity details, passwords and verification codes only on NetEase's official pages, never send them to this site or the creator. Registration is not resource approval.",
+      "好小的石头人 が2026-01-24に公開した開発者登録の動画です。原ページの題名・作者・公開日を確認しましたが、手順を全編検証したものではありません。公式登録ガイドと現在の管理画面を併せて確認してください。本人確認情報・パスワード・認証コードは網易公式ページだけで入力し、当サイトや作者に送らないでください。登録完了は作品の審査通過ではありません。"),
+  },
+  {
+    id: "developer-video-ethan-upload", category: "publishing", sourceId: "videoEthanUpload",
+    title: localized("网易皮肤投稿系列视频：第一期从哪里看？", "Where can I watch part one of the NetEase skin-submission series?", "網易スキン投稿シリーズの第1回はどこで見られますか？"),
+    summary: localized(
+      "一只Ethan于 2026-07-23 发布的第一期，原页简介为“我的世界如何上传自己的皮肤”。本次核对了标题、作者、日期和简介，未完整核验视频操作；适合与官方“上传并发布”和资源上传规则对照观看。原页标注个人观点仅供参考、未经授权禁止转载；本站只提供直达链接，不搬运视频，也不为作者的代发服务或收费背书。",
+      "一只Ethan published part one on 2026-07-23; its description introduces uploading one's own skin. We checked the page title, author, date and description, not the complete video procedure. Compare it with the official Upload and Publish guide and upload rules. The page identifies personal opinions and prohibits unauthorized reposting. This is a direct link, not a rehost or endorsement of paid publishing services.",
+      "一只Ethan が2026-07-23に公開した第1回で、概要は自作スキンの投稿についてです。原ページの題名・作者・日付・概要を確認し、動画の全手順を検証したものではありません。公式の投稿・公開ガイドと投稿規則を併用してください。原ページは個人の見解で無断転載禁止と明記しています。当サイトは原文リンクのみを提供し、作者の代行・料金を推奨しません。"),
+  },
+  {
+    id: "developer-video-ethan-publish", category: "publishing", sourceId: "videoEthanPublish",
+    title: localized("网易皮肤投稿系列视频：第二期发布与电脑绘画？", "Where is part two on publishing and PC painting?", "公開とPCでの描画を扱う第2回の入口は？"),
+    summary: localized(
+      "一只Ethan于 2026-07-24 发布的第二期，作者简介明确写到“发布和PC绘画内容”，可接着第一期观看。本次核对了原页信息，没有逐帧复核绘画或投稿步骤；电脑制作与网易公开上架是不同操作，导出纹理后仍需按目标端自测并提交审核。视频不保证审核通过、上架时间或费用；适用规则以网易当前后台为准，原视频未经作者授权禁止转载。",
+      "一只Ethan's 2026-07-24 second episode describes publishing and PC painting and can follow part one. We checked the source-page information, not every painting or submission step. Desktop editing and public listing are separate operations; test exported textures for the target edition and submit for review. The video does not guarantee approval, timing or fees. Current NetEase rules apply; unauthorized reposting is prohibited.",
+      "一只Ethan による2026-07-24公開の第2回で、概要に公開とPC描画を扱うと記載されています。第1回の続きとして参照できます。原ページ情報を確認したもので、全手順の検証ではありません。PC編集と公開は別の操作です。出力後も対象版で自測し審査へ提出してください。審査通過・公開時期・料金の保証ではなく、現在の網易規則が優先です。作者の許可なく転載しないでください。"),
+  },
+  {
+    id: "developer-video-jiang-upload", category: "publishing", sourceId: "videoJiangUpload",
+    title: localized("想换一个视角看网易皮肤上传，有近期视频吗？", "Is there a recent alternative perspective on NetEase skin uploads?", "別の視点で網易スキン投稿を学べる最近の動画は？"),
+    summary: localized(
+      "Minecraft_江弦月于 2026-09-07 发布的“教你网易我的世界上传皮肤”，原页带有教学、皮肤和我的世界手机版标签。本次核对标题、作者和日期，未完整观看验证操作；可作为另一位创作者的参考入口，不把标题理解为普通客户端一定支持直接导入，也不推定手机版与电脑版流程相同。请结合官方资源上传规则、当前平台界面及本站 V5 协议；本站不替外部作者接单或承诺过审。",
+      "Minecraft_江弦月 published this upload video on 2026-09-07, with tutorial, skin and mobile Minecraft tags. We verified its title, author and date, not the complete procedure. It offers another creator's perspective, not proof that the standard client supports direct import or that mobile and desktop submissions work identically. Consult official upload rules, the current portal and our separate V5 agreement. We do not take orders for the creator or promise approval.",
+      "Minecraft_江弦月 が2026-09-07に公開し、教学・スキン・モバイル版のタグがある投稿動画です。題名・作者・日付を確認しましたが、全操作を検証したものではありません。別の作者の参考資料として利用し、通常クライアントへの直接読み込みやPC版と同じ手順を保証する題名と解釈しないでください。公式投稿規則・現在の管理画面・当サービスの独立したV5規約を確認してください。作者の注文受付や審査通過を保証しません。"),
+  },
   {
     id: "developer-registration", category: "introduction", sourceId: "registration",
     title: {
